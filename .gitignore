@@ -1,0 +1,65 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.so
+*.dylib
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+.env
+*.env
+!backend/.env.example
+
+# ── Pytest / coverage ─────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# ── SQLite databases (runtime data, not source) ───────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ── Node / frontend ───────────────────────────────────────────────────────────
+node_modules/
+frontend/sentinel-ui/dist/
+frontend/sentinel-ui/.vite/
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Terraform state (contains secrets — never commit) ────────────────────────
+infra/.terraform/
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+infra/.terraform.lock.hcl
+infra/terraform.tfvars
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+.dockerignore
+
+# ── Sentence-transformers / HuggingFace model cache ──────────────────────────
+backend/models/
+~/.cache/huggingface/
+
+# ── Ollama model data (large binary blobs) ────────────────────────────────────
+ollama_data/
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/

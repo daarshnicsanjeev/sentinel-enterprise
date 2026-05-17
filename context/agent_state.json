@@ -1,0 +1,172 @@
+{
+  "_schema_version": "1.0.0",
+  "_description": "Machine-readable project state for programmatic agents. Update after each session.",
+  "_last_updated": "2026-05-16T-session3",
+  "_last_updated_by": "claude-sonnet-4-6",
+
+  "project": {
+    "name": "Project Sentinel",
+    "type": "local-poc",
+    "purpose": "JPMorgan CIB Full-Stack AI Engineer interview portfolio project",
+    "root_dir": "C:\\Sentinel Enterprise Agentic Document Routing & Compliance Engine",
+    "phase": "phase-5-complete"
+  },
+
+  "tdd": {
+    "methodology": "Red → Green → Refactor",
+    "backend_test_command": "python -m pytest tests/ -v",
+    "frontend_test_command": "node_modules\\.bin\\vitest run",
+    "total_tests": 176,
+    "backend_tests": 142,
+    "frontend_tests": 34,
+    "last_run_status": "all_pass",
+    "last_run_date": "2026-05-16",
+    "bug_caught": "evaluator_v1.0.0.json unescaped braces in user_template caused KeyError in .format(). Fixed: {{ escaping.",
+    "integration_verified": "2026-05-16 — contract_missing_clause.txt → REJECTED (faithfulness 1.00), credit_agreement_valid.txt → APPROVED (faithfulness 1.00)"
+  },
+
+  "execution_phases": [
+    {
+      "id": "phase-1",
+      "name": "Backend Build",
+      "status": "complete",
+      "completed_at": "2026-05-16"
+    },
+    {
+      "id": "phase-2",
+      "name": "Frontend Build",
+      "status": "complete",
+      "completed_at": "2026-05-16"
+    },
+    {
+      "id": "phase-3",
+      "name": "TDD Test Suite",
+      "status": "complete",
+      "completed_at": "2026-05-16",
+      "notes": "130 backend + 34 frontend tests green. Bug found and fixed in evaluator prompt."
+    },
+    {
+      "id": "phase-4",
+      "name": "Live Integration Test",
+      "status": "complete",
+      "completed_at": "2026-05-16",
+      "notes": "Fixed WinError 10049 (IPv4 base_url), replaced FAISS+OllamaEmbeddings with SimpleIndex keyword search (gemma4:e2b returned 501 for embeddings). Full pipeline verified: REJECTED+APPROVED both correct, faithfulness 1.00."
+    }
+  ],
+
+  "environment": {
+    "python_version": "3.12.10",
+    "python_executable": "C:\\sanjeev\\job-search\\.python312\\python.exe",
+    "python_venv": "C:\\sanjeev\\job-search\\.python312",
+    "pip_executable": "C:\\sanjeev\\job-search\\.python312\\Scripts\\pip.exe",
+    "node_version": "24.11.0",
+    "npm_version": "11.6.2",
+    "ollama_version": "0.23.3",
+    "ollama_model": "gemma4:31b-cloud",
+    "platform": "win32",
+    "os": "Windows 11 Home 10.0.26200",
+    "_note": "Use 'python -m pip install' to add packages to the venv, not bare 'pip' which may point to the system Python"
+  },
+
+  "installed_packages": {
+    "python": [
+      "fastapi",
+      "uvicorn[standard]",
+      "faiss-cpu",
+      "python-multipart",
+      "langchain-ollama",
+      "langchain",
+      "langchain-community",
+      "langchain-core",
+      "langchain-text-splitters",
+      "langgraph",
+      "pydantic"
+    ],
+    "npm": {
+      "location": "frontend/sentinel-ui/node_modules",
+      "status": "installed"
+    }
+  },
+
+  "servers": {
+    "backend": {
+      "command": "uvicorn main:app --reload --port 8000",
+      "working_dir": "backend",
+      "port": 8000,
+      "base_url": "http://localhost:8000",
+      "health_endpoint": "GET /api/health",
+      "analyze_endpoint": "POST /api/analyze"
+    },
+    "frontend": {
+      "command": "npm run dev",
+      "working_dir": "frontend/sentinel-ui",
+      "port": 5173,
+      "base_url": "http://localhost:5173"
+    }
+  },
+
+  "files": {
+    "backend/agents/state.py": { "status": "complete", "purpose": "AgentState TypedDict" },
+    "backend/agents/graph.py": { "status": "complete", "purpose": "LangGraph StateGraph with feedback loop" },
+    "backend/agents/router_agent.py": { "status": "complete", "purpose": "guardrail_node + router_node" },
+    "backend/agents/compliance_agent.py": { "status": "complete", "purpose": "compliance_node + query_regulatory_db tool" },
+    "backend/agents/eval_judge.py": { "status": "complete", "purpose": "eval_node LLM-as-a-Judge" },
+    "backend/api/routes.py": { "status": "complete", "purpose": "FastAPI SSE endpoint" },
+    "backend/main.py": { "status": "complete", "purpose": "FastAPI app with CORS" },
+    "backend/data/guardrails.py": { "status": "complete", "purpose": "Input sanitization" },
+    "backend/data/embeddings.py": { "status": "complete", "purpose": "FAISS RAG pipeline" },
+    "backend/data/regulatory_db.json": { "status": "complete", "purpose": "Required clause ledger per doc type" },
+    "backend/prompts/router_v1.0.0.json": { "status": "complete", "purpose": "Router agent prompt" },
+    "backend/prompts/compliance_v1.0.0.json": { "status": "complete", "purpose": "Compliance agent prompt" },
+    "backend/prompts/evaluator_v1.0.0.json": { "status": "complete", "purpose": "Evaluator agent prompt" },
+    "frontend/sentinel-ui/src/App.tsx": { "status": "complete", "purpose": "Root component with SSE logic" },
+    "frontend/sentinel-ui/src/components/WorkflowStream.tsx": { "status": "complete", "purpose": "Log stream viewer" },
+    "frontend/sentinel-ui/src/components/DocumentUpload.tsx": { "status": "complete", "purpose": "File drag-and-drop" },
+    "frontend/sentinel-ui/src/components/StatusBadge.tsx": { "status": "complete", "purpose": "Decision status pill" },
+    "sample_docs/credit_agreement_valid.txt": { "status": "complete", "expected_result": "APPROVED" },
+    "sample_docs/contract_missing_clause.txt": { "status": "complete", "expected_result": "REJECTED" }
+  },
+
+  "known_issues": [
+    "KI-001: FAISS embedding slow (10-30s per doc)",
+    "KI-002: Eval judge JSON parsing best-effort",
+    "KI-003: Global tsc broken (workaround in package.json)",
+    "KI-004: RE-ROUTE state not emitted as distinct final_decision"
+  ],
+
+  "open_tasks": [
+    {
+      "id": "OT-001",
+      "priority": "HIGH",
+      "description": "Run end-to-end integration test with Ollama",
+      "steps": [
+        "Start Ollama (ollama serve)",
+        "Run scripts/start_backend.ps1",
+        "Run scripts/verify.ps1",
+        "Run scripts/start_frontend.ps1",
+        "Upload sample_docs/contract_missing_clause.txt",
+        "Confirm REJECTED + log stream",
+        "Upload sample_docs/credit_agreement_valid.txt",
+        "Confirm APPROVED"
+      ],
+      "update_after": ["STATUS.md phase-3 to complete", "agent_state.json phase-3 status"]
+    },
+    {
+      "id": "OT-002",
+      "priority": "MEDIUM",
+      "description": "Fix KI-004: emit RE-ROUTE as distinct final_decision during retry",
+      "status": "complete",
+      "files_edited": ["backend/agents/graph.py"],
+      "note": "Done 2026-05-16. _increment_retry now returns final_decision='RE-ROUTE'. Test added: test_sets_re_route_as_final_decision."
+    },
+    {
+      "id": "OT-003",
+      "priority": "LOW",
+      "description": "Add PDF ingestion path",
+      "status": "complete",
+      "files_added": ["backend/data/pdf_extractor.py", "backend/tests/unit/test_pdf_extractor.py", "sample_docs/credit_agreement_valid.pdf", "sample_docs/contract_missing_clause.pdf", "docker-compose.yml", "backend/Dockerfile", "frontend/sentinel-ui/Dockerfile", "frontend/sentinel-ui/nginx.conf"],
+      "files_edited": ["backend/api/routes.py", "frontend/sentinel-ui/src/components/DocumentUpload.tsx", "backend/requirements.txt"],
+      "note": "Done 2026-05-16. pdfminer.six extracts text from PDF bytes; routes auto-detect .pdf by filename. 7 unit + 4 integration tests. Docker Compose added."
+    }
+  ]
+}

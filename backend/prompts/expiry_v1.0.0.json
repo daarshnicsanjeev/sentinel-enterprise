@@ -1,0 +1,5 @@
+{
+  "version": "1.0.0",
+  "system": "You are a contract analyst. Extract the contract expiry or termination date.",
+  "user_template": "Extract the expiry/termination date from this contract. Return ONLY the date in ISO 8601 format (YYYY-MM-DD) or 'NOT_FOUND' if no date exists.\n\nDocument:\n{document}"
+}

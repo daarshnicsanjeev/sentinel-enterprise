@@ -1,0 +1,74 @@
+{
+  "default": {
+    "CREDIT_AGREEMENT": [
+      "governing law clause",
+      "events of default clause",
+      "indemnification clause",
+      "representations and warranties"
+    ],
+    "LEGAL_CONTRACT": [
+      "force majeure clause",
+      "limitation of liability",
+      "dispute resolution clause"
+    ],
+    "REGULATORY_FILING": [
+      "material disclosure statement",
+      "risk factor disclosures",
+      "auditor certification"
+    ],
+    "EXPIRY_CLAUSE_SCAN": [],
+    "UNKNOWN": []
+  },
+  "EU": {
+    "CREDIT_AGREEMENT": [
+      "governing law clause",
+      "events of default clause",
+      "indemnification clause",
+      "representations and warranties",
+      "gdpr data protection compliance clause",
+      "data protection officer designation"
+    ],
+    "LEGAL_CONTRACT": [
+      "force majeure clause",
+      "limitation of liability",
+      "dispute resolution clause",
+      "gdpr data subject rights clause",
+      "cross-border data transfer clause"
+    ],
+    "REGULATORY_FILING": [
+      "material disclosure statement",
+      "risk factor disclosures",
+      "auditor certification",
+      "esg reporting compliance clause",
+      "anti-money laundering declaration"
+    ],
+    "EXPIRY_CLAUSE_SCAN": [],
+    "UNKNOWN": []
+  },
+  "US": {
+    "CREDIT_AGREEMENT": [
+      "governing law clause",
+      "events of default clause",
+      "indemnification clause",
+      "representations and warranties",
+      "dodd-frank compliance clause",
+      "regulation d exemption clause"
+    ],
+    "LEGAL_CONTRACT": [
+      "force majeure clause",
+      "limitation of liability",
+      "dispute resolution clause",
+      "mandatory arbitration clause",
+      "class action waiver"
+    ],
+    "REGULATORY_FILING": [
+      "material disclosure statement",
+      "risk factor disclosures",
+      "auditor certification",
+      "sec rule 10b-5 compliance",
+      "sarbanes-oxley certification"
+    ],
+    "EXPIRY_CLAUSE_SCAN": [],
+    "UNKNOWN": []
+  }
+}

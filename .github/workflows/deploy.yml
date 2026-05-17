@@ -1,0 +1,169 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: sentinel-backend
+
+jobs:
+  # ── Job 1: Run tests ─────────────────────────────────────────────────────────
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run backend tests
+        run: |
+          cd backend
+          python -m pytest tests/ -v --tb=short -q
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend/sentinel-ui
+          npm ci
+
+      - name: Run frontend tests
+        run: |
+          cd frontend/sentinel-ui
+          npx vitest run
+
+  # ── Job 2: Build and push Docker image to ECR ────────────────────────────────
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      image_uri: ${{ steps.build.outputs.image_uri }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push backend image
+        id: build
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+        run: |
+          IMAGE_URI="$REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA"
+          docker build -t "$IMAGE_URI" ./backend
+          docker push "$IMAGE_URI"
+          echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
+
+  # ── Job 3: Build and deploy React frontend to S3 ─────────────────────────────
+  deploy-frontend:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build React app
+        run: |
+          cd frontend/sentinel-ui
+          npm ci
+          npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Sync to S3
+        run: |
+          aws s3 sync frontend/sentinel-ui/dist/ \
+            s3://${{ secrets.S3_FRONTEND_BUCKET }} \
+            --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+  # ── Job 4: Deploy new backend image to EC2 ───────────────────────────────────
+  deploy-backend:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Deploy to EC2 via SSM
+        env:
+          IMAGE_URI: ${{ needs.build-and-push.outputs.image_uri }}
+        run: |
+          aws ssm send-command \
+            --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
+            --document-name "AWS-RunShellScript" \
+            --parameters "commands=[
+              'docker pull $IMAGE_URI',
+              'docker tag $IMAGE_URI sentinel-backend:latest',
+              'cd /opt/sentinel && docker compose up -d --no-build'
+            ]" \
+            --comment "Deploy $GITHUB_SHA"
+
+  # ── Job 5: Terraform infra (only on infra changes) ────────────────────────────
+  terraform:
+    needs: test
+    runs-on: ubuntu-latest
+    if: contains(github.event.commits[0].modified, 'infra/')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.0"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Terraform init
+        working-directory: infra
+        run: terraform init
+
+      - name: Terraform apply
+        working-directory: infra
+        run: |
+          terraform apply -auto-approve \
+            -var="ollama_base_url=${{ secrets.OLLAMA_BASE_URL }}" \
+            -var="ollama_model=${{ secrets.OLLAMA_MODEL }}" \
+            -var="sentinel_api_key=${{ secrets.SENTINEL_API_KEY }}"

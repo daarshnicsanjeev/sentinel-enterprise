@@ -1,0 +1,36 @@
+SENIOR SECURED REVOLVING CREDIT AGREEMENT
+
+This Senior Secured Revolving Credit Agreement ("Agreement") is entered into as of March 1, 2025, between Northgate Capital LLC ("Borrower") and First Continental Bank N.A. ("Lender").
+
+1. CREDIT FACILITY
+Lender agrees to provide a revolving credit facility of up to USD 50,000,000 (fifty million United States dollars) subject to the terms and conditions herein.
+
+2. REPRESENTATIONS AND WARRANTIES
+Borrower hereby makes the following representations and warranties as of the date hereof and as of each draw date: (a) Borrower is duly organized and validly existing under the laws of Delaware; (b) execution of this Agreement has been duly authorized by all necessary corporate action; (c) the financial statements provided to Lender fairly present the financial condition of Borrower; (d) no material adverse change has occurred in the business or financial condition of Borrower since the date of the most recent financial statements.
+
+3. EVENTS OF DEFAULT CLAUSE
+Each of the following shall constitute an Event of Default: (a) failure to pay principal or interest when due, continuing for more than five (5) business days; (b) breach of any material covenant under this Agreement; (c) insolvency or bankruptcy filing by or against Borrower; (d) any judgment exceeding USD 5,000,000 remains unsatisfied for more than thirty (30) days; (e) material misrepresentation in any document furnished to Lender.
+
+4. INDEMNIFICATION CLAUSE
+Borrower shall indemnify, defend, and hold harmless Lender, its officers, directors, employees, and agents from and against any and all claims, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising from or related to: (a) any breach by Borrower of this Agreement; (b) the use of proceeds of the credit facility; (c) any third-party claims related to Borrower's operations.
+
+5. GOVERNING LAW CLAUSE
+This Agreement and all disputes arising hereunder shall be governed by and construed in accordance with the laws of the State of New York, without regard to conflict of law principles. Each party hereby submits to the exclusive jurisdiction of the courts of New York County for any dispute arising under this Agreement.
+
+6. INTEREST RATE
+Loans under this facility shall bear interest at SOFR plus 2.50% per annum, calculated on the basis of a 360-day year.
+
+7. COVENANTS
+Borrower covenants that it shall: maintain a minimum interest coverage ratio of 2.5x; not incur additional indebtedness exceeding USD 10,000,000 without prior written consent; and provide quarterly financial statements within forty-five (45) days of each quarter end.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+Northgate Capital LLC
+By: ___________________________
+Name: James R. Whitfield
+Title: Chief Financial Officer
+
+First Continental Bank N.A.
+By: ___________________________
+Name: Sandra K. Okafor
+Title: Senior Vice President, Credit
