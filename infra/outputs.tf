@@ -1,24 +1,24 @@
-output "cloudfront_url" {
-  description = "Public HTTPS URL for the Sentinel UI (and /api/* proxy)"
-  value       = "https://${aws_cloudfront_distribution.cdn.domain_name}"
+output "s3_website_url" {
+  description = "Public URL of the React frontend (S3 static website endpoint)"
+  value       = "http://${aws_s3_bucket_website_configuration.frontend.website_endpoint}"
 }
 
 output "ec2_public_ip" {
-  description = "Direct EC2 public IP — useful for SSH debugging"
-  value       = aws_instance.api.public_ip
+  description = "Public IPv4 address of the FastAPI backend EC2 instance"
+  value       = aws_instance.sentinel_api.public_ip
 }
 
-output "ec2_public_dns" {
-  description = "EC2 public DNS hostname"
-  value       = aws_instance.api.public_dns
+output "ec2_api_url" {
+  description = "Direct URL to the FastAPI backend"
+  value       = "http://${aws_instance.sentinel_api.public_ip}:8000"
 }
 
-output "s3_frontend_bucket" {
-  description = "S3 bucket name — use with: aws s3 sync dist/ s3://<bucket>"
-  value       = aws_s3_bucket.frontend.bucket
+output "ssh_command" {
+  description = "SSH command to connect to the EC2 instance (replace key path as needed)"
+  value       = "ssh -i ~/.ssh/${var.key_pair_name}.pem ubuntu@${aws_instance.sentinel_api.public_ip}"
 }
 
-output "cloudfront_distribution_id" {
-  description = "CloudFront distribution ID — needed to invalidate cache after deploy"
-  value       = aws_cloudfront_distribution.cdn.id
+output "deploy_frontend_command" {
+  description = "AWS CLI command to upload the React build to S3"
+  value       = "aws s3 sync frontend/sentinel-ui/dist/ s3://${var.frontend_bucket_name} --delete"
 }
