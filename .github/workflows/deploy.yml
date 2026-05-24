@@ -53,7 +53,7 @@ jobs:
         run: sudo apt-get install -y tesseract-ocr libmagic1 --quiet
 
       - name: Install Python dependencies
-        run: pip install -r backend/requirements.txt
+        run: python -m pip install -r backend/requirements.txt
 
       - name: Run pytest
         working-directory: backend
