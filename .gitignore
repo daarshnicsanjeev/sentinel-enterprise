@@ -83,3 +83,6 @@ backend/data/few_shot_examples.jsonl
 "sample_docs - Copy*/
 sample_docs - Copy/
 *.zip
+# Demo ZIPs shipped with the repo for documentation / demo purposes
+!sample_docs\ batch\ demo.zip
+!sample_docs\ feedback\ loop\ demo.zip

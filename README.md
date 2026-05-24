@@ -313,10 +313,47 @@ See `backend/.env.example` for the complete list.
 
 ---
 
+## Demo Packages
+
+Two ready-to-use ZIP files are included for running demos without any setup:
+
+### `sample_docs batch demo.zip` (1.9 MB)
+A complete batch upload demo — 51 labelled documents covering every supported format and decision path. Drop the ZIP directly into the **Batch Upload** tab.
+
+| Category | Documents | Expected results |
+|----------|-----------|-----------------|
+| Legal Contracts | NDA, MSA, service agreement | APPROVED / REJECTED (missing clauses) |
+| Credit Agreements | Syndicated loan, consumer mortgage, venture debt | APPROVED / REJECTED / ESCALATE |
+| Employment Contracts | CEO, CTO, intern, missing-clause variants | APPROVED / REJECTED |
+| Insurance Policies | Cyber liability, professional indemnity, D&O | APPROVED / REJECTED |
+| Partnership Agreements | JV technology, missing dissolution | APPROVED / REJECTED |
+| Regulatory Filings | SEC 10-K, GDPR DPA, EU tenant, missing risk factors | APPROVED / REJECTED |
+| Guardrail tests | PII (SSN, passport, IBAN), prompt injection, SQL injection, DAN jailbreak | BLOCKED |
+| Format variety | PDF, DOCX, XLSX, PPTX, HTML, PNG, JPG, TIFF (scanned), plain TXT | — |
+| Language tests | French, Spanish, German contracts | WARNING (non-English) |
+| Dedup test | Duplicate resubmission | Instant cached result |
+
+### `sample_docs feedback loop demo.zip` (20 KB)
+Five targeted documents + the Testing Guide for demonstrating the AI feedback loop end-to-end:
+
+| File | Scenario | Purpose |
+|------|----------|---------|
+| `fl_test_s1_nda_all_current_clauses_APPROVED.txt` | S1 — missing_rule | Trigger: approved NDA missing data breach notification |
+| `fl_test_s1_nda_with_breach_notice_APPROVED.txt` | S1 — missing_rule | Verify: NDA with breach notice clause (passes after fix) |
+| `fl_test_s2_credit_unusual_phrasing_REJECTED_before_fix.txt` | S2 — comprehension_failure | Credit agreement with non-standard clause headings |
+| `fl_test_s3_employment_all_current_clauses_APPROVED.txt` | S3 — missing_rule | Trigger: employment contract missing remote work policy |
+| `fl_test_s3_employment_with_remote_work_APPROVED.txt` | S3 — missing_rule | Verify: employment contract with remote work clause |
+| `FEEDBACK_LOOP_TESTING_GUIDE.md` | All | Step-by-step instructions with exact feedback text |
+
+See [Feedback Loop Testing Guide](docs/FEEDBACK_LOOP_TESTING_GUIDE.md) for the complete walkthrough.
+
+---
+
 ## Docs
 
 - [User Guide](docs/USER_GUIDE.md) — for compliance officers and analysts
 - [Developer Guide](docs/DEVELOPER_GUIDE.md) — architecture, API reference, how to extend
+- [Feedback Loop Testing Guide](docs/FEEDBACK_LOOP_TESTING_GUIDE.md) — end-to-end demo walkthrough
 
 ---
 
