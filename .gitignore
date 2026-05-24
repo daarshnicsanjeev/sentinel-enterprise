@@ -86,3 +86,5 @@ sample_docs - Copy/
 # Demo ZIPs shipped with the repo for documentation / demo purposes
 !sample_docs\ batch\ demo.zip
 !sample_docs\ feedback\ loop\ demo.zip
+!sample_docs/batch_demo.zip
+!sample_docs/feedback_loop_demo.zip
