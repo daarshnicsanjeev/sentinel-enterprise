@@ -434,17 +434,17 @@ export function HelpPanel() {
       </InfoBox>
       <ol style={{ color: "#cbd5e1", fontSize: "0.9rem", lineHeight: 2, paddingLeft: "20px", marginTop: 0, marginBottom: "12px" }}>
         <li>Click <strong style={{ color: "#e2e8f0" }}>Batch Upload</strong> in the navigation bar.</li>
-        <li>Select a <strong style={{ color: "#e2e8f0" }}>ZIP file</strong> containing your documents.</li>
-        <li>(Optional) Check <strong style={{ color: "#e2e8f0" }}>Re-analyse (ignore cache)</strong> to force fresh analysis for all files.</li>
-        <li>Click <strong style={{ color: "#e2e8f0" }}>Analyse Batch</strong> — the job starts immediately.</li>
+        <li>Drag and drop a <strong style={{ color: "#e2e8f0" }}>ZIP file</strong> onto the upload zone, or click to browse.</li>
+        <li>Analysis starts automatically — no extra button to click.</li>
         <li>A progress bar tracks how many documents have been processed.</li>
         <li>When complete, a results table shows the decision, faithfulness score, and <strong style={{ color: "#e2e8f0" }}>Source</strong> (cached / fresh) for each file.</li>
+        <li>(Optional) Tick the checkboxes next to individual results, then click <strong style={{ color: "#e2e8f0" }}>↺ Re-analyse Selected</strong> to force a fresh run for those documents — bypasses the deduplication cache.</li>
       </ol>
       <p style={P}>
         Sentinel caches each document by its SHA-256 fingerprint. If an identical document was analysed
-        previously, the result is returned instantly — the AI pipeline is skipped. Use{" "}
-        <strong style={{ color: "#e2e8f0" }}>Re-analyse (ignore cache)</strong> to force a fresh run (e.g.,
-        after a new recommendation is approved).
+        previously, the result is returned instantly — the AI pipeline is skipped. To force re-analysis
+        after approving a new recommendation, select the relevant rows and use{" "}
+        <strong style={{ color: "#e2e8f0" }}>↺ Re-analyse Selected</strong>.
       </p>
       <p style={{ ...P, fontSize: "0.82rem", color: "#64748b" }}>
         Limits: up to 50 documents per ZIP, maximum 50 MB total. Rate limit: 2 batch jobs per minute.
