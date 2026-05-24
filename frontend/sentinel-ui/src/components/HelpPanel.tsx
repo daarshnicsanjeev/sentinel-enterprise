@@ -428,9 +428,15 @@ export function HelpPanel() {
         documents in one operation.
       </p>
       <InfoBox>
-        <strong>Quick demo:</strong> use the <strong>sample_docs batch demo.zip</strong> package (51 documents
-        covering all document types, formats, and decision outcomes) — download it from the project repository
-        and drop it directly into the Batch Upload tab.
+        <strong>Quick demo:</strong> download the 51-document batch demo package and drop it directly into
+        the Batch Upload tab — covers all document types, formats, and decision outcomes.{" "}
+        <a
+          href={`${API_BASE}/api/samples/batch_demo.zip`}
+          download="batch_demo.zip"
+          style={{ color: "#60a5fa", fontWeight: 600, textDecoration: "underline" }}
+        >
+          ↓ Download batch_demo.zip (1.9 MB)
+        </a>
       </InfoBox>
       <ol style={{ color: "#cbd5e1", fontSize: "0.9rem", lineHeight: 2, paddingLeft: "20px", marginTop: 0, marginBottom: "12px" }}>
         <li>Click <strong style={{ color: "#e2e8f0" }}>Batch Upload</strong> in the navigation bar.</li>
@@ -521,9 +527,15 @@ export function HelpPanel() {
         AI Feedback Loop Test Documents
       </p>
       <p style={{ ...P, fontSize: "0.87rem", color: "#94a3b8" }}>
-        Use these with the Insights tab to demo the full feedback loop. See the{" "}
-        <strong style={{ color: "#e2e8f0" }}>FEEDBACK_LOOP_TESTING_GUIDE.md</strong> in the repository
-        for step-by-step instructions and exact feedback text to submit for each scenario.
+        Use these with the Insights tab to demo the full feedback loop. Download all 5 files + the
+        step-by-step guide as a single ZIP, or download individual files from the table below.{" "}
+        <a
+          href={`${API_BASE}/api/samples/feedback_loop_demo.zip`}
+          download="feedback_loop_demo.zip"
+          style={{ color: "#60a5fa", fontWeight: 600, textDecoration: "underline" }}
+        >
+          ↓ Download feedback_loop_demo.zip (20 KB)
+        </a>
       </p>
       <SampleTable samples={FEEDBACK_LOOP} />
 

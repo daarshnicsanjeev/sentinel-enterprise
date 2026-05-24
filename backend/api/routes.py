@@ -45,7 +45,7 @@ _REVIEW_MIN_EVIDENCE = int(os.environ.get("REVIEW_MIN_EVIDENCE", "1"))
 
 # Sample documents directory (two levels up from backend/api/)
 _SAMPLE_DOCS_DIR = (Path(__file__).parent.parent.parent / "sample_docs").resolve()
-_SAMPLE_ALLOWED_EXT = {".txt", ".pdf", ".docx", ".xlsx", ".pptx", ".html", ".png", ".jpg", ".jpeg", ".tiff", ".tif"}
+_SAMPLE_ALLOWED_EXT = {".txt", ".pdf", ".docx", ".xlsx", ".pptx", ".html", ".png", ".jpg", ".jpeg", ".tiff", ".tif", ".zip"}
 
 _MAX_UPLOAD_BYTES = 5 * 1024 * 1024  # 5 MB
 _API_KEY = os.environ.get("SENTINEL_API_KEY", "")

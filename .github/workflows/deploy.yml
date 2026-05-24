@@ -158,6 +158,13 @@ jobs:
             backend/ \
             ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/sentinel/backend/
 
+      - name: rsync sample_docs to EC2
+        run: |
+          rsync -az --delete \
+            -e "ssh -i /tmp/sentinel-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=20" \
+            sample_docs/ \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/sentinel/sample_docs/
+
       - name: Restart backend service
         run: |
           ssh -i /tmp/sentinel-key.pem \
