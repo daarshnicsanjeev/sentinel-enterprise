@@ -81,10 +81,24 @@ This Services Agreement is entered into between Provider Ltd and Client Inc.
 
 @pytest.fixture(autouse=True)
 def reset_rate_limiter():
-    """Reset slowapi in-memory storage before every test."""
+    """Reset slowapi in-memory storage and _REG_DB global before every test.
+
+    Some tests (e.g. test_feedback approve/undo) monkeypatch _REG_DB_PATH to a
+    tmp file and call the approve endpoint, which calls _reload_regulatory_db()
+    and overwrites the module-level _REG_DB dict.  monkeypatch only reverts
+    _REG_DB_PATH, not the dict itself.  By the time this fixture's setup runs
+    for the *next* test, monkeypatch from the *previous* test has already been
+    reverted, so _REG_DB_PATH is the real path again and we can safely reload.
+    """
     try:
         from api.routes import limiter
         limiter._storage.reset()
+    except Exception:
+        pass
+    try:
+        import json
+        import api.routes as _routes
+        _routes._REG_DB = json.loads(_routes._REG_DB_PATH.read_text())
     except Exception:
         pass
     yield

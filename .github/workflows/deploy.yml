@@ -55,6 +55,9 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install -r backend/requirements.txt
 
+      - name: Download spaCy language model
+        run: python -m spacy download en_core_web_sm
+
       - name: Run pytest
         working-directory: backend
         run: python -m pytest tests/ -v --tb=short -q
