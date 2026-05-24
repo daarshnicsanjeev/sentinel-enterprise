@@ -1,0 +1,139 @@
+SENIOR SECURED CREDIT AGREEMENT
+
+This Senior Secured Credit Agreement ("Agreement") is entered into as of 20 May 2026
+between Northbridge Commercial Finance Ltd., an English company ("Lender") and
+Pellucid Manufacturing Group Inc., a Texas corporation ("Borrower").
+
+RECITALS
+
+The Lender has agreed to make available to the Borrower a revolving credit facility
+of up to USD 25,000,000 (Twenty-Five Million United States Dollars) on the terms
+and conditions set out in this Agreement.
+
+1. DEFINITIONS
+
+"Facility" means the revolving credit facility described in Clause 2.
+"Drawdown Date" means any Business Day on which the Borrower makes a drawing.
+"Interest Period" means each consecutive period of one (1) month, or such other
+period as the parties may agree.
+"Security Package" means all collateral granted to the Lender pursuant to the
+Security Documents.
+
+2. FACILITY AND DRAWDOWN
+The Lender agrees to make available to the Borrower a revolving credit facility of
+USD 25,000,000. Drawings shall be made in minimum amounts of USD 500,000. The
+Borrower may request a drawing by delivering a duly completed Drawdown Notice to
+the Lender no later than 10:00 a.m. (London time) three (3) Business Days prior to
+the proposed Drawdown Date.
+
+3. INTEREST AND FEES
+Interest shall accrue on each drawing at a rate per annum equal to Term SOFR plus
+a margin of 3.50% per annum, calculated on the basis of actual days elapsed over
+a 360-day year. The Borrower shall pay a commitment fee of 1.00% per annum on
+the undrawn and uncancelled amount of the Facility, payable quarterly in arrears.
+
+4. GOVERNING LAW CLAUSE
+This Agreement and any non-contractual obligations arising out of or in connection
+with it shall be governed by and construed in accordance with the laws of the State
+of New York, without regard to its conflict of law provisions. Each party irrevocably
+submits to the exclusive jurisdiction of the federal and state courts located in
+New York County, New York.
+
+5. OBLIGOR ACCELERATION EVENTS
+The following circumstances shall each constitute an "Obligor Acceleration Event"
+(understood by the parties to be equivalent to what is commonly termed events of
+default in standard credit documentation), the occurrence of any one of which shall
+entitle the Lender, by written notice to the Borrower, to declare all outstanding
+amounts immediately due and payable and to enforce the Security Package without
+further formality:
+
+(a) Non-Payment: the Borrower fails to pay any sum due under this Agreement on
+    its due date, unless such failure is due to an administrative or technical
+    error and is remedied within three (3) Business Days;
+
+(b) Covenant Breach: the Borrower breaches any covenant, undertaking, condition
+    or provision of this Agreement (other than a payment obligation) and, if
+    capable of remedy, fails to remedy such breach within twenty (20) Business Days
+    of the Lender's written notice;
+
+(c) Insolvency: the Borrower becomes insolvent, is unable to pay its debts as
+    they fall due, makes a general assignment for the benefit of its creditors,
+    or a receiver, administrator or liquidator is appointed over all or any
+    material part of its assets;
+
+(d) Material Adverse Change: any event or circumstance occurs which, in the
+    Lender's reasonable opinion, has or is reasonably likely to have a material
+    adverse effect on the Borrower's ability to perform its obligations under
+    this Agreement;
+
+(e) Cross-Default: any financial indebtedness of the Borrower in excess of
+    USD 1,000,000 becomes due and payable prior to its stated maturity, or any
+    creditor of the Borrower becomes entitled to declare such indebtedness so due.
+
+6. MUTUAL HOLD-HARMLESS AND COST-SHIFTING UNDERTAKING
+Each party (the "Indemnifying Party") shall fully protect, hold harmless, defend,
+and make whole the other party and its affiliates, directors, officers, employees,
+agents and successors (each an "Indemnified Person") from and against any and all
+claims, losses, damages, costs, charges, expenses, penalties, fines, liabilities and
+judgments (collectively, "Losses") arising out of or in connection with: (a) any
+breach by the Indemnifying Party of its obligations under this Agreement; (b) any
+third-party claim attributable to the acts or omissions of the Indemnifying Party;
+or (c) any inaccuracy in the representations and warranties of the Indemnifying Party.
+This mutual hold-harmless obligation shall survive the termination of this Agreement.
+
+NOTE TO COMPLIANCE REVIEWER: The clause in Section 6 above serves as the
+indemnification clause for this agreement. The heading "Mutual Hold-Harmless and
+Cost-Shifting Undertaking" is used in accordance with Northbridge's in-house drafting
+conventions but is substantively identical to a standard indemnification provision.
+
+7. REPRESENTATIONS, WARRANTIES AND FACTUAL ACKNOWLEDGEMENTS
+The Borrower represents, warrants and acknowledges as true on the date of this
+Agreement and on each Drawdown Date:
+
+(a) Corporate Standing: the Borrower is duly incorporated, validly existing and
+    in good standing under the laws of its jurisdiction of incorporation;
+
+(b) Authority: the Borrower has full corporate power and authority to execute,
+    deliver and perform this Agreement; all necessary corporate action has been taken;
+
+(c) No Conflict: the execution and performance of this Agreement does not violate
+    any law, regulation, order, or the Borrower's constitutional documents, or any
+    agreement to which the Borrower is a party;
+
+(d) Financial Statements: the Borrower's most recent audited financial statements
+    give a true and fair view of its financial condition and have been prepared in
+    accordance with US GAAP consistently applied;
+
+(e) No Litigation: there is no pending or, to the Borrower's knowledge, threatened
+    litigation, arbitration or administrative proceeding that would reasonably be
+    expected to have a material adverse effect on the Borrower.
+
+8. SECURITY
+As security for the Borrower's obligations under this Agreement, the Borrower shall,
+on or before the first Drawdown Date, grant to the Lender: (a) a first-priority
+perfected security interest in all accounts receivable and inventory; (b) a first
+mortgage over the Borrower's manufacturing facility located at 4400 Industrial
+Parkway, Houston, Texas 77001; and (c) a pledge over all shares of each material
+subsidiary of the Borrower.
+
+9. TERM AND AVAILABILITY
+The Facility shall be available for drawing during the Availability Period, being the
+period from the date of this Agreement until the date falling thirty-six (36) months
+thereafter (the "Termination Date"). On the Termination Date all outstanding drawings
+shall be repaid and the Facility shall be cancelled.
+
+10. GENERAL
+This Agreement constitutes the entire agreement between the parties relating to the
+Facility and supersedes all prior negotiations. Amendments require written consent
+of both parties. If any provision is held invalid, the remaining provisions continue
+in full force and effect.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first
+written above.
+
+NORTHBRIDGE COMMERCIAL FINANCE LTD.     PELLUCID MANUFACTURING GROUP INC.
+
+By: ___________________________         By: ___________________________
+Name: Alistair F. Drummond             Name: Cynthia L. Okafor
+Title: Head of Corporate Lending        Title: Chief Financial Officer
+Date: 20 May 2026                       Date: 20 May 2026

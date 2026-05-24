@@ -1,0 +1,77 @@
+NON-DISCLOSURE AGREEMENT
+
+This Non-Disclosure Agreement ("Agreement") is entered into as of 15 May 2026 between
+Meridian Capital Partners LLC, a Delaware limited liability company ("Disclosing Party")
+and Vantage Analytics Inc., a California corporation ("Receiving Party").
+
+1. PURPOSE
+The parties wish to explore a potential business collaboration involving proprietary
+financial modelling methodologies and client portfolio strategies. This Agreement
+governs all confidential information exchanged in connection with that evaluation.
+
+2. CONFIDENTIAL INFORMATION
+"Confidential Information" means any non-public information disclosed by either party,
+including but not limited to: trade secrets, financial models, client lists, pricing data,
+software algorithms, and business strategies, whether disclosed orally, in writing, or
+by any other means.
+
+3. OBLIGATIONS OF RECEIVING PARTY
+The Receiving Party shall: (a) hold all Confidential Information in strict confidence
+using at least the same degree of care it uses to protect its own confidential
+information, but in no event less than reasonable care; (b) not disclose Confidential
+Information to any third party without prior written consent; (c) use Confidential
+Information solely for the purpose of evaluating the potential collaboration.
+
+4. FORCE MAJEURE CLAUSE
+Neither party shall be liable for any failure or delay in performing its obligations
+under this Agreement where such failure or delay results from any cause beyond that
+party's reasonable control, including but not limited to: acts of God, flood, drought,
+earthquake, or other natural disaster; epidemic or pandemic; terrorist attack, civil
+war, civil commotion or riots; war, threat of or preparation for war; nuclear, chemical
+or biological contamination; any law or action taken by a government or public
+authority; collapse of buildings, fire, explosion or accident; any labour or trade
+disputes, strikes, industrial action or lockouts; or interruption or failure of utility
+service. The affected party shall give prompt written notice to the other party and
+shall use commercially reasonable efforts to resume performance as soon as practicable.
+
+5. LIMITATION OF LIABILITY
+IN NO EVENT SHALL EITHER PARTY BE LIABLE TO THE OTHER FOR ANY INDIRECT, INCIDENTAL,
+CONSEQUENTIAL, SPECIAL, EXEMPLARY OR PUNITIVE DAMAGES ARISING OUT OF OR RELATED TO THIS
+AGREEMENT, EVEN IF SUCH PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+Each party's total cumulative liability arising out of or related to this Agreement,
+whether in contract, tort or under any other theory of liability, shall not exceed the
+total fees paid or payable under any ancillary service agreement between the parties in
+the six (6) months preceding the claim giving rise to such liability.
+
+6. DISPUTE RESOLUTION CLAUSE
+Any dispute, controversy or claim arising out of or relating to this Agreement, or the
+breach, termination or invalidity thereof, shall first be submitted to non-binding
+mediation administered by JAMS within thirty (30) days of written notice. If mediation
+fails to resolve the dispute within sixty (60) days of initiation, either party may
+submit the dispute to binding arbitration administered by JAMS pursuant to its
+Comprehensive Arbitration Rules and Procedures. The arbitration shall take place in
+New York, New York, before a single arbitrator mutually agreed upon by the parties.
+The award shall be final and binding and may be entered as a judgment in any court of
+competent jurisdiction.
+
+7. TERM AND TERMINATION
+This Agreement shall remain in effect for a period of three (3) years from the date
+first written above, unless earlier terminated by either party upon thirty (30) days
+written notice. The obligations of confidentiality shall survive termination for an
+additional period of five (5) years.
+
+8. GENERAL PROVISIONS
+This Agreement constitutes the entire agreement between the parties with respect to
+the subject matter hereof and supersedes all prior negotiations, representations,
+warranties and understandings. This Agreement may not be amended except by written
+instrument signed by both parties.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first
+written above.
+
+MERIDIAN CAPITAL PARTNERS LLC          VANTAGE ANALYTICS INC.
+
+By: ___________________________         By: ___________________________
+Name: Jonathan R. Hargrove             Name: Sarah T. Kimura
+Title: Managing Director               Title: Chief Executive Officer
+Date: 15 May 2026                      Date: 15 May 2026

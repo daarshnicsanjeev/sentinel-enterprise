@@ -1,0 +1,160 @@
+EMPLOYMENT AGREEMENT
+
+This Employment Agreement ("Agreement") is entered into as of 19 May 2026 between
+Helix Biotech Solutions Inc., a Delaware corporation ("Company") and
+Dr. Marcus A. Osei ("Employee").
+
+1. POSITION AND DUTIES
+The Company hereby employs the Employee as Senior Principal Scientist, Genomics
+Division. The Employee shall report to the Vice President of Research and Development
+and shall perform such duties as are customarily associated with such position and
+as may be reasonably assigned from time to time by the Company.
+
+2. COMMENCEMENT AND LOCATION
+Employment shall commence on 1 June 2026. The Employee's primary place of work
+shall be the Company's research facility located at 2200 Discovery Drive,
+San Diego, California 92121.
+
+3. COMPENSATION AND BENEFITS CLAUSE
+3.1 Base Salary. The Company shall pay the Employee a base salary of USD 185,000
+per annum, payable bi-weekly in equal instalments, less applicable withholdings.
+
+3.2 Annual Bonus. The Employee shall be eligible for an annual performance bonus
+of up to thirty percent (30%) of base salary, based on individual and company
+performance targets established annually by the Board of Directors.
+
+3.3 Equity. The Employee shall be granted options to purchase 12,000 shares of
+the Company's common stock, vesting over four (4) years with a one-year cliff,
+pursuant to the Company's 2024 Equity Incentive Plan.
+
+3.4 Benefits. The Employee shall be entitled to participate in all benefit plans
+and programs generally made available to employees at the same level, including
+health, dental, vision, life insurance, and a 401(k) plan with a Company match
+of up to four percent (4%) of eligible compensation.
+
+3.5 Expenses. The Company shall reimburse the Employee for reasonable and necessary
+business expenses incurred in the performance of duties, subject to the Company's
+expense reimbursement policy in effect from time to time.
+
+4. INTELLECTUAL PROPERTY ASSIGNMENT CLAUSE
+4.1 Assignment of Inventions. The Employee hereby irrevocably assigns, transfers
+and conveys to the Company, and agrees to assign to the Company, all right, title
+and interest in and to any and all inventions, discoveries, developments,
+improvements, innovations, software, works of authorship, trade secrets, know-how
+and all other intellectual property (collectively, "Inventions") that the Employee
+conceives, develops, reduces to practice or contributes to during the period of
+employment that: (a) relate to the Company's actual or reasonably anticipated
+business, research or development; or (b) result from or are suggested by any
+work performed by the Employee for the Company; or (c) are made using the Company's
+facilities, equipment, materials, personnel or Confidential Information.
+
+4.2 Work for Hire. To the extent any Invention constitutes a "work made for hire"
+under applicable copyright law, such Invention shall be the exclusive property of
+the Company from the moment of its creation.
+
+4.3 Prior Inventions. Schedule A sets out a complete list of inventions or
+improvements that the Employee has, alone or jointly, conceived or reduced to
+practice prior to the commencement of employment that the Employee wishes to
+exclude from this assignment. If Schedule A is blank, the Employee represents
+that no such prior inventions exist.
+
+4.4 Cooperation. The Employee shall, both during and after employment, at the
+Company's expense, execute all documents and take all actions reasonably necessary
+to perfect, protect and enforce the Company's rights in any assigned Invention.
+
+5. TERMINATION AND SEVERANCE CLAUSE
+5.1 At-Will. Either party may terminate this Agreement at any time, with or without
+cause, subject to the notice and severance provisions below.
+
+5.2 Termination by Company Without Cause. If the Company terminates the Employee's
+employment without Cause (as defined below), the Company shall pay the Employee:
+(a) all accrued but unpaid base salary and vacation through the termination date;
+(b) a severance payment equal to three (3) months of base salary, payable in a
+lump sum within thirty (30) days of termination; and (c) continuation of health
+benefits for three (3) months, or a cash equivalent if continuation is not
+practicable. Such payments are conditioned on the Employee executing a general
+release of claims in the Company's standard form within twenty-one (21) days of
+receiving it.
+
+5.3 Termination by Company for Cause. The Company may terminate employment
+immediately for Cause. "Cause" means: (i) material breach of this Agreement not
+cured within fifteen (15) days of written notice; (ii) conviction of, or guilty
+plea to, any felony; (iii) gross negligence or wilful misconduct materially
+harmful to the Company; or (iv) material violation of Company policy.
+
+5.4 Resignation. The Employee shall provide thirty (30) days' written notice of
+resignation. The Company may elect to waive all or part of the notice period and
+pay in lieu of notice.
+
+6. NON-COMPETE AND CONFIDENTIALITY CLAUSE
+6.1 Confidentiality. During employment and for a period of five (5) years
+thereafter, the Employee shall not use or disclose any Confidential Information
+of the Company except as required for the performance of duties or as authorised
+in writing by the Company. "Confidential Information" includes all non-public
+technical, commercial and financial information relating to the Company's business,
+including research data, clinical trial results, formulae, customer lists and
+pricing information.
+
+6.2 Non-Solicitation of Employees. During employment and for a period of two (2)
+years after termination, the Employee shall not directly or indirectly solicit,
+induce or recruit any employee of the Company to leave their employment.
+
+6.3 Non-Solicitation of Customers. During employment and for a period of one (1)
+year after termination, the Employee shall not solicit any customer or prospective
+customer of the Company with whom the Employee had material contact in the twelve
+(12) months preceding termination.
+
+6.4 Non-Compete. During employment and for a period of one (1) year after
+termination, the Employee shall not, within the United States, engage in or provide
+services to any entity that is in direct competition with the Company's genomics
+diagnostics business. The Company acknowledges that this restriction shall be
+enforceable only to the extent permitted by applicable law.
+
+7. REMOTE WORK AND FLEXIBLE ARRANGEMENTS POLICY
+7.1 Hybrid Schedule. Subject to the operational requirements of the Employee's role
+and the prior written approval of the Employee's direct supervisor, the Employee
+may work remotely for up to two (2) days per week. The Employee must be present
+on-site on all days designated by the Company as mandatory in-office days.
+
+7.2 Home Office Standards. When working remotely, the Employee shall: (a) maintain
+a dedicated, distraction-free work environment; (b) be reachable via the Company's
+standard communication channels during core business hours (9:00 a.m. to 3:00 p.m.
+Pacific Time); (c) use only Company-approved VPN and security software when
+accessing Company systems; and (d) comply with all data security and confidentiality
+obligations under this Agreement, ensuring that Confidential Information is not
+accessible to or overheard by unauthorised persons.
+
+7.3 Equipment and Expenses. The Company shall provide the Employee with a laptop
+and necessary peripherals for remote work. The Employee shall be responsible for
+a reliable internet connection; the Company will not reimburse home internet costs
+unless otherwise agreed in a separate written addendum.
+
+7.4 Modification. The remote work arrangement described in this clause does not
+constitute a change in the Employee's base location and may be modified or revoked
+by the Company on thirty (30) days' written notice if business needs require it.
+
+8. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of
+the State of California. Any dispute shall be resolved exclusively in the state or
+federal courts located in San Diego County, California.
+
+9. ENTIRE AGREEMENT
+This Agreement, together with any equity grant documents and Schedule A, constitutes
+the entire agreement between the parties concerning the subject matter hereof and
+supersedes all prior agreements, representations and understandings. Amendments
+must be in writing signed by both parties.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first
+written above.
+
+HELIX BIOTECH SOLUTIONS INC.           DR. MARCUS A. OSEI
+
+By: ___________________________         ___________________________
+Name: Patricia K. Whitmore             Signature
+Title: Chief People Officer
+Date: 19 May 2026                       Date: 19 May 2026
+
+
+SCHEDULE A — PRIOR INVENTIONS
+
+[None — Employee represents no prior inventions to exclude.]
