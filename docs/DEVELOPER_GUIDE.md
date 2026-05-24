@@ -203,7 +203,8 @@ AI Feedback Loop (on-demand, no scheduling):
 ├── sample_docs batch demo.zip     # 51-document batch upload demo package
 ├── sample_docs feedback loop demo.zip  # 5-document feedback loop demo package
 ├── .github/workflows/
-│   └── deploy.yml                 # CI/CD: test → build → S3 sync → EC2 rsync
+│   ├── deploy.yml                 # Code delivery: test → build → S3 sync → EC2 rsync (every push)
+│   └── infra.yml                  # Infrastructure: terraform plan/apply (infra/** changes only)
 └── .gitignore
 ```
 
@@ -1161,9 +1162,20 @@ The script:
 6. Installs + starts `sentinel.service` via systemd
 7. Retries `GET /api/health` up to 5 times (3 s apart) before declaring success
 
-### GitHub Actions CI/CD
+### GitHub Actions CI/CD — Two Separate Workflows
 
-The workflow at `.github/workflows/deploy.yml` triggers on push to `main`:
+There are two workflows, each with a distinct responsibility:
+
+```
+infra/**  changed  →  infra.yml   (terraform plan/apply — provision AWS resources)
+src/ or backend/ changed  →  deploy.yml  (rsync code to existing EC2)
+```
+
+This separation is intentional. Running `terraform apply` on every code push is dangerous — it re-evaluates the full resource graph and can destroy/recreate EC2 or S3 unexpectedly. Terraform only runs when infrastructure files actually change.
+
+---
+
+#### `deploy.yml` — Code Delivery (triggers on every push to `main`)
 
 **Job 1 — `backend-tests`:**
 - Sets up Python 3.12 + pip cache
@@ -1176,25 +1188,84 @@ The workflow at `.github/workflows/deploy.yml` triggers on push to `main`:
 - Runs `npx vite build` with `VITE_API_BASE_URL` injected from GitHub Secret
 - Uploads `dist/` as a build artifact
 
-**Job 3 — `deploy`** (only on push to `main`, not PRs):
+**Job 3 — `deploy`** (push to `main` only, not PRs):
 - Downloads the frontend artifact
-- `aws s3 sync` assets (long TTL `max-age=31536000,immutable`)
-- `aws s3 sync` HTML (short TTL `max-age=0,must-revalidate`) with `--delete`
+- `aws s3 sync` assets — long TTL (`max-age=31536000,immutable`)
+- `aws s3 sync` HTML — short TTL (`max-age=0,must-revalidate`) + `--delete`
 - `rsync` backend to EC2 (excludes `.env`, `*.db`, `*.jsonl`, `__pycache__`)
 - SSH `sudo systemctl restart sentinel` + health check
 
-**Required GitHub Secrets:**
+**Required secrets for `deploy.yml`:**
 
-| Secret | Example Value |
-|--------|--------------|
-| `AWS_ACCESS_KEY_ID` | IAM key with S3 PutObject + ListBucket |
+| Secret | Example |
+|--------|---------|
+| `AWS_ACCESS_KEY_ID` | IAM key (S3 PutObject + ListBucket) |
 | `AWS_SECRET_ACCESS_KEY` | IAM secret |
 | `AWS_REGION` | `ap-south-1` |
-| `S3_BUCKET` | `sentinel-ui-demo-2026` |
+| `S3_BUCKET` | `sentinel-ui-951066974179` |
 | `EC2_HOST` | `65.2.181.197` |
 | `EC2_SSH_KEY` | Full contents of the `.pem` file |
 | `EC2_USER` | `ubuntu` |
 | `VITE_API_BASE_URL` | `http://65.2.181.197:8000` |
+
+---
+
+#### `infra.yml` — Infrastructure Provisioning (triggers on `infra/**` changes only)
+
+**When it runs:**
+- **Push to `main`** with changes under `infra/` → plan + apply automatically
+- **Pull request** with changes under `infra/` → plan only (no apply; plan posted as PR comment)
+- **`workflow_dispatch`** → manual trigger from GitHub Actions UI with action choice: `plan` / `apply` / `destroy`
+
+**Jobs:**
+1. `terraform init` — initialises with S3 remote backend (bucket injected via secret)
+2. `terraform validate` + `fmt -check`
+3. `terraform plan -out=tfplan` — always runs; exit code 2 (changes pending) treated as non-error
+4. `terraform apply -auto-approve tfplan` — only on push to `main` or manual `apply`
+5. `terraform output` — prints EC2 IP + CloudFront URL to the Actions log after apply
+6. `terraform destroy` — only on manual `destroy` dispatch; **never triggered automatically**
+
+**Concurrency lock:** `cancel-in-progress: false` — if two infra runs queue up, the second waits rather than cancelling, preventing state corruption.
+
+**Required secrets for `infra.yml`:**
+
+| Secret | Example |
+|--------|---------|
+| `AWS_ACCESS_KEY_ID` | IAM key (EC2, S3, CloudFront, IAM) |
+| `AWS_SECRET_ACCESS_KEY` | IAM secret |
+| `AWS_REGION` | `ap-south-1` |
+| `TF_STATE_BUCKET` | `sentinel-tf-state-951066974179` |
+| `FRONTEND_BUCKET_NAME` | `sentinel-ui-951066974179` |
+| `EC2_KEY_PAIR_NAME` | `sentinel-key` (name only, not `.pem`) |
+| `REVIEW_MIN_EVIDENCE` | `1` |
+| `OLLAMA_BASE_URL` | *(empty for local Ollama on EC2)* |
+
+**One-time state bucket bootstrap** (run once before the first `terraform init`):
+
+```bash
+aws s3api create-bucket \
+  --bucket sentinel-tf-state-<your-account-id> \
+  --region ap-south-1 \
+  --create-bucket-configuration LocationConstraint=ap-south-1
+
+# Enable versioning so you can recover from bad applies
+aws s3api put-bucket-versioning \
+  --bucket sentinel-tf-state-<your-account-id> \
+  --versioning-configuration Status=Enabled
+```
+
+Then add `TF_STATE_BUCKET=sentinel-tf-state-<your-account-id>` to GitHub Secrets.
+
+**Local init with S3 backend:**
+
+```bash
+cd infra
+terraform init \
+  -backend-config="bucket=sentinel-tf-state-<your-account-id>" \
+  -backend-config="key=sentinel/terraform.tfstate" \
+  -backend-config="region=ap-south-1" \
+  -backend-config="encrypt=true"
+```
 
 ### Frontend Build (manual)
 

@@ -21,7 +21,27 @@ terraform {
       version = "~> 5.0"
     }
   }
-  # No remote state — keeping it simple for PoC
+
+  # S3 remote state — configured at init time via -backend-config flags
+  # (bucket / key / region are injected by GitHub Actions or the developer's
+  #  local terraform init command; no values are hard-coded here)
+  #
+  # One-time bootstrap (run ONCE, before terraform init):
+  #   aws s3api create-bucket \
+  #     --bucket sentinel-tf-state-<your-account-id> \
+  #     --region ap-south-1 \
+  #     --create-bucket-configuration LocationConstraint=ap-south-1
+  #   aws s3api put-bucket-versioning \
+  #     --bucket sentinel-tf-state-<your-account-id> \
+  #     --versioning-configuration Status=Enabled
+  #
+  # Then init locally with:
+  #   terraform init \
+  #     -backend-config="bucket=sentinel-tf-state-<your-account-id>" \
+  #     -backend-config="key=sentinel/terraform.tfstate" \
+  #     -backend-config="region=ap-south-1" \
+  #     -backend-config="encrypt=true"
+  backend "s3" {}
 }
 
 provider "aws" {
