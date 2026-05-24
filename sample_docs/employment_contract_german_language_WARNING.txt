@@ -1,0 +1,72 @@
+ARBEITSVERTRAG — SENIOR SOFTWAREENTWICKLER
+
+Dieser Arbeitsvertrag ("Vertrag") wird abgeschlossen am 1. März 2026 zwischen:
+
+ARBEITGEBER: FinTech Solutions GmbH, eine Gesellschaft mit beschränkter Haftung nach deutschem Recht, eingetragen im Handelsregister des Amtsgerichts Frankfurt am Main unter HRB 102847, mit Sitz in der Taunusanlage 12, 60325 Frankfurt am Main ("Arbeitgeber")
+
+ARBEITNEHMER: Thomas Becker ("Arbeitnehmer")
+
+POSITION: Senior Softwareentwickler, Abteilung Zahlungssysteme
+BEGINN DES ARBEITSVERHÄLTNISSES: 1. April 2026
+ARBEITSORT: Frankfurt am Main (Hybrides Arbeitsmodell: 3 Tage im Büro, 2 Tage Homeoffice)
+
+§ 1 VERGÜTUNG UND LEISTUNGEN
+
+1.1 Grundgehalt
+Der Arbeitgeber zahlt dem Arbeitnehmer ein monatliches Bruttogehalt von EUR 8.500,00 (in Worten: achttausendfünfhundert Euro), zahlbar jeweils zum letzten Werktag des laufenden Kalendermonats auf das vom Arbeitnehmer angegebene Bankkonto.
+
+1.2 Jahresbonus
+Der Arbeitnehmer nimmt am Bonusprogramm des Arbeitgebers teil. Der Zielbonus beträgt 15% des Jahresgrundgehalts (EUR 15.300,00) und richtet sich nach der individuellen Leistung des Arbeitnehmers sowie dem Unternehmensergebnis. Ein Rechtsanspruch auf den Bonus besteht nicht.
+
+1.3 Nebenleistungen
+Der Arbeitnehmer erhält folgende Zusatzleistungen: (a) Betriebliche Altersversorgung gemäß dem Versorgungswerk des Arbeitgebers mit einem Arbeitgeberzuschuss von 5% des Grundgehalts; (b) Jobticket für den öffentlichen Nahverkehr in Frankfurt; (c) Monatliche Sachbezugsgutscheine im Wert von EUR 50,00 steuerfrei; (d) Weiterbildungsbudget von EUR 2.500,00 pro Jahr; (e) 30 Werktage Jahresurlaub gemäß § 3 BUrlG.
+
+§ 2 GEISTIGES EIGENTUM UND ARBEITNEHMERERFINDERRECHT
+
+2.1 Abtretung von Arbeitsergebnissen
+Alle vom Arbeitnehmer im Rahmen seines Arbeitsverhältnisses erstellten Werke, Erfindungen, Innovationen, Softwareprogramme, Algorithmen und sonstigen geistigen Eigentumsrechte ("Arbeitsergebnisse") werden gemäß § 69b UrhG und dem Gesetz über Arbeitnehmererfindungen (ArbnErfG) dem Arbeitgeber übertragen. Der Arbeitnehmer tritt hiermit unwiderruflich alle Rechte an solchen Arbeitsergebnissen an den Arbeitgeber ab.
+
+2.2 Offenlegungspflicht
+Der Arbeitnehmer ist verpflichtet, dem Arbeitgeber unverzüglich alle im Rahmen des Arbeitsverhältnisses gemachten Erfindungen und Entwicklungen mitzuteilen, soweit diese zur betrieblichen Tätigkeit oder dem Bereich des Arbeitgebers gehören.
+
+2.3 Vergütung von Arbeitnehmererfindungen
+Für gebundene Erfindungen gemäß ArbnErfG erhält der Arbeitnehmer eine angemessene Vergütung, deren Höhe nach den Richtlinien des Deutschen Patent- und Markenamts berechnet wird.
+
+§ 3 KÜNDIGUNG UND ABFINDUNG
+
+3.1 Kündigungsfristen
+Die gesetzliche Kündigungsfrist beträgt für beide Parteien gemäß § 622 BGB drei Monate zum Monatsende. Nach fünfjähriger Betriebszugehörigkeit verlängert sich die Kündigungsfrist auf vier Monate, nach acht Jahren auf fünf Monate, nach zehn Jahren auf sechs Monate.
+
+3.2 Außerordentliche Kündigung
+Das Recht zur fristlosen Kündigung aus wichtigem Grund gemäß § 626 BGB bleibt für beide Parteien unberührt. Wichtige Gründe für eine fristlose Kündigung des Arbeitnehmers umfassen insbesondere: Verrat von Betriebsgeheimnissen, schwerwiegende Vertragsverletzungen, Diebstahl und grobe Pflichtverletzungen.
+
+3.3 Abfindungsregelung
+Im Falle einer betriebsbedingten Kündigung durch den Arbeitgeber erhält der Arbeitnehmer eine Abfindung in Höhe von 0,75 Monatsgehältern je vollendetes Beschäftigungsjahr, maximal jedoch 12 Monatsgehälter. Die Abfindung wird innerhalb von vier Wochen nach dem letzten Arbeitstag ausgezahlt.
+
+§ 4 WETTBEWERBSVERBOT UND GEHEIMHALTUNG
+
+4.1 Geheimhaltungspflicht
+Der Arbeitnehmer verpflichtet sich, alle Geschäfts- und Betriebsgeheimnisse des Arbeitgebers, insbesondere technische und kaufmännische Informationen, Kundendaten, Preiskalkulationen und Entwicklungsstrategien, sowohl während der Dauer des Arbeitsverhältnisses als auch für einen Zeitraum von fünf Jahren nach dessen Beendigung streng vertraulich zu behandeln.
+
+4.2 Nachvertragliches Wettbewerbsverbot
+Für die Dauer von zwölf (12) Monaten nach Beendigung des Arbeitsverhältnisses unterlässt der Arbeitnehmer jede Tätigkeit für ein direkt konkurrierendes Fintech-Unternehmen im Bereich Zahlungsverkehrssysteme in der Bundesrepublik Deutschland, Österreich und der Schweiz. Der Arbeitgeber zahlt dem Arbeitnehmer während dieses Zeitraums eine monatliche Karenzentschädigung in Höhe von 50% des letzten Bruttomonatsgehalts.
+
+4.3 Vertragsstrafe
+Bei schuldhafter Verletzung der Geheimhaltungs- oder Wettbewerbspflichten ist der Arbeitnehmer zur Zahlung einer Vertragsstrafe in Höhe von drei Bruttomonatsgehältern verpflichtet, unbeschadet weitergehender Schadensersatzansprüche.
+
+§ 5 SCHLUSSBESTIMMUNGEN
+
+Dieser Vertrag unterliegt dem Recht der Bundesrepublik Deutschland. Gerichtsstand für alle Streitigkeiten aus diesem Arbeitsverhältnis ist Frankfurt am Main. Änderungen und Ergänzungen dieses Vertrages bedürfen der Schriftform.
+
+UNTERSCHRIFTEN
+
+FINTECH SOLUTIONS GMBH
+Unterschrift: ___________________________
+Name: Dr. Sabine Müller
+Funktion: Geschäftsführerin
+Datum: 1. März 2026
+
+ARBEITNEHMER
+Unterschrift: ___________________________
+Name: Thomas Becker
+Datum: 1. März 2026

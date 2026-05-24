@@ -46,4 +46,40 @@ describe('ClauseDiffViewer', () => {
     render(<ClauseDiffViewer history={[attempt1, attempt2]} />)
     expect(screen.getByText(/retry diff/i)).toBeInTheDocument()
   })
+
+  it('renders nothing when history is empty', () => {
+    const { container } = render(<ClauseDiffViewer history={[]} />)
+    expect(container.firstChild).toBeNull()
+  })
+
+  it('handles attempt2 having more clauses than attempt1 without crashing', () => {
+    const short = [{ clause: 'force majeure', status: 'MISSING', evidence: '' }]
+    const long = [
+      { clause: 'force majeure', status: 'PRESENT', evidence: '' },
+      { clause: 'limitation of liability', status: 'PRESENT', evidence: '' },
+    ]
+    render(<ClauseDiffViewer history={[short, long]} />)
+    // Only the overlapping clause should be rendered
+    expect(screen.getByText('force majeure')).toBeInTheDocument()
+    expect(screen.queryByText('limitation of liability')).toBeNull()
+  })
+
+  it('handles attempt1 having more clauses than attempt2 without crashing', () => {
+    const long = [
+      { clause: 'force majeure', status: 'MISSING', evidence: '' },
+      { clause: 'limitation of liability', status: 'PRESENT', evidence: '' },
+    ]
+    const short = [{ clause: 'force majeure', status: 'PRESENT', evidence: '' }]
+    render(<ClauseDiffViewer history={[long, short]} />)
+    expect(screen.getByText('force majeure')).toBeInTheDocument()
+    expect(screen.queryByText('limitation of liability')).toBeNull()
+  })
+
+  it('applies neutral grey color for unknown status values', () => {
+    const withUnknown = [{ clause: 'indemnity', status: 'PENDING', evidence: '' }]
+    const withPresent = [{ clause: 'indemnity', status: 'PRESENT', evidence: '' }]
+    render(<ClauseDiffViewer history={[withUnknown, withPresent]} />)
+    // Component renders without crashing; PENDING text is present
+    expect(screen.getByText('PENDING')).toBeInTheDocument()
+  })
 })

@@ -72,7 +72,7 @@ class TestDocxExtractor:
 
     def test_invalid_bytes_raise_value_error(self):
         from data.file_extractor import extract_text
-        with pytest.raises(ValueError, match="not a valid DOCX"):
+        with pytest.raises(ValueError, match="valid DOCX"):
             extract_text("doc.docx", b"not a docx file at all")
 
     def test_multiple_paragraphs_joined(self):
@@ -111,7 +111,7 @@ class TestXlsxExtractor:
 
     def test_invalid_bytes_raise_value_error(self):
         from data.file_extractor import extract_text
-        with pytest.raises(ValueError, match="not a valid XLSX"):
+        with pytest.raises(ValueError, match="valid XLSX"):
             extract_text("file.xlsx", b"this is not an xlsx")
 
 
@@ -138,7 +138,7 @@ class TestPptxExtractor:
 
     def test_invalid_bytes_raise_value_error(self):
         from data.file_extractor import extract_text
-        with pytest.raises(ValueError, match="not a valid PPTX"):
+        with pytest.raises(ValueError, match="valid PPTX"):
             extract_text("deck.pptx", b"not a pptx file")
 
 
@@ -190,25 +190,25 @@ class TestHtmlExtractor:
 class TestImageExtractor:
     def test_image_extraction_calls_tesseract(self, monkeypatch):
         from data import file_extractor
-        monkeypatch.setattr(file_extractor, "_ocr_image", lambda content: "Force majeure extracted via OCR")
+        monkeypatch.setattr(file_extractor, "_ocr_image", lambda content, _ext="": "Force majeure extracted via OCR")
         result = file_extractor.extract_text("scan.png", b"fake-image-bytes")
         assert "Force majeure" in result
 
     def test_jpg_extension_dispatches_to_ocr(self, monkeypatch):
         from data import file_extractor
-        monkeypatch.setattr(file_extractor, "_ocr_image", lambda content: "OCR result")
+        monkeypatch.setattr(file_extractor, "_ocr_image", lambda content, _ext="": "OCR result")
         result = file_extractor.extract_text("scan.jpg", b"fake")
         assert result == "OCR result"
 
     def test_tiff_extension_dispatches_to_ocr(self, monkeypatch):
         from data import file_extractor
-        monkeypatch.setattr(file_extractor, "_ocr_image", lambda content: "Tiff OCR text")
+        monkeypatch.setattr(file_extractor, "_ocr_image", lambda content, _ext="": "Tiff OCR text")
         result = file_extractor.extract_text("scan.tiff", b"fake")
         assert "Tiff OCR text" in result
 
     def test_ocr_unavailable_raises_value_error(self, monkeypatch):
         from data import file_extractor
-        def _fail(content):
+        def _fail(content, _ext=""):
             raise ValueError("OCR not available: install Pillow and pytesseract.")
         monkeypatch.setattr(file_extractor, "_ocr_image", _fail)
         with pytest.raises(ValueError, match="OCR not available"):
@@ -240,3 +240,40 @@ class TestDispatcher:
         from data.file_extractor import extract_text
         with pytest.raises(ValueError):
             extract_text("blob.bin", bytes(range(256)))
+
+
+# ---------------------------------------------------------------------------
+# _safe_filename — path traversal protection (including Windows paths on Linux)
+# ---------------------------------------------------------------------------
+
+class TestSafeFilename:
+    def test_strips_unix_directory(self):
+        from data.file_extractor import _safe_filename
+        assert _safe_filename("../../etc/passwd") == "passwd"
+
+    def test_strips_windows_path_on_linux(self):
+        from data.file_extractor import _safe_filename
+        assert _safe_filename("C:\\Users\\evil\\file.pdf") == "file.pdf"
+
+    def test_strips_mixed_slashes(self):
+        from data.file_extractor import _safe_filename
+        assert _safe_filename("path/to\\evil/../file.pdf") == "file.pdf"
+
+    def test_plain_filename_unchanged(self):
+        from data.file_extractor import _safe_filename
+        assert _safe_filename("contract.pdf") == "contract.pdf"
+
+    def test_rejects_dot(self):
+        from data.file_extractor import _safe_filename
+        with pytest.raises(ValueError, match="Invalid filename"):
+            _safe_filename(".")
+
+    def test_rejects_dotdot(self):
+        from data.file_extractor import _safe_filename
+        with pytest.raises(ValueError, match="Invalid filename"):
+            _safe_filename("..")
+
+    def test_rejects_empty_string(self):
+        from data.file_extractor import _safe_filename
+        with pytest.raises(ValueError, match="Invalid filename"):
+            _safe_filename("")

@@ -1,0 +1,55 @@
+ANNUAL REPORT ON FORM 10-K
+
+UNITED STATES SECURITIES AND EXCHANGE COMMISSION
+Washington, D.C. 20549
+
+For the fiscal year ended December 31, 2025
+
+Commission file number: 001-44219
+
+ORBIS FINANCIAL TECHNOLOGIES INC.
+(Exact name of registrant as specified in its charter)
+
+Nevada | EIN: 82-1047293
+Principal Executive Offices: 550 Montgomery Street, Suite 900, San Francisco, CA 94111
+Telephone: (415) 555-0293
+Securities registered: Common Stock — OTC: ORFT
+
+ITEM 1. BUSINESS
+
+Orbis Financial Technologies Inc. is a financial technology company providing AI-powered payment processing solutions for small and medium-sized businesses across North America. The Company was incorporated in Nevada in 2019 and commenced operations in 2020.
+
+Our proprietary platform, OrbisPay, processes over 2.3 million transactions monthly with an aggregate value exceeding $840 million. We serve approximately 14,500 active merchants across 38 states and 3 Canadian provinces.
+
+ITEM 2. PROPERTIES
+Our principal offices are located at 550 Montgomery Street, Suite 900, San Francisco, California, where we lease approximately 8,200 square feet under a lease expiring in December 2028.
+
+ITEM 3. LEGAL PROCEEDINGS
+We are party to a civil lawsuit filed in the Northern District of California by a former employee alleging wrongful termination. The case is in early discovery and we believe the claims are without merit. We do not expect this matter to have a material adverse effect on our financial condition.
+
+ITEM 8. FINANCIAL STATEMENTS
+
+CONSOLIDATED BALANCE SHEET (in thousands)
+                                    December 31, 2025    December 31, 2024
+Cash and cash equivalents           $    18,442          $    12,334
+Accounts receivable, net            $     9,217          $     6,441
+Total current assets                $    31,882          $    22,117
+Total assets                        $    58,334          $    44,229
+Total liabilities                   $    27,118          $    19,884
+Total stockholders' equity          $    31,216          $    24,345
+
+Revenue                             $    34,118          $    21,334
+Net income                          $     6,871          $     2,445
+Earnings per share                  $      0.42          $      0.17
+
+ITEM 7. MANAGEMENT DISCUSSION
+Revenue grew 60% year-over-year driven by merchant acquisition and increased transaction volumes. The Company achieved profitability for the first time in fiscal year 2025. Management remains optimistic about continued growth.
+
+NOTE: THIS FILING DOES NOT INCLUDE ITEM 1A RISK FACTOR DISCLOSURES. THE COMPANY HAS DETERMINED, ON ADVICE OF COUNSEL, THAT AS A NON-ACCELERATED FILER WITH MARKET CAPITALIZATION BELOW $75 MILLION, DETAILED RISK FACTOR DISCLOSURES ARE NOT REQUIRED FOR THIS REPORTING PERIOD.
+
+NOTE: THIS FILING HAS NOT BEEN REVIEWED BY AN INDEPENDENT REGISTERED PUBLIC ACCOUNTING FIRM. THE FINANCIAL STATEMENTS CONTAINED HEREIN ARE UNAUDITED AND HAVE BEEN PREPARED BY MANAGEMENT. AN AUDITOR CERTIFICATION WILL BE PROVIDED IN AN AMENDMENT TO THIS FILING WITHIN 60 DAYS.
+
+Filed with the Securities and Exchange Commission on March 1, 2026.
+
+Chief Executive Officer: Marcus J. Holloway
+Chief Financial Officer: Diana Perez

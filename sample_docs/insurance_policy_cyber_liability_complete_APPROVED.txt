@@ -1,0 +1,101 @@
+CYBER LIABILITY AND DATA BREACH INSURANCE POLICY
+
+Policy Number: CYB-2026-048291-GL
+Insurer: Meridian Specialty Insurance Company
+Insured: DataVault Corporation, 888 Market Street, San Francisco, CA 94105
+Policy Period: January 1, 2026 to December 31, 2026
+Premium: USD 287,500 per annum
+
+DECLARATIONS
+
+This Cyber Liability and Data Breach Insurance Policy ("Policy") is issued by Meridian Specialty Insurance Company ("Insurer") to DataVault Corporation ("Insured") for the policy period stated above.
+
+1. COVERAGE SCOPE AND LIMITS
+
+1.1 Aggregate Policy Limit
+The total aggregate limit of liability under this Policy for all claims and incidents arising during the Policy Period shall be USD 25,000,000 (Twenty-Five Million US Dollars).
+
+1.2 Coverage Part A — First-Party Data Breach Response
+Limit: USD 5,000,000 per incident
+Sub-limits:
+- Forensic Investigation: USD 2,000,000
+- Notification and Credit Monitoring: USD 1,500,000
+- Public Relations and Crisis Management: USD 500,000
+- Data Recovery and System Restoration: USD 1,000,000
+
+1.3 Coverage Part B — Business Interruption and Cyber Extortion
+Limit: USD 10,000,000 per incident; USD 1,000,000 sublimit for ransomware payments
+Retention (Deductible): USD 100,000 per incident
+Waiting Period: 8 hours before business interruption coverage triggers
+
+1.4 Coverage Part C — Third-Party Liability
+Limit: USD 15,000,000 per claim; USD 25,000,000 aggregate
+Coverage includes: Network security liability, privacy liability, media liability, regulatory defense, and PCI-DSS fines and penalties.
+Retention: USD 150,000 per claim.
+
+1.5 Coverage Part D — Regulatory Defense and Fines
+Limit: USD 3,000,000 per regulatory proceeding
+Covers defense costs and fines/penalties arising from data protection regulation violations including GDPR, CCPA, HIPAA, and state breach notification laws, to the extent insurable by law.
+
+2. EXCLUSIONS AND LIMITATIONS
+
+2.1 Expressly Excluded from All Coverage Parts:
+(a) Intentional, criminal, or fraudulent acts by the Insured or its executive officers, where proven by final adjudication;
+(b) Bodily injury or physical property damage (covered under general liability policies);
+(c) War, terrorism, or acts of foreign state-sponsored cyberattack (nation-state exclusion), unless the Insured can demonstrate the attack was opportunistic rather than targeted;
+(d) Prior known circumstances: any incident that the Insured was aware of prior to the Policy Inception Date that was reasonably likely to give rise to a claim;
+(e) Insured vs. Insured claims (claims brought by one Insured Entity against another);
+(f) Patent infringement or trade secret theft not involving unauthorized access to the Insured's systems;
+(g) Infrastructure failures not caused by a covered cyber incident (power outages, hardware failures due to wear and tear);
+(h) Losses arising from the Insured's failure to maintain minimum security standards as specified in the Security Warranty Schedule attached as Appendix B;
+(i) Fines and penalties where coverage is prohibited by applicable law.
+
+2.2 Sub-limits Apply
+Certain coverages are subject to sub-limits as specified in Section 1 above. Sub-limits do not increase the aggregate policy limit.
+
+3. CLAIMS PROCEDURE
+
+3.1 Notice of Claim
+In the event of a covered cyber incident, the Insured shall provide written notice to the Insurer as soon as practicable, but in no event later than thirty (30) days after the Insured becomes aware of the incident. Notice shall be provided to: Meridian Claims Department, claims@meridianspecialty.com, Tel: +1 (415) 555-0199.
+
+3.2 Emergency Response Hotline
+The Insurer maintains a 24/7 emergency cyber incident response hotline at +1 (800) 555-CYBER (555-2923). Activation of the hotline is available from the first hour of discovery and does not constitute a formal claim but allows immediate access to pre-approved incident response vendors.
+
+3.3 Proof of Loss
+Within ninety (90) days of providing notice of claim, the Insured shall submit a sworn proof of loss including: (a) a description of the incident and timeline; (b) forensic investigation findings; (c) enumeration of affected individuals and data elements; (d) documentation of all losses claimed; (e) evidence of notification to affected individuals and regulators.
+
+3.4 Cooperation Obligation
+The Insured shall cooperate fully with the Insurer's investigation and, where requested, shall provide access to relevant personnel, systems logs, and documentation. Failure to cooperate may void coverage for the relevant claim.
+
+3.5 Subrogation
+The Insurer shall be subrogated to all rights of recovery of the Insured against any person or organization upon payment of any claim under this Policy.
+
+4. PREMIUM PAYMENT AND CANCELLATION TERMS
+
+4.1 Premium Payment
+The annual premium of USD 287,500 is due and payable within thirty (30) days of the Policy Inception Date. Payment shall be made by wire transfer to the Insurer's bank account specified in the Premium Notice. The Insured may elect a quarterly payment schedule (USD 75,000 per quarter) subject to a 2% instalment fee.
+
+4.2 Late Payment
+Premium not received within 30 days of the due date shall result in a 10-day grace period notice. If premium is not received by the end of the grace period, the Insurer may suspend coverage with 7 days' written notice to the Insured.
+
+4.3 Cancellation by Insured
+The Insured may cancel this Policy at any time by providing thirty (30) days' written notice to the Insurer. Upon cancellation by the Insured, the Insurer shall retain the pro-rata premium for the period during which coverage was in force plus a short-rate penalty of 10% of the unearned premium.
+
+4.4 Cancellation by Insurer
+The Insurer may cancel this Policy upon sixty (60) days' written notice to the Insured for any reason, or upon ten (10) days' notice for non-payment of premium. In the event of cancellation by the Insurer, the Insurer shall refund the pro-rata unearned premium to the Insured within 30 days.
+
+4.5 Non-Renewal
+Either party may elect non-renewal of this Policy by providing written notice to the other party no later than sixty (60) days before the Policy expiry date.
+
+SIGNED AND ISSUED by Meridian Specialty Insurance Company
+
+Authorised Signatory: ___________________________
+Name: Margaret L. Thornton
+Title: Chief Underwriting Officer, Cyber Division
+Date: December 15, 2025
+Policy Effective: January 1, 2026
+
+Acknowledged by Insured: ___________________________
+Name: Kevin Park
+Title: Chief Risk Officer, DataVault Corporation
+Date: December 20, 2025

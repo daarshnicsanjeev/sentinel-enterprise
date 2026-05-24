@@ -124,6 +124,12 @@ h2 {
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  margin: 0;   /* reset <dt> default */
+}
+
+/* reset <dd> browser default indent so values align with labels */
+.result-grid dd {
+  margin: 0;
 }
 
 .upload-section,

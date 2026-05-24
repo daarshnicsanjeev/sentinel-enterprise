@@ -4,10 +4,17 @@ _lock = threading.Lock()
 _counters: dict[str, float] = {}
 
 
+def _escape_label_value(v: str) -> str:
+    """Escape Prometheus label value per the exposition format spec."""
+    return v.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+
+
 def _format_key(name: str, labels: dict | None) -> str:
     if not labels:
         return name
-    label_str = ",".join(f'{k}="{v}"' for k, v in sorted(labels.items()))
+    label_str = ",".join(
+        f'{k}="{_escape_label_value(str(v))}"' for k, v in sorted(labels.items())
+    )
     return f"{name}{{{label_str}}}"
 
 

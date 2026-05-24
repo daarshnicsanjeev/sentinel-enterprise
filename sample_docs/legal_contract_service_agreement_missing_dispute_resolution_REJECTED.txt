@@ -1,0 +1,43 @@
+MASTER SERVICE AGREEMENT
+
+This Master Service Agreement ("Agreement") is entered into as of March 1, 2026, between Apex Digital Solutions Pvt. Ltd., an Indian private limited company with registered office at 42 Bandra Kurla Complex, Mumbai 400051 ("Service Provider"), and GlobalRetail Corp., a company incorporated under the laws of England and Wales ("Client").
+
+1. SCOPE OF SERVICES
+Service Provider agrees to provide software development, maintenance, and technical support services as described in each Statement of Work ("SOW") executed by the parties. Each SOW shall be incorporated into and form part of this Agreement. Service Provider shall perform the Services in a professional and workmanlike manner consistent with industry standards.
+
+2. PAYMENT TERMS
+Client shall pay Service Provider the fees set forth in each applicable SOW within thirty (30) days of receipt of invoice. Undisputed amounts not paid within such period shall accrue interest at the rate of 1.5% per month or the maximum rate permitted by applicable law, whichever is less. Service Provider reserves the right to suspend Services upon fifteen (15) days' written notice if undisputed amounts remain unpaid for more than sixty (60) days.
+
+3. INTELLECTUAL PROPERTY
+All work product, deliverables, and developments created by Service Provider specifically for Client under this Agreement ("Work Product") shall be considered works made for hire. To the extent any Work Product does not qualify as a work made for hire, Service Provider hereby irrevocably assigns to Client all right, title and interest in and to such Work Product, including all intellectual property rights therein. Service Provider retains ownership of all pre-existing tools, methodologies, and general-purpose software components.
+
+4. CONFIDENTIALITY
+Each party agrees to maintain the confidentiality of the other party's proprietary information using at least the same degree of care it uses to protect its own confidential information, but in no event less than reasonable care. This obligation shall survive termination of this Agreement for a period of five (5) years.
+
+5. FORCE MAJEURE
+Neither party shall be held liable for any delay or failure to perform its obligations under this Agreement if such delay or failure is caused by circumstances beyond its reasonable control, including acts of God, war, terrorism, government action, epidemics, natural disasters, internet or telecommunication failures, or labour disputes not involving that party's employees.
+
+6. LIMITATION OF LIABILITY
+NEITHER PARTY SHALL BE LIABLE TO THE OTHER FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. EACH PARTY'S TOTAL CUMULATIVE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT SHALL NOT EXCEED THE TOTAL FEES PAID OR PAYABLE BY CLIENT TO SERVICE PROVIDER IN THE THREE (3) MONTHS IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO THE CLAIM.
+
+7. TERM
+This Agreement shall commence on the Effective Date and continue for an initial term of two (2) years. Thereafter, it shall automatically renew for successive one (1) year periods unless either party provides ninety (90) days' written notice of non-renewal prior to the end of the then-current term.
+
+8. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of England and Wales.
+
+NOTE: This agreement intentionally omits a formal Dispute Resolution clause. Any disputes arising hereunder shall be handled as the parties may mutually agree at the time of the dispute.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.
+
+APEX DIGITAL SOLUTIONS PVT. LTD.
+By: _______________________
+Name: Priya Sharma
+Title: CEO
+Date: March 1, 2026
+
+GLOBALRETAIL CORP.
+By: _______________________
+Name: James Whitfield
+Title: COO
+Date: March 1, 2026

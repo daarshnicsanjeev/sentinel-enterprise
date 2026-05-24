@@ -1,72 +1,112 @@
 {
   "default": {
     "CREDIT_AGREEMENT": [
-      "governing law clause",
-      "events of default clause",
-      "indemnification clause",
-      "representations and warranties"
+      {"name": "governing law clause",           "risk_level": "HIGH"},
+      {"name": "events of default clause",       "risk_level": "HIGH"},
+      {"name": "indemnification clause",         "risk_level": "MEDIUM"},
+      {"name": "representations and warranties", "risk_level": "MEDIUM"}
     ],
     "LEGAL_CONTRACT": [
-      "force majeure clause",
-      "limitation of liability",
-      "dispute resolution clause"
+      {"name": "force majeure clause",    "risk_level": "HIGH"},
+      {"name": "limitation of liability", "risk_level": "HIGH"},
+      {"name": "dispute resolution clause", "risk_level": "MEDIUM"}
     ],
     "REGULATORY_FILING": [
-      "material disclosure statement",
-      "risk factor disclosures",
-      "auditor certification"
+      {"name": "material disclosure statement", "risk_level": "HIGH"},
+      {"name": "risk factor disclosures",       "risk_level": "HIGH"},
+      {"name": "auditor certification",         "risk_level": "MEDIUM"}
+    ],
+    "EMPLOYMENT_CONTRACT": [
+      {"name": "compensation and benefits clause",          "risk_level": "HIGH"},
+      {"name": "intellectual property assignment clause",   "risk_level": "HIGH"},
+      {"name": "termination and severance clause",          "risk_level": "MEDIUM"},
+      {"name": "non-compete and confidentiality clause",    "risk_level": "MEDIUM"}
+    ],
+    "INSURANCE_POLICY": [
+      {"name": "coverage scope and limits",           "risk_level": "HIGH"},
+      {"name": "exclusions and limitations clause",   "risk_level": "HIGH"},
+      {"name": "claims procedure",                    "risk_level": "MEDIUM"},
+      {"name": "premium payment and cancellation terms", "risk_level": "LOW"}
+    ],
+    "PARTNERSHIP_AGREEMENT": [
+      {"name": "capital contribution clause",    "risk_level": "HIGH"},
+      {"name": "profit and loss distribution",   "risk_level": "HIGH"},
+      {"name": "governance and voting rights",   "risk_level": "MEDIUM"},
+      {"name": "dissolution and exit clause",    "risk_level": "MEDIUM"}
     ],
     "EXPIRY_CLAUSE_SCAN": [],
     "UNKNOWN": []
   },
   "EU": {
+    "EMPLOYMENT_CONTRACT": [
+      {"name": "compensation and benefits clause",          "risk_level": "HIGH"},
+      {"name": "intellectual property assignment clause",   "risk_level": "HIGH"},
+      {"name": "termination and severance clause",          "risk_level": "MEDIUM"},
+      {"name": "non-compete and confidentiality clause",    "risk_level": "MEDIUM"},
+      {"name": "gdpr employee data processing clause",      "risk_level": "HIGH"},
+      {"name": "works council consultation clause",         "risk_level": "LOW"}
+    ],
+    "INSURANCE_POLICY": [
+      {"name": "coverage scope and limits",                 "risk_level": "HIGH"},
+      {"name": "exclusions and limitations clause",         "risk_level": "HIGH"},
+      {"name": "claims procedure",                          "risk_level": "MEDIUM"},
+      {"name": "premium payment and cancellation terms",    "risk_level": "LOW"},
+      {"name": "solvency ii regulatory compliance clause",  "risk_level": "HIGH"}
+    ],
+    "PARTNERSHIP_AGREEMENT": [
+      {"name": "capital contribution clause",    "risk_level": "HIGH"},
+      {"name": "profit and loss distribution",   "risk_level": "HIGH"},
+      {"name": "governance and voting rights",   "risk_level": "MEDIUM"},
+      {"name": "dissolution and exit clause",    "risk_level": "MEDIUM"},
+      {"name": "gdpr data sharing clause",       "risk_level": "HIGH"}
+    ],
     "CREDIT_AGREEMENT": [
-      "governing law clause",
-      "events of default clause",
-      "indemnification clause",
-      "representations and warranties",
-      "gdpr data protection compliance clause",
-      "data protection officer designation"
+      {"name": "governing law clause",                    "risk_level": "HIGH"},
+      {"name": "events of default clause",                "risk_level": "HIGH"},
+      {"name": "indemnification clause",                  "risk_level": "MEDIUM"},
+      {"name": "representations and warranties",          "risk_level": "MEDIUM"},
+      {"name": "gdpr data protection compliance clause",  "risk_level": "HIGH"},
+      {"name": "data protection officer designation",     "risk_level": "MEDIUM"}
     ],
     "LEGAL_CONTRACT": [
-      "force majeure clause",
-      "limitation of liability",
-      "dispute resolution clause",
-      "gdpr data subject rights clause",
-      "cross-border data transfer clause"
+      {"name": "force majeure clause",            "risk_level": "HIGH"},
+      {"name": "limitation of liability",         "risk_level": "HIGH"},
+      {"name": "dispute resolution clause",       "risk_level": "MEDIUM"},
+      {"name": "gdpr data subject rights clause", "risk_level": "HIGH"},
+      {"name": "cross-border data transfer clause", "risk_level": "HIGH"}
     ],
     "REGULATORY_FILING": [
-      "material disclosure statement",
-      "risk factor disclosures",
-      "auditor certification",
-      "esg reporting compliance clause",
-      "anti-money laundering declaration"
+      {"name": "material disclosure statement",       "risk_level": "HIGH"},
+      {"name": "risk factor disclosures",             "risk_level": "HIGH"},
+      {"name": "auditor certification",               "risk_level": "MEDIUM"},
+      {"name": "esg reporting compliance clause",     "risk_level": "MEDIUM"},
+      {"name": "anti-money laundering declaration",   "risk_level": "HIGH"}
     ],
     "EXPIRY_CLAUSE_SCAN": [],
     "UNKNOWN": []
   },
   "US": {
     "CREDIT_AGREEMENT": [
-      "governing law clause",
-      "events of default clause",
-      "indemnification clause",
-      "representations and warranties",
-      "dodd-frank compliance clause",
-      "regulation d exemption clause"
+      {"name": "governing law clause",           "risk_level": "HIGH"},
+      {"name": "events of default clause",       "risk_level": "HIGH"},
+      {"name": "indemnification clause",         "risk_level": "MEDIUM"},
+      {"name": "representations and warranties", "risk_level": "MEDIUM"},
+      {"name": "dodd-frank compliance clause",   "risk_level": "HIGH"},
+      {"name": "regulation d exemption clause",  "risk_level": "MEDIUM"}
     ],
     "LEGAL_CONTRACT": [
-      "force majeure clause",
-      "limitation of liability",
-      "dispute resolution clause",
-      "mandatory arbitration clause",
-      "class action waiver"
+      {"name": "force majeure clause",       "risk_level": "HIGH"},
+      {"name": "limitation of liability",    "risk_level": "HIGH"},
+      {"name": "dispute resolution clause",  "risk_level": "MEDIUM"},
+      {"name": "mandatory arbitration clause", "risk_level": "MEDIUM"},
+      {"name": "class action waiver",        "risk_level": "LOW"}
     ],
     "REGULATORY_FILING": [
-      "material disclosure statement",
-      "risk factor disclosures",
-      "auditor certification",
-      "sec rule 10b-5 compliance",
-      "sarbanes-oxley certification"
+      {"name": "material disclosure statement",  "risk_level": "HIGH"},
+      {"name": "risk factor disclosures",        "risk_level": "HIGH"},
+      {"name": "auditor certification",          "risk_level": "MEDIUM"},
+      {"name": "sec rule 10b-5 compliance",      "risk_level": "HIGH"},
+      {"name": "sarbanes-oxley certification",   "risk_level": "HIGH"}
     ],
     "EXPIRY_CLAUSE_SCAN": [],
     "UNKNOWN": []

@@ -1,0 +1,161 @@
+VENTURE DEBT AND CONVERTIBLE LOAN AGREEMENT
+
+This Venture Debt and Convertible Loan Agreement ("Agreement") is entered into as of
+March 14, 2026, between:
+
+SILICON VALLEY GROWTH FINANCE LLC, a Delaware limited liability company and registered
+investment advisor, with principal offices at 3000 Sand Hill Road, Suite 210, Menlo Park,
+CA 94025 ("Lender"), and
+
+QUANTUMLEAP TECHNOLOGIES, INC., a Delaware corporation with principal offices at
+601 Townsend Street, Suite 500, San Francisco, CA 94103 (the "Borrower").
+
+RECITALS
+
+Borrower is a venture-backed Series B company developing quantum-accelerated machine learning
+chips. Lender has agreed to extend venture debt financing to Borrower on the terms and
+conditions set forth herein, alongside conversion rights as partial consideration.
+
+─────────────────────────────────────────────────────────────────────────────────
+ARTICLE I — LOAN FACILITY
+─────────────────────────────────────────────────────────────────────────────────
+
+1.1  Facility Amount: USD 12,000,000 (twelve million US dollars), in two tranches:
+     - Tranche A: USD 8,000,000 available at closing
+     - Tranche B: USD 4,000,000 available upon achievement of ARR milestone of USD 5M
+       (draw period: 6 months from Tranche A closing)
+
+1.2  Maturity Date: 36 months from the Tranche A closing date.
+
+1.3  Interest Rate: 9.5% per annum, payable monthly in arrears. Interest-only period:
+12 months, after which equal monthly principal-plus-interest instalments apply.
+
+1.4  Conversion Rights: Lender has the right (but not the obligation) to convert up to
+USD 3,000,000 of outstanding principal into Borrower's equity securities at a 20%
+discount to the price per share of the Borrower's next Qualified Financing Event (defined
+as a financing raising at least USD 15,000,000).
+
+─────────────────────────────────────────────────────────────────────────────────
+ARTICLE II — REPRESENTATIONS AND WARRANTIES
+─────────────────────────────────────────────────────────────────────────────────
+
+As of the date hereof and as of each drawdown date, Borrower represents and warrants:
+
+2.1  Organisation and Good Standing: Borrower is duly incorporated, validly existing, and
+in good standing under the laws of Delaware. Borrower is duly qualified to do business in
+each jurisdiction where its operations require qualification.
+
+2.2  Authority: The execution, delivery, and performance of this Agreement have been duly
+authorised by all necessary corporate action. This Agreement constitutes the legal, valid,
+and binding obligation of the Borrower, enforceable in accordance with its terms.
+
+2.3  Financial Statements: The financial statements provided to Lender fairly present
+the financial condition of the Borrower as of their respective dates, prepared in
+accordance with U.S. GAAP on a consistent basis.
+
+2.4  No Material Adverse Change: Since December 31, 2025, there has been no material
+adverse change in the business, operations, properties, assets, or financial condition
+of the Borrower.
+
+2.5  Intellectual Property: Borrower owns or holds valid licences to all intellectual
+property necessary to conduct its business. No claims have been asserted challenging
+Borrower's ownership or right to use such intellectual property.
+
+2.6  Litigation: No material litigation, arbitration, or governmental proceeding is
+pending or, to the Borrower's knowledge, threatened against Borrower.
+
+2.7  Compliance with Laws: Borrower is in compliance in all material respects with all
+applicable laws, regulations, and governmental orders.
+
+─────────────────────────────────────────────────────────────────────────────────
+ARTICLE III — EVENTS OF DEFAULT CLAUSE
+─────────────────────────────────────────────────────────────────────────────────
+
+3.1  Events of Default: Each of the following shall constitute an "Event of Default":
+
+     (a) Payment Default: Failure to pay any principal or interest when due, not cured
+         within five (5) business days after written notice from Lender;
+
+     (b) Covenant Breach: Material breach of any covenant, obligation, or undertaking
+         under this Agreement not remedied within thirty (30) days of written notice;
+
+     (c) Representation and Warranty Breach: Any representation or warranty proves
+         materially false or misleading when made or deemed made;
+
+     (d) Cross-Default: Default under any other indebtedness of Borrower exceeding
+         USD 500,000 in aggregate, if such default gives the relevant creditor the right
+         to accelerate;
+
+     (e) Insolvency: (i) Borrower commences a voluntary proceeding under any bankruptcy
+         or insolvency law; (ii) an involuntary proceeding is commenced against Borrower
+         and not dismissed within sixty (60) days; (iii) Borrower makes a general
+         assignment for the benefit of creditors; or (iv) appointment of a receiver
+         or trustee over any material portion of Borrower's assets;
+
+     (f) Change of Control: Any Change of Control of Borrower without Lender's prior
+         written consent, not to be unreasonably withheld;
+
+     (g) Material Adverse Change: Lender determines in its reasonable judgment that a
+         Material Adverse Change has occurred in the business, financial condition, or
+         prospects of the Borrower;
+
+     (h) IP Assignment: Any purported assignment, sale, or transfer of material
+         intellectual property outside the ordinary course of business.
+
+3.2  Remedies: Upon an Event of Default, Lender may: (a) declare all outstanding principal,
+accrued interest, and fees immediately due and payable; (b) exercise any right, power, or
+remedy available at law or in equity; (c) foreclose on any security interest or lien granted
+hereunder.
+
+─────────────────────────────────────────────────────────────────────────────────
+ARTICLE IV — INDEMNIFICATION CLAUSE
+─────────────────────────────────────────────────────────────────────────────────
+
+4.1  General Indemnification: Borrower shall indemnify, defend, and hold harmless Lender
+and its officers, directors, members, employees, advisors, successors, and assigns
+(collectively, "Indemnified Parties") from and against any and all claims, damages, losses,
+costs, and expenses (including reasonable attorneys' fees) arising out of or relating to:
+(a) any breach of this Agreement by Borrower; (b) any inaccuracy in any representation or
+warranty; (c) the use or application of the Loan proceeds; (d) any claim by a third party
+arising from Borrower's business operations; or (e) enforcement of this Agreement.
+
+4.2  Procedure: In the event of any claim subject to indemnification, Lender shall promptly
+notify Borrower in writing. Borrower shall assume control of the defence with counsel
+reasonably acceptable to Lender. Lender shall cooperate in the defence and shall not settle
+any claim for which it seeks indemnification without Borrower's prior written consent.
+
+4.3  Survival: The indemnification obligations under this Article IV shall survive the
+repayment of the Loan and termination of this Agreement for a period of three (3) years.
+
+─────────────────────────────────────────────────────────────────────────────────
+ARTICLE V — GOVERNING LAW CLAUSE
+─────────────────────────────────────────────────────────────────────────────────
+
+5.1  Governing Law: This Agreement shall be governed by and construed in accordance with
+the laws of the State of California, without regard to its conflict-of-law principles.
+The parties irrevocably consent to the exclusive jurisdiction of the state and federal
+courts located in San Francisco County, California for any dispute arising hereunder.
+
+5.2  Waiver of Jury Trial: Each party hereby irrevocably waives all right to trial by
+jury in any action, proceeding, or counterclaim arising out of or related to this Agreement.
+
+─────────────────────────────────────────────────────────────────────────────────
+ARTICLE VI — GENERAL PROVISIONS
+─────────────────────────────────────────────────────────────────────────────────
+
+6.1  Entire Agreement: This Agreement constitutes the entire agreement between the parties
+with respect to the subject matter hereof.
+
+6.2  Amendments: No amendment shall be binding unless executed in writing by both parties.
+
+6.3  Severability: If any provision is held invalid or unenforceable, the remaining
+provisions shall continue in full force and effect.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+SILICON VALLEY GROWTH FINANCE LLC           QUANTUMLEAP TECHNOLOGIES, INC.
+By: _______________________                 By: _______________________
+Name: Marcus R. Tate, Managing Director     Name: Dr. Anika S. Patel, CEO
+Date: March 14, 2026                        Date: March 14, 2026
+
+Loan Reference: SVGF-VD-QLT-2026-012

@@ -16,15 +16,22 @@ _VERSION = _prompt_cfg.get("version", "1.0.0")
 _JSON_RE = re.compile(r"\{[^{}]+\}", re.DOTALL)
 
 
+_MAX_LLM_RESPONSE_CHARS = 10_000
+_VALID_RISKS = {"low", "medium", "high"}
+
+
 def _parse_eval(raw: str) -> tuple[float, str, str]:
     """Extract faithfulness score, hallucination_risk, and rationale from LLM output."""
     match = _JSON_RE.search(raw)
     if match:
         try:
             data = json.loads(match.group())
-            score = float(data.get("faithfulness", 0.5))
-            risk = str(data.get("hallucination_risk", "medium"))
-            rationale = str(data.get("rationale", ""))
+            raw_score = float(data.get("faithfulness", 0.5))
+            score = max(0.0, min(1.0, raw_score))  # clamp to [0, 1]
+            risk = str(data.get("hallucination_risk", "medium")).lower()
+            if risk not in _VALID_RISKS:
+                risk = "medium"
+            rationale = str(data.get("rationale", ""))[:500]
             return score, risk, rationale
         except (json.JSONDecodeError, ValueError):
             pass
@@ -34,16 +41,20 @@ def _parse_eval(raw: str) -> tuple[float, str, str]:
 def eval_node(state: AgentState) -> dict:
     system_msg = _prompt_cfg["system"]
     rubric = _prompt_cfg["scoring_rubric"]
+    # Use the FAISS-retrieved context the compliance agent actually saw.
+    # Falls back to the first 2000 chars of raw_text for guardrail-blocked
+    # or expiry-only runs where compliance_context is not populated.
+    source_context = state.get("compliance_context") or state["raw_text"][:2000]
     user_msg = (
-        f"Source Document:\n{state['raw_text'][:2000]}\n\n"
+        f"Relevant Document Context (retrieved excerpts):\n{source_context}\n\n"
         f"Compliance Agent Report:\n{state.get('compliance_output', '')}\n\n"
         f"{rubric}"
     )
 
     response = _llm.invoke([SystemMessage(content=system_msg), HumanMessage(content=user_msg)])
-    score, risk, rationale = _parse_eval(response.content)
+    score, risk, rationale = _parse_eval(response.content[:_MAX_LLM_RESPONSE_CHARS])
 
-    log = f"[Evaluator v{_VERSION}] Faithfulness: {score:.2f} | Hallucination Risk: {risk} | {rationale}"
+    log = f"[Evaluator v{_VERSION}] Faithfulness: {score:.0%} | Hallucination Risk: {risk} | {rationale}"
     return {
         "evaluation_score": score,
         "hallucination_risk": risk,

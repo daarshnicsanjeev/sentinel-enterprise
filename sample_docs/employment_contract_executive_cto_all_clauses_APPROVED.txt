@@ -1,0 +1,80 @@
+EXECUTIVE EMPLOYMENT AGREEMENT — CHIEF TECHNOLOGY OFFICER
+
+This Executive Employment Agreement ("Agreement") is entered into as of March 1, 2026, between:
+
+COMPANY: NovaTech Systems Inc., a Delaware corporation ("Company")
+EMPLOYEE: Dr. Priya Mehta ("Executive")
+POSITION: Chief Technology Officer (CTO)
+START DATE: April 1, 2026
+
+1. COMPENSATION AND BENEFITS
+
+1.1 Base Salary
+The Company shall pay Executive an annual base salary of USD 380,000, payable in equal semi-monthly instalments in accordance with the Company's standard payroll practices. The base salary shall be reviewed annually by the Board of Directors and may be increased (but not decreased without Executive's written consent) at the Board's discretion.
+
+1.2 Annual Performance Bonus
+Executive shall be eligible for an annual cash bonus with a target of 50% of base salary (USD 190,000), based on achievement of mutually agreed performance objectives established by the Board within 60 days of each fiscal year. The maximum bonus shall not exceed 150% of the target amount.
+
+1.3 Equity Compensation
+Executive shall be granted options to purchase 1,200,000 shares of the Company's common stock at the fair market value on the grant date, subject to a four-year vesting schedule with a one-year cliff (25% vesting after 12 months of service, then monthly vesting of the remaining 75% over the subsequent 36 months).
+
+1.4 Benefits
+Executive shall participate in all employee benefit programs maintained by the Company for senior executives, including: (a) comprehensive medical, dental, and vision insurance for Executive and dependents; (b) 401(k) plan with Company matching up to 6% of base salary; (c) life insurance equal to three times base salary; (d) long-term disability insurance; (e) 25 days of paid vacation annually; (f) Company-provided mobile device and laptop.
+
+2. INTELLECTUAL PROPERTY ASSIGNMENT
+
+2.1 Assignment of Inventions
+Executive hereby irrevocably assigns, transfers, and conveys to the Company all right, title, and interest in and to any and all inventions, innovations, improvements, developments, methods, processes, works of authorship, designs, software, algorithms, trade secrets, and other intellectual property ("Inventions") that Executive conceives, develops, creates, reduces to practice, or makes, either alone or jointly with others, during the term of employment that: (a) relate to the Company's current or reasonably anticipated business, research, or development; (b) result from work performed by Executive for the Company; or (c) are made using the Company's equipment, supplies, facilities, or proprietary information.
+
+2.2 Disclosure and Cooperation
+Executive shall promptly disclose to the Company all Inventions. Executive shall execute all documents, instruments, and assignments reasonably necessary to perfect and protect the Company's ownership of all Inventions, including patent applications, copyright registrations, and trademark filings.
+
+2.3 Pre-Existing Intellectual Property
+Executive represents that all intellectual property developed prior to the commencement of employment and listed in Exhibit A attached hereto is excluded from this Assignment. No such pre-existing IP shall be assigned to the Company without a separate written agreement.
+
+3. TERMINATION AND SEVERANCE
+
+3.1 Termination by Company for Cause
+The Company may terminate this Agreement immediately for Cause, defined as: (a) material breach of this Agreement unremedied after 30 days' written notice; (b) conviction of or guilty plea to a felony or crime of moral turpitude; (c) willful misconduct, fraud, or misappropriation of Company assets; (d) material violation of Company policies resulting in significant harm to the Company.
+
+3.2 Termination by Company Without Cause
+The Company may terminate this Agreement without Cause upon sixty (60) days' written notice. In the event of termination without Cause, Executive shall be entitled to: (a) continued payment of base salary for a period of twelve (12) months from the termination date ("Severance Period"); (b) continuation of health benefits during the Severance Period at the Company's cost; (c) accelerated vesting of all unvested equity awards scheduled to vest within 12 months of the termination date; (d) a pro-rated bonus for the fiscal year in which termination occurs.
+
+3.3 Termination by Executive
+Executive may terminate this Agreement upon ninety (90) days' written notice to the Company. Termination by Executive for Good Reason (material reduction in compensation, title, or duties; relocation of principal office more than 50 miles without consent; material breach of this Agreement by Company) shall be treated as termination without Cause for severance purposes.
+
+3.4 Return of Property
+Upon termination for any reason, Executive shall promptly return all Company property including confidential information, equipment, and all copies of proprietary materials.
+
+4. NON-COMPETE AND CONFIDENTIALITY
+
+4.1 Confidential Information
+Executive acknowledges that, in the course of employment, Executive will have access to highly sensitive and proprietary information, including technical data, business plans, customer lists, financial projections, product roadmaps, and trade secrets ("Confidential Information"). Executive agrees to: (a) hold all Confidential Information in strict confidence; (b) not disclose Confidential Information to any third party without prior written consent; (c) use Confidential Information solely for Company business purposes; (d) take all reasonable measures to protect Confidential Information from unauthorized disclosure. These obligations shall survive termination of employment indefinitely.
+
+4.2 Non-Solicitation of Employees
+During employment and for a period of twenty-four (24) months following termination, Executive agrees not to directly or indirectly solicit, recruit, induce, or encourage any employee of the Company to leave the Company's employ.
+
+4.3 Non-Solicitation of Customers
+During employment and for a period of eighteen (18) months following termination, Executive agrees not to solicit or accept business from any customer of the Company with whom Executive had material contact during the last 24 months of employment, for purposes competitive with the Company's business.
+
+4.4 Non-Competition
+During employment and for a period of twelve (12) months following termination, Executive agrees not to directly or indirectly engage in, be employed by, consult for, or own an interest in any entity that competes directly with the Company's primary product lines in North America. This restriction applies only to roles substantially similar to Executive's position at the Company.
+
+4.5 Remedies
+Executive acknowledges that any breach of this Section 4 would cause irreparable harm for which monetary damages would be inadequate. The Company shall be entitled to seek equitable relief, including injunction and specific performance, in addition to all other remedies available at law or in equity.
+
+5. GOVERNING LAW
+This Agreement shall be governed by the laws of the State of Delaware. Any disputes arising under this Agreement shall be resolved by binding arbitration administered by JAMS under its Employment Arbitration Rules, except that either party may seek injunctive relief in any court of competent jurisdiction for violations of Section 4.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+NOVATECH SYSTEMS INC.
+By: _________________________
+Name: Robert Chen
+Title: Chief Executive Officer
+Date: March 1, 2026
+
+EXECUTIVE
+Signature: _________________________
+Name: Dr. Priya Mehta
+Date: March 1, 2026

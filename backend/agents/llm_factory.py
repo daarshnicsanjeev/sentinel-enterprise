@@ -9,15 +9,17 @@ from langchain_ollama import ChatOllama
 
 _DEFAULT_MODEL = "gemma4:31b-cloud"
 _DEFAULT_BASE_URL = "http://127.0.0.1:11434"
+_DEFAULT_TIMEOUT = 120.0  # seconds — generous for large models, prevents indefinite hangs
 
 
 def create_llm(temperature: float = 0.0, **kwargs):
     """Return a configured LLM instance.
 
     Env vars:
-      LLM_PROVIDER   — only "ollama" supported (default)
-      OLLAMA_MODEL   — model tag (default: gemma4:31b-cloud)
-      OLLAMA_BASE_URL — Ollama server URL (default: localhost:11434)
+      LLM_PROVIDER          — only "ollama" supported (default)
+      OLLAMA_MODEL          — model tag (default: gemma4:31b-cloud)
+      OLLAMA_BASE_URL       — Ollama server URL (default: localhost:11434)
+      LLM_TIMEOUT_SECONDS   — per-request timeout in seconds (default: 120)
     """
     provider = os.getenv("LLM_PROVIDER", "ollama")
     if provider != "ollama":
@@ -25,5 +27,6 @@ def create_llm(temperature: float = 0.0, **kwargs):
 
     model = os.getenv("OLLAMA_MODEL", _DEFAULT_MODEL)
     base_url = os.getenv("OLLAMA_BASE_URL", _DEFAULT_BASE_URL)
+    timeout = float(os.getenv("LLM_TIMEOUT_SECONDS", str(_DEFAULT_TIMEOUT)))
 
-    return ChatOllama(model=model, temperature=temperature, base_url=base_url, **kwargs)
+    return ChatOllama(model=model, temperature=temperature, base_url=base_url, request_timeout=timeout, **kwargs)

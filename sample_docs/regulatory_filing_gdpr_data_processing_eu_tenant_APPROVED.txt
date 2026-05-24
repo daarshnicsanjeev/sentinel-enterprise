@@ -1,0 +1,118 @@
+DATA PROCESSING IMPACT ASSESSMENT AND REGULATORY COMPLIANCE FILING
+
+Submitted to: European Data Protection Board (EDPB) and Irish Data Protection Commission (DPC)
+Filing Reference: GDPR-DPA-2026-IE-00847
+Date: March 15, 2026
+Filing Type: Article 35 Data Protection Impact Assessment (DPIA)
+
+CONTROLLER DETAILS:
+Organisation: CloudStream Analytics Limited
+Registered Address: 1 Grand Canal Square, Dublin 2, D02 P820, Ireland
+DPC Registration: IE-DPC-2021-0034892
+DPO Contact: dpo@cloudstream.io | +353 1 555 0192
+
+1. MATERIAL DISCLOSURE
+
+1.1 Nature and Scope of Processing
+CloudStream Analytics Limited processes personal data of approximately 2.3 million EU/EEA data subjects across 27 member states in connection with its cloud-based business intelligence platform ("Platform"). The processing involves: behavioural analytics data, device identifiers, IP addresses, usage patterns, and where applicable, professional profile information for B2B customers.
+
+1.2 High-Risk Processing Activities
+This DPIA is submitted because the proposed processing activities involve: (a) systematic and extensive evaluation of personal aspects using automated processing, including profiling; (b) processing on a large scale of special categories of data as referred to in Article 9(1) GDPR; (c) systematic monitoring of a publicly accessible area on a large scale.
+
+1.3 Legal Basis for Processing
+The Company relies on the following legal bases under Article 6 GDPR: (a) Article 6(1)(b) — performance of a contract; (b) Article 6(1)(c) — compliance with legal obligation; (c) Article 6(1)(f) — legitimate interests, having conducted and documented a Legitimate Interests Assessment (LIA) dated January 10, 2026.
+
+1.4 International Data Transfers
+Personal data is transferred to the following third countries: United States (under Standard Contractual Clauses per Commission Decision 2021/914 and supplementary measures including encryption at rest and in transit, access controls, and regular audits); United Kingdom (adequacy decision in place per Article 45 GDPR).
+
+2. RISK FACTOR DISCLOSURES
+
+2.1 Identified Risks and Mitigations
+
+RISK 1 — Unauthorised Access: Risk Level: HIGH
+Potential for data breach through cyberattack or insider threat.
+Mitigation: AES-256 encryption at rest; TLS 1.3 in transit; MFA enforced for all employees; quarterly penetration testing; SOC 2 Type II certification maintained.
+Residual Risk after Mitigation: MEDIUM
+
+RISK 2 — Algorithmic Bias in Profiling: Risk Level: MEDIUM
+Automated profiling decisions may result in discriminatory outcomes.
+Mitigation: Regular algorithmic audits conducted by independent third party; human review process for significant decisions; opt-out mechanism for profiling.
+Residual Risk after Mitigation: LOW
+
+RISK 3 — Data Subject Rights Fulfilment: Risk Level: MEDIUM
+Volume of DSARs may exceed operational capacity.
+Mitigation: Automated DSAR portal deployed; dedicated Privacy Operations team of 8 FTEs; SLA of 25 days for response (5 days inside statutory limit).
+Residual Risk after Mitigation: LOW
+
+RISK 4 — Processor Non-Compliance: Risk Level: MEDIUM
+Sub-processors may not maintain adequate data protection standards.
+Mitigation: Data Processing Agreements in place with all 23 sub-processors; annual audits of critical sub-processors; sub-processor register publicly available.
+Residual Risk after Mitigation: LOW
+
+3. AUDITOR CERTIFICATION
+
+INDEPENDENT DATA PROTECTION AUDIT CERTIFICATION
+
+We, PwC Ireland Data Privacy Practice, have been engaged by CloudStream Analytics Limited to independently assess the data processing activities described in this DPIA.
+
+Scope of Assessment: We examined CloudStream's data processing activities, technical and organisational measures, sub-processor agreements, data subject rights procedures, and cross-border transfer mechanisms as of February 28, 2026.
+
+Findings: Based on our assessment, we confirm that CloudStream Analytics Limited has implemented data processing activities in material compliance with the requirements of Regulation (EU) 2016/679 (General Data Protection Regulation). The technical and organisational measures in place are appropriate to the risks presented by the processing activities.
+
+Certification: This DPIA has been prepared in accordance with Article 35 GDPR and ICO guidance. The processing may proceed subject to implementation of the additional recommendations in Appendix C of this report.
+
+Signed: Catherine O'Brien, Partner, PwC Ireland
+CIPP/E, CIPM, CISA
+Date: March 10, 2026
+PwC Reference: IE-DPP-2026-1847
+
+Data Protection Officer Acknowledgement:
+─────────────────────────────────────────────────────────────────────────────────
+SECTION 5 — ESG REPORTING COMPLIANCE CLAUSE
+─────────────────────────────────────────────────────────────────────────────────
+
+CloudStream Analytics Limited confirms compliance with EU ESG reporting requirements under
+the Corporate Sustainability Reporting Directive (CSRD) and the Sustainable Finance Disclosure
+Regulation (SFDR). This esg reporting compliance clause documents the Company's environmental,
+social, and governance disclosures for the reporting period:
+
+Environmental: The Company operates a carbon-neutral data processing infrastructure. All
+EU-based data centres operate on 100% renewable energy. Carbon footprint: 0.4 kg CO2e per
+EUR 1,000 revenue (FY 2025). Environmental management certified under ISO 14001.
+
+Social: The Company employs 847 staff across EU member states. Living wage commitment in
+all jurisdictions. Employee satisfaction index: 4.2/5.0 (2025 survey). Diversity: 47%
+female workforce, 38% in senior management. No material labour disputes in the period.
+
+Governance: Board consists of 8 members, including 4 independent non-executives. Audit
+Committee, Remuneration Committee, and Data Ethics Committee are fully operational.
+ESG performance linked to 15% of executive variable compensation.
+
+─────────────────────────────────────────────────────────────────────────────────
+SECTION 6 — ANTI-MONEY LAUNDERING DECLARATION
+─────────────────────────────────────────────────────────────────────────────────
+
+Anti-Money Laundering (AML) and Counter-Terrorism Financing (CTF) Declaration pursuant to
+EU Directive 2018/843 (5th Anti-Money Laundering Directive) and applicable Irish legislation:
+
+The Company confirms that:
+1. All business activities and revenue streams are derived from legitimate commercial operations
+   in the provision of cloud-based data analytics and software services.
+2. The Company maintains a documented AML/CTF policy reviewed annually by the Board.
+3. Customer due diligence (CDD) procedures are applied to all enterprise clients per the
+   Risk-Based Approach Guidelines issued by the EBA.
+4. No suspicious transaction reports (STRs) were filed with the Financial Intelligence Unit
+   during the reporting period.
+5. The Company's Money Laundering Reporting Officer (MLRO) is: Declan O'Brien, Head of
+   Compliance. No material AML compliance deficiencies were identified in the period.
+
+─────────────────────────────────────────────────────────────────────────────────
+CERTIFICATION AND SIGNATURE
+─────────────────────────────────────────────────────────────────────────────────
+
+I confirm this DPIA accurately represents CloudStream's processing activities and risk profile.
+Signed: Aoife Murphy, DPO — CloudStream Analytics Limited
+Date: March 14, 2026
+
+CEO Certification: I confirm the accuracy of all disclosures in this filing.
+Signed: Ciara Brennan, CEO — Date: March 15, 2026

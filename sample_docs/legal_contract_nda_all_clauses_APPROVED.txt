@@ -1,0 +1,38 @@
+NON-DISCLOSURE AGREEMENT
+
+This Non-Disclosure Agreement ("Agreement") is entered into as of January 15, 2026, by and between Meridian Technologies Inc., a Delaware corporation ("Disclosing Party"), and Vanguard Consulting Group LLC, a New York limited liability company ("Receiving Party").
+
+1. CONFIDENTIAL INFORMATION
+For purposes of this Agreement, "Confidential Information" means any data or information that is proprietary to the Disclosing Party and not generally known to the public, whether in tangible or intangible form, including but not limited to: technical data, trade secrets, know-how, research, product plans, products, services, customers, customer lists, markets, software, developments, inventions, processes, formulas, technology, designs, drawings, engineering, hardware configuration information, marketing, finances, or other business information disclosed by the Disclosing Party either directly or indirectly in writing, orally, or by drawings or inspection of parts or equipment.
+
+2. FORCE MAJEURE
+Neither party shall be liable for any failure or delay in performance under this Agreement (other than for delay in the payment of money due and payable hereunder) to the extent said failures or delays are proximately caused by causes beyond that party's reasonable control and occurring without its fault or negligence, including, without limitation: acts of God, acts of civil or military authorities, fires, floods, earthquakes, riots, wars, sabotage, labour disputes (excluding those involving the employees of such party), pandemic events, governmental actions, power failures, or internet outages. In the event of such a force majeure event, the affected party shall promptly notify the other party in writing, stating the period of time the occurrence is expected to continue.
+
+3. LIMITATION OF LIABILITY
+IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION, LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, RESULTING FROM (I) ACCESS TO OR USE OF OR INABILITY TO ACCESS OR USE CONFIDENTIAL INFORMATION; (II) ANY CONDUCT OR CONTENT OF ANY THIRD PARTY; (III) UNAUTHORIZED ACCESS, USE OR ALTERATION OF CONFIDENTIAL INFORMATION. IN ANY CASE, THE DISCLOSING PARTY'S AGGREGATE LIABILITY SHALL NOT EXCEED USD $500,000 OR THE AMOUNT PAID BY THE RECEIVING PARTY IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM, WHICHEVER IS GREATER.
+
+4. DISPUTE RESOLUTION
+Any dispute, controversy or claim arising out of or relating to this Agreement, or the breach, termination or invalidity thereof, shall be settled by binding arbitration in accordance with the JAMS Arbitration Rules and Procedures. The place of arbitration shall be New York, New York. The arbitration shall be conducted in English. The award rendered by the arbitrator shall be final and binding, and judgment may be entered upon it in any court having jurisdiction thereof. Notwithstanding the foregoing, either party may seek injunctive or other equitable relief in any court of competent jurisdiction to prevent irreparable harm pending arbitration.
+
+5. TERM AND TERMINATION
+This Agreement shall commence on the date first set forth above and shall remain in effect for a period of three (3) years, unless earlier terminated. Either party may terminate this Agreement upon thirty (30) days' prior written notice to the other party. Upon termination or expiry, the Receiving Party shall promptly return or destroy all Confidential Information and certify in writing to the Disclosing Party that it has done so.
+
+6. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of the State of New York, without regard to its conflict of laws provisions. The parties hereby irrevocably consent to the exclusive jurisdiction and venue of the federal and state courts located in New York County, New York for any dispute not subject to arbitration.
+
+7. ENTIRE AGREEMENT
+This Agreement constitutes the entire agreement between the parties with respect to its subject matter and supersedes all prior and contemporaneous understandings, agreements, representations and warranties, both written and oral, with respect to such subject matter.
+
+IN WITNESS WHEREOF, the parties hereto have executed this Non-Disclosure Agreement as of the date first written above.
+
+MERIDIAN TECHNOLOGIES INC.
+By: _______________________
+Name: Alexandra Chen
+Title: Chief Legal Officer
+Date: January 15, 2026
+
+VANGUARD CONSULTING GROUP LLC
+By: _______________________
+Name: Robert Harrington
+Title: Managing Partner
+Date: January 15, 2026

@@ -1,0 +1,49 @@
+REVOLVING CREDIT FACILITY AGREEMENT
+
+This Revolving Credit Facility Agreement ("Agreement") is dated March 10, 2017, and is entered into between:
+
+BORROWER: Clearwater Manufacturing Ltd., a company incorporated in England and Wales (Company No. 08821644) ("Borrower")
+LENDER: Northern Bank PLC, a bank authorised by the Prudential Regulation Authority ("Lender")
+
+FACILITY LIMIT: GBP 15,000,000
+
+1. THE FACILITY
+The Lender agrees to make available to the Borrower a revolving credit facility of up to GBP 15,000,000 (Fifteen Million Pounds Sterling) for the purposes of financing the Borrower's working capital requirements and general corporate purposes.
+
+2. AVAILABILITY PERIOD
+The Facility shall be available from the date of this Agreement until March 9, 2019 (the "Termination Date"). All outstanding amounts drawn under this Facility must be repaid in full on or before the Termination Date. THIS FACILITY EXPIRED ON MARCH 9, 2019. ANY FURTHER DRAWDOWNS AFTER THIS DATE ARE INVALID.
+
+3. REPRESENTATIONS AND WARRANTIES
+The Borrower represents and warrants to the Lender that:
+(a) it is a company duly incorporated under the laws of England and Wales and is in good standing;
+(b) it has full power and authority to enter into, exercise its rights and comply with its obligations under this Agreement;
+(c) all financial statements delivered to the Lender fairly and accurately represent its financial position as at the date to which they are drawn up;
+(d) no litigation, arbitration or administrative proceedings are current or, to its knowledge, pending or threatened, which might materially and adversely affect it;
+(e) no Event of Default has occurred and is continuing.
+
+4. EVENTS OF DEFAULT
+The following constitute Events of Default:
+(a) the Borrower fails to pay any sum due under this Agreement within five (5) Business Days of the due date;
+(b) any representation or warranty made by the Borrower is or proves to have been incorrect in any material respect;
+(c) the Borrower fails to comply with any provision of this Agreement and, if capable of remedy, such failure is not remedied within twenty (20) Business Days of the Lender giving notice;
+(d) the Borrower becomes insolvent, is unable to pay its debts as they fall due, or commences or suffers any insolvency proceedings;
+(e) a material adverse change occurs in the financial condition or business of the Borrower.
+
+5. INDEMNIFICATION
+The Borrower shall, within three (3) Business Days of demand by the Lender, indemnify the Lender against any cost, loss or liability incurred by the Lender as a result of: (a) the occurrence of any Event of Default; (b) any enquiry, investigation, subpoena or order of any court or regulatory authority; or (c) acting or relying on any notice, request or instruction which it reasonably believes to be genuine, correct and duly authorised.
+
+6. GOVERNING LAW AND JURISDICTION
+This Agreement is governed by English law. The courts of England and Wales have exclusive jurisdiction to hear any dispute arising under or in connection with this Agreement.
+
+7. EXPIRY NOTICE
+IMPORTANT: This credit facility expired on March 9, 2019. The outstanding balance of GBP 3,250,000 as of the Termination Date was not repaid and has been transferred to a Term Loan under separate agreement dated April 1, 2019. This document is being submitted for historical compliance record purposes only. Any reliance on this agreement for current financing purposes is erroneous.
+
+Signed for and on behalf of CLEARWATER MANUFACTURING LTD.
+Name: Thomas Hewitt
+Title: Finance Director
+Date: March 10, 2017
+
+Signed for and on behalf of NORTHERN BANK PLC
+Name: Sarah Alderton
+Title: Senior Relationship Manager
+Date: March 10, 2017

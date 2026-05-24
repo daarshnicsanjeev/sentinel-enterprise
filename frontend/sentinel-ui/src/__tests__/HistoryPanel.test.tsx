@@ -16,6 +16,7 @@ const MOCK_RECORDS = [
     faithfulness: 0.92,
     risk: 'low',
     created_at: '2026-05-16T10:00:00Z',
+    feedback_rating: 'positive',
   },
   {
     trace_id: 'def-456',
@@ -25,6 +26,17 @@ const MOCK_RECORDS = [
     faithfulness: 0.45,
     risk: 'high',
     created_at: '2026-05-16T11:00:00Z',
+    feedback_rating: 'negative',
+  },
+  {
+    trace_id: 'ghi-789',
+    filename: 'other.txt',
+    doc_type: 'NDA',
+    decision: 'ESCALATE',
+    faithfulness: 0.7,
+    risk: 'medium',
+    created_at: '2026-05-16T12:00:00Z',
+    feedback_rating: null,
   },
 ]
 
@@ -106,6 +118,119 @@ describe('HistoryPanel', () => {
     await waitFor(() => {
       expect(screen.getByText('APPROVED')).toBeInTheDocument()
       expect(screen.getByText('REJECTED')).toBeInTheDocument()
+    })
+  })
+
+  it('shows an error message when fetch throws a network error', async () => {
+    vi.mocked(fetch).mockRejectedValue(new Error('Network failure'))
+    render(<HistoryPanel />)
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument()
+    })
+  })
+
+  it('shows an error message when server returns HTTP 500', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => ({}),
+    } as unknown as Response)
+    render(<HistoryPanel />)
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument()
+    })
+  })
+
+  it('shows empty state when server returns non-array JSON', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => ({ unexpected: 'object' }),
+    } as unknown as Response)
+    render(<HistoryPanel />)
+    await waitFor(() => {
+      expect(screen.getByText(/no analyses/i)).toBeInTheDocument()
+    })
+  })
+
+  it('renders a Report column header', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => [],
+    } as unknown as Response)
+    render(<HistoryPanel />)
+    await waitFor(() => {
+      expect(screen.getByText(/report/i)).toBeInTheDocument()
+    })
+  })
+
+  it('renders a PDF download button for each record', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => MOCK_RECORDS,
+    } as unknown as Response)
+    render(<HistoryPanel />)
+    await waitFor(() => {
+      const buttons = screen.getAllByRole('button', { name: /pdf/i })
+      expect(buttons).toHaveLength(MOCK_RECORDS.length)
+    })
+  })
+
+  it('renders a Feedback column header', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => [],
+    } as unknown as Response)
+    render(<HistoryPanel />)
+    await waitFor(() => {
+      expect(screen.getByText(/feedback/i)).toBeInTheDocument()
+    })
+  })
+
+  it('shows thumbs-up emoji for positive feedback_rating', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => MOCK_RECORDS,
+    } as unknown as Response)
+    render(<HistoryPanel />)
+    await waitFor(() => {
+      expect(screen.getByText('👍')).toBeInTheDocument()
+    })
+  })
+
+  it('shows thumbs-down emoji for negative feedback_rating', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => MOCK_RECORDS,
+    } as unknown as Response)
+    render(<HistoryPanel />)
+    await waitFor(() => {
+      expect(screen.getByText('👎')).toBeInTheDocument()
+    })
+  })
+
+  it('shows dash for null feedback_rating', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => MOCK_RECORDS,
+    } as unknown as Response)
+    render(<HistoryPanel />)
+    await waitFor(() => {
+      // The record with feedback_rating: null should render a dash
+      const cells = screen.getAllByRole('cell')
+      const dashCells = cells.filter(c => c.textContent === '—')
+      expect(dashCells.length).toBeGreaterThan(0)
+    })
+  })
+
+  it('PDF button has a descriptive title attribute', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => [MOCK_RECORDS[0]],
+    } as unknown as Response)
+    render(<HistoryPanel />)
+    await waitFor(() => {
+      const btn = screen.getByRole('button', { name: /pdf/i })
+      expect(btn).toHaveAttribute('title')
     })
   })
 })

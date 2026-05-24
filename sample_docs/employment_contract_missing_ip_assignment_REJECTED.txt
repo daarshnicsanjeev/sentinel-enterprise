@@ -1,0 +1,68 @@
+EMPLOYMENT AGREEMENT — SOFTWARE ENGINEER
+
+This Employment Agreement ("Agreement") is made effective January 15, 2026, between:
+
+EMPLOYER: CloudBase Technologies Ltd., a UK private limited company ("Company")
+EMPLOYEE: James Whitfield ("Employee")
+ROLE: Senior Software Engineer, Platform Team
+LOCATION: London, United Kingdom (Hybrid — 3 days on-site)
+
+NOTE: This agreement intentionally omits an intellectual property assignment clause to test compliance rejection.
+
+1. COMPENSATION AND BENEFITS
+
+1.1 Base Salary
+The Company shall pay Employee a gross annual salary of GBP 92,000, paid monthly on the last business day of each calendar month via BACS transfer to Employee's nominated bank account.
+
+1.2 Annual Bonus
+Employee shall be eligible for an annual discretionary bonus of up to 15% of base salary based on individual and company performance. Bonus payments are not guaranteed and do not form part of Employee's contractual entitlement.
+
+1.3 Benefits Package
+Employee shall be entitled to the following benefits: (a) BUPA private medical insurance for Employee and family; (b) 25 days annual leave plus UK public holidays; (c) pension contributions of 8% employer, 5% employee under the Company's auto-enrolment scheme; (d) cycle-to-work scheme; (e) professional development budget of GBP 3,000 per annum; (f) Company-provided MacBook Pro and peripherals.
+
+1.4 Stock Options
+Employee shall be granted options over 50,000 shares in the Company's EMI scheme, vesting over 48 months with a 12-month cliff, subject to the terms of the Company's Share Option Plan.
+
+2. TERMINATION AND SEVERANCE
+
+2.1 Notice Period
+Either party may terminate this Agreement by giving the other not less than three (3) months' written notice. During the notice period, the Company may, at its absolute discretion, pay Employee in lieu of notice (PILON) an amount equal to the salary and contractual benefits that would have been received during the notice period.
+
+2.2 Summary Dismissal
+The Company may terminate this Agreement without notice or payment in lieu of notice in the event of gross misconduct, including but not limited to: (a) serious breach of Company policies; (b) dishonesty, fraud, or theft; (c) bringing the Company into serious disrepute; (d) serious negligence causing significant damage to the Company.
+
+2.3 Redundancy
+In the event of redundancy, Employee shall receive statutory redundancy pay calculated in accordance with the Employment Rights Act 1996, plus an enhanced payment of one week's pay for each complete year of service, capped at twenty (20) weeks' pay.
+
+2.4 Garden Leave
+The Company reserves the right to place Employee on garden leave during any notice period, during which Employee shall remain an employee of the Company, continue to receive salary and benefits, but shall not be required (and may be excluded) from Company premises and systems.
+
+3. NON-COMPETE AND CONFIDENTIALITY
+
+3.1 Confidentiality
+Employee acknowledges that in the course of employment they will have access to trade secrets, customer information, business plans, financial data, and other proprietary information ("Confidential Information"). Employee agrees to maintain the strictest confidence regarding all Confidential Information both during and after employment, for a period of five (5) years post-termination.
+
+3.2 Non-Solicitation of Employees
+For twelve (12) months following the termination of employment, Employee shall not solicit or encourage any employee of the Company to leave their employment for a competitor.
+
+3.3 Non-Solicitation of Clients
+For twelve (12) months following termination, Employee shall not solicit or deal with any client of the Company with whom Employee had business contact during the final twelve months of employment.
+
+3.4 Post-Termination Restrictions
+For six (6) months following termination, Employee shall not be employed by or provide services to a directly competing business in the United Kingdom. The Company agrees to provide compensation at 50% of base salary during this restricted period.
+
+4. GOVERNING LAW AND JURISDICTION
+This Agreement is governed by the laws of England and Wales. The parties submit to the exclusive jurisdiction of the courts of England and Wales.
+
+Signed by the parties on the dates shown below.
+
+CLOUDBASE TECHNOLOGIES LTD.
+Signed: _________________________
+Name: Sarah Brennan
+Title: Head of People & Culture
+Date: January 15, 2026
+
+EMPLOYEE
+Signed: _________________________
+Name: James Whitfield
+Date: January 15, 2026

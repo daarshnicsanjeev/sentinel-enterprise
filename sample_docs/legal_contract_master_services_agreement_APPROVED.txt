@@ -1,0 +1,107 @@
+MASTER SERVICES AGREEMENT
+
+This Master Services Agreement ("Agreement") is entered into as of January 15, 2026, between
+APEX TECHNOLOGY SOLUTIONS, INC., a Delaware corporation ("Service Provider"), and
+GLOBALSTREAM MEDIA GROUP LLC, a New York limited liability company ("Client").
+
+─────────────────────────────────────────────────────────────────────────────────
+SECTION 1 — FORCE MAJEURE CLAUSE
+─────────────────────────────────────────────────────────────────────────────────
+
+Neither party shall be liable for any failure or delay in performance under this Agreement
+to the extent such failure or delay is caused by circumstances beyond the reasonable control
+of the affected party, including but not limited to: acts of God, natural disasters, floods,
+earthquakes, fire, epidemic or pandemic, government actions, war, civil unrest, terrorism,
+labour strikes not involving the affected party's employees, widespread internet or
+telecommunications outages, or interruption of essential utility services.
+
+Force Majeure Notice Requirement: The affected party must notify the other party in writing
+within five (5) business days of the onset of the force majeure event, specifying the nature,
+anticipated duration, and steps being taken to mitigate the impact. Failure to provide timely
+notice shall not excuse performance unless notice was itself made impossible by the same event.
+
+Duration and Termination Right: If a force majeure event persists for more than sixty (60)
+consecutive calendar days, either party may terminate the affected Statement of Work without
+penalty by providing fifteen (15) days' written notice. Pre-paid fees for undelivered Services
+shall be refunded on a pro-rata basis within thirty (30) days of termination.
+
+─────────────────────────────────────────────────────────────────────────────────
+SECTION 2 — LIMITATION OF LIABILITY
+─────────────────────────────────────────────────────────────────────────────────
+
+2.1  Aggregate Cap: EXCEPT FOR (I) WILFUL MISCONDUCT OR FRAUD, (II) INDEMNIFICATION
+OBLIGATIONS UNDER SECTION 8, AND (III) BREACH OF CONFIDENTIALITY UNDER SECTION 6,
+EACH PARTY'S TOTAL CUMULATIVE LIABILITY TO THE OTHER PARTY ARISING OUT OF OR RELATING
+TO THIS AGREEMENT OR ANY STATEMENT OF WORK SHALL NOT EXCEED THE TOTAL FEES PAID OR
+PAYABLE UNDER THE RELEVANT STATEMENT OF WORK IN THE TWELVE (12) MONTHS PRECEDING THE
+CLAIM.
+
+2.2  Exclusion of Consequential Damages: IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR
+ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE, OR CONSEQUENTIAL DAMAGES, INCLUDING LOSS
+OF REVENUE, LOSS OF PROFITS, LOSS OF BUSINESS, LOSS OF DATA, LOSS OF GOODWILL, OR
+COST OF SUBSTITUTE SERVICES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+2.3  Exceptions to Limitation: The limitation of liability in Section 2.1 shall not apply to:
+(a) claims for death or personal injury caused by negligence; (b) claims arising under
+applicable consumer protection statutes that cannot be contractually limited; or
+(c) amounts awarded by a court for wilful infringement of intellectual property rights.
+
+─────────────────────────────────────────────────────────────────────────────────
+SECTION 3 — DISPUTE RESOLUTION CLAUSE
+─────────────────────────────────────────────────────────────────────────────────
+
+3.1  Escalation: Either party may escalate a dispute to senior management by written notice.
+The parties' designated senior representatives shall meet (in person or virtually) within ten
+(10) business days of such notice to attempt resolution in good faith.
+
+3.2  Mediation: If the dispute remains unresolved after thirty (30) days of escalation,
+either party may refer the matter to non-binding mediation administered by JAMS under its
+Streamlined Mediation Rules. The cost of the mediator shall be borne equally.
+
+3.3  Arbitration: Any unresolved dispute shall be submitted to final and binding arbitration
+administered by the American Arbitration Association ("AAA") under its Commercial Arbitration
+Rules. The arbitration shall be conducted by a single arbitrator agreed by the parties, or
+appointed by AAA in default of agreement. The seat of arbitration shall be New York, New York.
+The language of arbitration proceedings shall be English.
+
+3.4  Governing Law: This Agreement shall be governed by and construed in accordance with
+the laws of the State of New York, excluding its conflict-of-law principles.
+
+3.5  Confidentiality of Proceedings: All arbitration proceedings, awards, and settlements
+shall be treated as confidential information by both parties.
+
+─────────────────────────────────────────────────────────────────────────────────
+SECTION 4 — SERVICES AND DELIVERABLES
+─────────────────────────────────────────────────────────────────────────────────
+
+Service Provider shall perform technology consulting, software development, and managed IT
+services as described in individual Statements of Work executed from time to time. Each
+Statement of Work shall specify: scope of services, deliverables, timelines, acceptance
+criteria, and applicable fees.
+
+─────────────────────────────────────────────────────────────────────────────────
+SECTION 5 — FEES AND PAYMENT
+─────────────────────────────────────────────────────────────────────────────────
+
+Fees shall be invoiced monthly in arrears. Payment is due within thirty (30) days of invoice
+date. Late payments shall accrue interest at 1.5% per month. The annual master retainer for
+this Agreement is USD 1,200,000, exclusive of expenses and applicable taxes.
+
+─────────────────────────────────────────────────────────────────────────────────
+SECTION 6 — CONFIDENTIALITY
+─────────────────────────────────────────────────────────────────────────────────
+
+Each party agrees to maintain in strict confidence all Confidential Information received from
+the other party, using the same degree of care it applies to its own confidential information
+(no less than reasonable care), for a period of five (5) years from disclosure.
+
+IN WITNESS WHEREOF, the parties have executed this Master Services Agreement as of the date
+first written above.
+
+APEX TECHNOLOGY SOLUTIONS, INC.
+By: _________________________ Name: David K. Morrison, CEO  Date: January 15, 2026
+
+GLOBALSTREAM MEDIA GROUP LLC
+By: _________________________ Name: Priya N. Chandrasekhar, COO  Date: January 15, 2026
+
+Agreement Reference: MSA-APEX-GSM-2026-001

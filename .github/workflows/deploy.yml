@@ -1,169 +1,168 @@
-name: Deploy to AWS
+# =============================================================================
+# Project Sentinel — CI/CD Pipeline
+#
+# Triggers on every push to main:
+#   1. Run backend tests (pytest) — all LLM calls mocked, no Ollama needed
+#   2. Run frontend tests (vitest)
+#   3. Build React app (vite build)
+#   4. Sync dist/ to S3 (frontend)
+#   5. rsync backend/ to EC2 + restart sentinel.service
+#
+# Required GitHub Secrets (Settings → Secrets → Actions):
+#   AWS_ACCESS_KEY_ID         IAM key with S3 PutObject + S3 ListBucket
+#   AWS_SECRET_ACCESS_KEY     IAM secret
+#   AWS_REGION                e.g. ap-south-1
+#   S3_BUCKET                 e.g. sentinel-ui-sanjeev-2026
+#   EC2_HOST                  public IP of the EC2 instance
+#   EC2_SSH_KEY               full contents of the .pem file
+#   EC2_USER                  ubuntu
+#   VITE_API_BASE_URL         e.g. http://65.2.181.197:8000 (backend EC2 URL)
+# =============================================================================
+
+name: CI/CD — Test, Build, Deploy
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 env:
-  AWS_REGION: us-east-1
-  ECR_REPOSITORY: sentinel-backend
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "20"
 
 jobs:
-  # ── Job 1: Run tests ─────────────────────────────────────────────────────────
-  test:
+  # ---------------------------------------------------------------------------
+  # Job 1: Backend tests (no Ollama, no DB — all mocked)
+  # ---------------------------------------------------------------------------
+  backend-tests:
+    name: Backend Tests (pytest)
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
 
-      - name: Install backend dependencies
+      - name: Install system deps (Tesseract for OCR tests)
+        run: sudo apt-get install -y tesseract-ocr libmagic1 --quiet
+
+      - name: Install Python dependencies
         run: pip install -r backend/requirements.txt
 
-      - name: Run backend tests
-        run: |
-          cd backend
-          python -m pytest tests/ -v --tb=short -q
+      - name: Run pytest
+        working-directory: backend
+        run: python -m pytest tests/ -v --tb=short -q
 
-      - name: Set up Node 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install frontend dependencies
-        run: |
-          cd frontend/sentinel-ui
-          npm ci
-
-      - name: Run frontend tests
-        run: |
-          cd frontend/sentinel-ui
-          npx vitest run
-
-  # ── Job 2: Build and push Docker image to ECR ────────────────────────────────
-  build-and-push:
-    needs: test
+  # ---------------------------------------------------------------------------
+  # Job 2: Frontend tests + production build
+  # ---------------------------------------------------------------------------
+  frontend-build:
+    name: Frontend Tests + Build (vitest + vite)
     runs-on: ubuntu-latest
-    outputs:
-      image_uri: ${{ steps.build.outputs.image_uri }}
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
         with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ env.AWS_REGION }}
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/sentinel-ui/package-lock.json
 
-      - name: Login to Amazon ECR
-        id: ecr-login
-        uses: aws-actions/amazon-ecr-login@v2
+      - name: Install npm dependencies
+        working-directory: frontend/sentinel-ui
+        run: npm ci
 
-      - name: Build, tag, and push backend image
-        id: build
+      - name: Run vitest
+        working-directory: frontend/sentinel-ui
+        run: npx vitest run
+
+      - name: Build production bundle
+        working-directory: frontend/sentinel-ui
         env:
-          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-        run: |
-          IMAGE_URI="$REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA"
-          docker build -t "$IMAGE_URI" ./backend
-          docker push "$IMAGE_URI"
-          echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        run: npx vite build
 
-  # ── Job 3: Build and deploy React frontend to S3 ─────────────────────────────
-  deploy-frontend:
-    needs: test
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/sentinel-ui/dist/
+          retention-days: 1
+
+  # ---------------------------------------------------------------------------
+  # Job 3: Deploy — only on push to main (not on PRs)
+  # ---------------------------------------------------------------------------
+  deploy:
+    name: Deploy to AWS
     runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Node 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Build React app
-        run: |
-          cd frontend/sentinel-ui
-          npm ci
-          npm run build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Sync to S3
+      # ── Frontend → S3 ──────────────────────────────────────────────────────
+      - name: Download frontend dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/sentinel-ui/dist/
+
+      - name: Sync assets to S3 (long-TTL — hashed filenames)
+        run: |
+          aws s3 sync frontend/sentinel-ui/dist/assets/ \
+            s3://${{ secrets.S3_BUCKET }}/assets/ \
+            --cache-control "public,max-age=31536000,immutable"
+
+      - name: Sync HTML to S3 (short-TTL — always fresh)
         run: |
           aws s3 sync frontend/sentinel-ui/dist/ \
-            s3://${{ secrets.S3_FRONTEND_BUCKET }} \
-            --delete
+            s3://${{ secrets.S3_BUCKET }}/ \
+            --delete \
+            --exclude "assets/*" \
+            --cache-control "public,max-age=0,must-revalidate"
 
-      - name: Invalidate CloudFront cache
+      # ── Backend → EC2 via rsync + SSH ─────────────────────────────────────
+      - name: Write SSH key
         run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
+          echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/sentinel-key.pem
+          chmod 600 /tmp/sentinel-key.pem
 
-  # ── Job 4: Deploy new backend image to EC2 ───────────────────────────────────
-  deploy-backend:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ env.AWS_REGION }}
-
-      - name: Deploy to EC2 via SSM
-        env:
-          IMAGE_URI: ${{ needs.build-and-push.outputs.image_uri }}
+      - name: rsync backend to EC2
         run: |
-          aws ssm send-command \
-            --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
-            --document-name "AWS-RunShellScript" \
-            --parameters "commands=[
-              'docker pull $IMAGE_URI',
-              'docker tag $IMAGE_URI sentinel-backend:latest',
-              'cd /opt/sentinel && docker compose up -d --no-build'
-            ]" \
-            --comment "Deploy $GITHUB_SHA"
+          rsync -az --delete \
+            -e "ssh -i /tmp/sentinel-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=20" \
+            --exclude=".env" \
+            --exclude="sentinel.db" \
+            --exclude="*.jsonl" \
+            --exclude="__pycache__/" \
+            --exclude=".pytest_cache/" \
+            backend/ \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/sentinel/backend/
 
-  # ── Job 5: Terraform infra (only on infra changes) ────────────────────────────
-  terraform:
-    needs: test
-    runs-on: ubuntu-latest
-    if: contains(github.event.commits[0].modified, 'infra/')
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.7.0"
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ env.AWS_REGION }}
-
-      - name: Terraform init
-        working-directory: infra
-        run: terraform init
-
-      - name: Terraform apply
-        working-directory: infra
+      - name: Restart backend service
         run: |
-          terraform apply -auto-approve \
-            -var="ollama_base_url=${{ secrets.OLLAMA_BASE_URL }}" \
-            -var="ollama_model=${{ secrets.OLLAMA_MODEL }}" \
-            -var="sentinel_api_key=${{ secrets.SENTINEL_API_KEY }}"
+          ssh -i /tmp/sentinel-key.pem \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=20 \
+              ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+              "sudo systemctl restart sentinel && sleep 6 && curl -sf http://localhost:8000/api/health"
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f /tmp/sentinel-key.pem

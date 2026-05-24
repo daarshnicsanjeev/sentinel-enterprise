@@ -63,3 +63,23 @@ ollama_data/
 # ── Logs ──────────────────────────────────────────────────────────────────────
 *.log
 logs/
+
+# ── SSH / TLS keys (NEVER commit private keys) ───────────────────────────────
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ── Frontend env files (contain EC2 IP / API URLs — set via CI secrets) ──────
+frontend/sentinel-ui/.env.local
+frontend/sentinel-ui/.env.production
+frontend/sentinel-ui/.env.*.local
+
+# ── Runtime feedback data (append-only logs, not source) ─────────────────────
+backend/data/correction_examples.jsonl
+backend/data/few_shot_examples.jsonl
+
+# ── Duplicate / temp artifacts ────────────────────────────────────────────────
+"sample_docs - Copy*/
+sample_docs - Copy/
+*.zip

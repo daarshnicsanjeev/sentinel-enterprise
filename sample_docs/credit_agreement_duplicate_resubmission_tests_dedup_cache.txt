@@ -1,0 +1,25 @@
+REVOLVING CREDIT FACILITY AGREEMENT
+
+PARTIES:
+Lender: Pacific Commerce Bank
+Borrower: Greenfield Innovations LLC
+Date: January 15, 2026
+Facility: USD 2,500,000 Revolving Credit Line
+
+NOTE: This is an intentional duplicate of a previously submitted document to test the system's deduplication cache. Upload the file named "credit_agreement_valid.txt" first, then upload this file — the system should return the cached result instantly without re-running the full pipeline.
+
+1. REPRESENTATIONS AND WARRANTIES
+Borrower represents and warrants that it is validly organized, has authority to enter into this Agreement, its financial statements are accurate in all material respects, and no material adverse change has occurred in its financial condition.
+
+2. EVENTS OF DEFAULT
+Events of Default include: failure to pay when due, breach of covenant unremedied within thirty (30) days of notice, insolvency, material misrepresentation, or cross-default on other indebtedness exceeding $100,000.
+
+3. INDEMNIFICATION
+Borrower shall indemnify Lender against any losses arising from breach of representations, third party claims related to collateral, or violations of applicable law.
+
+4. GOVERNING LAW
+This Agreement is governed by the laws of the State of California. Disputes shall be resolved in the courts of San Francisco County, California.
+
+Signed: January 15, 2026
+Borrower: Greenfield Innovations LLC
+Lender: Pacific Commerce Bank

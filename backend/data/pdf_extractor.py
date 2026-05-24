@@ -42,17 +42,19 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
     except Exception as exc:
         raise ValueError(f"not a valid PDF: {exc}") from exc
 
-    page_texts: list[str] = []
-    for page in doc:
-        text = page.get_text().strip()
-        if len(text) < _OCR_THRESHOLD:
-            # Sparse or empty page — likely scanned; render and OCR
-            mat = fitz.Matrix(2, 2)  # 2x zoom for sharper OCR input
-            pix = page.get_pixmap(matrix=mat)
-            text = _ocr_page_image(pix)
-        page_texts.append(text)
+    try:
+        page_texts: list[str] = []
+        for page in doc:
+            text = page.get_text().strip()
+            if len(text) < _OCR_THRESHOLD:
+                # Sparse or empty page — likely scanned; render and OCR
+                mat = fitz.Matrix(2, 2)  # 2x zoom for sharper OCR input
+                pix = page.get_pixmap(matrix=mat)
+                text = _ocr_page_image(pix)
+            page_texts.append(text)
+    finally:
+        doc.close()
 
-    doc.close()
     combined = "\n\n".join(t for t in page_texts if t.strip())
     combined = re.sub(r"\n{3,}", "\n\n", combined)
     return combined.strip()
@@ -79,3 +81,5 @@ def _ocr_page_image(pix) -> str:
         ) from exc
     except Exception as exc:
         raise ValueError(f"OCR failed: {exc}") from exc
+    finally:
+        img.close()

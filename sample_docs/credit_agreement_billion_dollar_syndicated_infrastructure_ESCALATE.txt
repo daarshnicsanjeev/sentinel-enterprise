@@ -1,0 +1,103 @@
+SENIOR SECURED SYNDICATED TERM LOAN AND REVOLVING CREDIT FACILITY AGREEMENT
+
+FACILITY AMOUNT: USD 2,750,000,000 (Two Billion Seven Hundred Fifty Million United States Dollars)
+
+This Senior Secured Syndicated Credit Agreement ("Agreement") is dated March 28, 2026, and entered into among:
+
+BORROWER: TransContinental Infrastructure Holdings LLC, a Delaware limited liability company ("Borrower")
+GUARANTORS: All material subsidiaries of Borrower listed in Schedule I ("Guarantors")
+ADMINISTRATIVE AGENT: JPMorgan Chase Bank, N.A. ("Administrative Agent")
+COLLATERAL AGENT: JPMorgan Chase Bank, N.A. ("Collateral Agent")
+LEAD ARRANGERS AND BOOKRUNNERS: JPMorgan Chase Bank, N.A.; Goldman Sachs Bank USA; Citibank, N.A.; Bank of America, N.A.; Barclays Bank PLC
+LENDERS: The financial institutions listed in Schedule II (collectively, "Lenders")
+
+PURPOSE: Financing of the TransContinental High-Speed Rail Network spanning 1,847 kilometres across seven U.S. states, including refinancing of existing construction facilities and working capital for the first operational phase commencing Q3 2027.
+
+FACILITY STRUCTURE:
+- Tranche A Term Loan: USD 1,500,000,000 — 7-year maturity, amortising at 5% per annum
+- Tranche B Term Loan: USD 750,000,000 — 10-year maturity, bullet repayment
+- Revolving Credit Facility: USD 500,000,000 — 5-year revolving, for working capital and letters of credit
+
+1. REPRESENTATIONS AND WARRANTIES
+
+The Borrower and each Guarantor represent and warrant to the Administrative Agent and each Lender, as of the date hereof and as of each drawdown date, that:
+
+1.1 Organisation and Standing
+Borrower is a limited liability company duly organized, validly existing, and in good standing under the laws of the State of Delaware. Each Guarantor is duly organized, validly existing, and in good standing under the laws of its jurisdiction of formation. Each entity has all requisite power and authority to own and operate its properties and to carry on its business as currently conducted.
+
+1.2 Authorization and Enforceability
+The execution, delivery, and performance of this Agreement and all related loan documents have been duly authorized by all necessary action of the Borrower and each Guarantor. This Agreement constitutes the legal, valid, and binding obligation of each such entity, enforceable in accordance with its terms, subject to applicable bankruptcy, insolvency, reorganization, moratorium, and similar laws affecting creditors' rights generally.
+
+1.3 No Conflicts
+The execution and delivery of this Agreement do not: (a) violate the organizational documents of Borrower or any Guarantor; (b) conflict with any law, regulation, judgment, order, or decree applicable to any such entity; (c) result in a default under any material agreement to which such entity is a party.
+
+1.4 Financial Statements
+The consolidated financial statements of Borrower for the fiscal year ended December 31, 2025, prepared in accordance with GAAP, fairly present in all material respects the financial condition of Borrower as of the date thereof. Since December 31, 2025, no Material Adverse Effect has occurred.
+
+1.5 Infrastructure Permits and Approvals
+All material federal, state, and local governmental authorizations, approvals, licenses, and permits necessary for the construction and operation of the TransContinental High-Speed Rail Network have been obtained or are being diligently pursued. Borrower is not aware of any pending challenge to any material permit.
+
+1.6 Environmental Representations
+Borrower and its subsidiaries are in compliance in all material respects with all applicable environmental laws. There are no pending or threatened environmental claims that could reasonably be expected to result in liabilities exceeding USD 50,000,000 in aggregate.
+
+2. EVENTS OF DEFAULT
+
+The occurrence and continuation of any of the following events shall constitute an "Event of Default":
+
+2.1 Payment Default
+Failure by Borrower to pay any principal, interest, or fees when due under this Agreement, and such failure continues for five (5) Business Days after the due date.
+
+2.2 Covenant Default
+Breach of any financial covenant (including the Leverage Ratio not to exceed 7.5x Net Debt/EBITDA and the Debt Service Coverage Ratio not less than 1.20x) or any negative covenant, and such breach is not remedied within thirty (30) days of written notice from the Administrative Agent.
+
+2.3 Misrepresentation
+Any representation or warranty proves to have been materially incorrect when made and, if curable, is not cured within thirty (30) Business Days of the Borrower becoming aware.
+
+2.4 Cross-Default
+Borrower or any Material Subsidiary (as defined herein) defaults on other indebtedness with an aggregate outstanding principal amount exceeding USD 100,000,000, and such default has not been waived or cured within the applicable grace period.
+
+2.5 Insolvency Events
+Borrower or any Material Subsidiary: (a) files for voluntary bankruptcy protection or has an involuntary bankruptcy petition filed against it that is not dismissed within sixty (60) days; (b) makes an assignment for the benefit of creditors; (c) has a receiver, trustee, or liquidator appointed for all or substantially all of its assets.
+
+2.6 Change of Control
+Any Change of Control (defined as any person or group acquiring more than 50% of the voting interests in Borrower or the ultimate parent entity) without the prior written consent of Lenders holding at least 66.67% of the outstanding facility.
+
+2.7 Material Project Events
+(a) Cessation of construction of the Rail Network for more than ninety (90) consecutive days for reasons other than Force Majeure; (b) loss, revocation, or suspension of any material governmental permit necessary for construction or operation of the Rail Network that is not reinstated within sixty (60) days; (c) cost overrun on the Rail Network project exceeding 20% of the total project budget of USD 18.4 billion.
+
+3. INDEMNIFICATION
+
+3.1 General Indemnification
+Borrower shall indemnify, defend, and hold harmless the Administrative Agent, Collateral Agent, Lead Arrangers, and each Lender (and their respective officers, directors, employees, affiliates, agents, successors, and assigns, collectively "Indemnitees") from and against all losses, claims, damages, liabilities, costs, and expenses (including reasonable attorneys' fees and legal costs) that arise out of, relate to, or result from: (a) the execution or delivery of this Agreement; (b) the performance by any party of its obligations under this Agreement; (c) any breach of any representation, warranty, or covenant; (d) any environmental liability of Borrower or any of its subsidiaries; (e) any investigation, litigation, or proceeding related to this Agreement or the use of proceeds of the credit facilities.
+
+3.2 Environmental Indemnification
+Borrower shall indemnify each Indemnitee for all costs and liabilities arising from environmental conditions at any real property owned, operated, or controlled by Borrower or any Guarantor, including costs of investigation, remediation, and regulatory compliance. This indemnification shall survive repayment of all obligations under this Agreement.
+
+3.3 Indemnification Procedure
+Each Indemnitee shall promptly notify Borrower of any claim for which it seeks indemnification. Borrower shall have the right to assume defence of any such claim with counsel reasonably acceptable to the Indemnitee, provided that the Indemnitee shall retain the right to participate in such defence with its own counsel at Borrower's expense in the event of any conflict of interest.
+
+4. GOVERNING LAW AND JURISDICTION
+
+4.1 Governing Law
+This Agreement shall be governed by and construed in accordance with the laws of the State of New York, without regard to conflict of laws principles. The parties acknowledge and agree that the choice of New York law is a reasonable and legitimate choice given the substantial connections of the parties and the transaction to New York.
+
+4.2 Consent to Jurisdiction
+Each party irrevocably submits to the exclusive jurisdiction of the United States District Court for the Southern District of New York, or if federal jurisdiction is unavailable, the state courts of New York County, for resolution of any dispute arising under or in connection with this Agreement. Each party waives any objection to the laying of venue.
+
+4.3 Waiver of Jury Trial
+EACH PARTY HEREBY IRREVOCABLY WAIVES ALL RIGHT TO TRIAL BY JURY IN ANY ACTION, PROCEEDING, OR CLAIM ARISING OUT OF OR RELATING TO THIS AGREEMENT.
+
+EXECUTED as of the date first written above by the duly authorized representatives of each party.
+
+TRANSCONTINENTAL INFRASTRUCTURE HOLDINGS LLC
+By: _________________________
+Name: Bradley Ashworth
+Title: Chief Executive Officer
+
+JPMORGAN CHASE BANK, N.A. (as Administrative Agent and Lead Arranger)
+By: _________________________
+Name: Victoria Chen
+Title: Managing Director, Leveraged Finance
+
+[Signature pages for all Lenders on file with Administrative Agent]
+Date of Execution: March 28, 2026

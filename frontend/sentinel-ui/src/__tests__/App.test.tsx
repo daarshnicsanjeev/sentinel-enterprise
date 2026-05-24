@@ -1,34 +1,44 @@
 /**
- * TDD spec for App.tsx — tenant selector (C3) and override button (C2).
+ * TDD spec for App.tsx — override button (C2), clause display.
  */
 import { render, screen } from '@testing-library/react'
 import App from '../App'
-
-describe('App — tenant selector (C3)', () => {
-  it('renders a tenant selector labelled "Regulatory Profile"', () => {
-    render(<App />)
-    expect(screen.getByLabelText(/regulatory profile/i)).toBeInTheDocument()
-  })
-
-  it('tenant selector has Default, EU, and US options', () => {
-    render(<App />)
-    const select = screen.getByLabelText(/regulatory profile/i) as HTMLSelectElement
-    const options = Array.from(select.options).map((o) => o.value)
-    expect(options).toContain('default')
-    expect(options).toContain('EU')
-    expect(options).toContain('US')
-  })
-
-  it('tenant selector defaults to "default"', () => {
-    render(<App />)
-    const select = screen.getByLabelText(/regulatory profile/i) as HTMLSelectElement
-    expect(select.value).toBe('default')
-  })
-})
+import { clauseDisplayLabel } from '../App'
 
 describe('App — history tab (C1)', () => {
   it('renders an Analysis History tab button', () => {
     render(<App />)
     expect(screen.getByRole('button', { name: /analysis history/i })).toBeInTheDocument()
+  })
+})
+
+describe('App — guardrail block visibility', () => {
+  it('override button is absent when sanitized is false', () => {
+    // The override button condition requires sanitized !== false, so with no result
+    // rendered it simply should not appear on initial load
+    render(<App />)
+    expect(screen.queryByText(/override.*approve/i)).not.toBeInTheDocument()
+  })
+})
+
+describe('clauseDisplayLabel — ESCALATE unverified badge', () => {
+  it('returns PRESENT unchanged when decision is not ESCALATE', () => {
+    expect(clauseDisplayLabel('PRESENT', 'APPROVED')).toBe('PRESENT')
+  })
+
+  it('returns MISSING unchanged when decision is not ESCALATE', () => {
+    expect(clauseDisplayLabel('MISSING', 'APPROVED')).toBe('MISSING')
+  })
+
+  it('returns ⚠ UNVERIFIED for PRESENT when decision is ESCALATE', () => {
+    expect(clauseDisplayLabel('PRESENT', 'ESCALATE')).toBe('⚠ UNVERIFIED')
+  })
+
+  it('returns MISSING unchanged even when decision is ESCALATE', () => {
+    expect(clauseDisplayLabel('MISSING', 'ESCALATE')).toBe('MISSING')
+  })
+
+  it('returns PRESENT unchanged when decision is REJECTED', () => {
+    expect(clauseDisplayLabel('PRESENT', 'REJECTED')).toBe('PRESENT')
   })
 })

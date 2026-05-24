@@ -5,16 +5,15 @@ variable "aws_region" {
 }
 
 variable "instance_type" {
-  description = "EC2 instance type — t2.micro is Free Tier eligible (1 vCPU, 1 GB RAM)"
+  description = "EC2 instance type — t3.micro is Free Tier eligible in ap-south-1 (1 vCPU, 1 GB RAM)"
   type        = string
-  default     = "t2.micro"
+  default     = "t3.micro"
 }
 
 variable "frontend_bucket_name" {
   description = "S3 bucket name for the React frontend — must be globally unique across all of AWS"
   type        = string
-  default     = "sentinel-ui-demo"
-  # If this name is taken, change it to something unique e.g. "sentinel-ui-yourname-2026"
+  default     = "sentinel-ui-951066974179"  # account ID suffix ensures global uniqueness
 }
 
 variable "key_pair_name" {
@@ -28,4 +27,10 @@ variable "ollama_base_url" {
   description = "Ollama server URL — leave empty when running locally on EC2 (http://localhost:11434)"
   type        = string
   default     = ""
+}
+
+variable "review_min_evidence" {
+  description = "Minimum negative feedback entries per doc type before the review agent calls the LLM. 1 = demo mode (any single thumbs-down produces a recommendation)."
+  type        = number
+  default     = 1
 }

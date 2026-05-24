@@ -1,0 +1,99 @@
+JOINT VENTURE AGREEMENT — TECHNOLOGY PLATFORM DEVELOPMENT
+
+This Joint Venture Agreement ("Agreement") is entered into as of May 1, 2026, between:
+
+PARTY A: Quantum Analytics GmbH, a company incorporated under the laws of Germany, registered at Amtsgericht Munich HRB 243891, with registered office at Maximilianstrasse 35, 80539 Munich, Germany ("Quantum")
+
+PARTY B: Apex Data Systems Pte. Ltd., a company incorporated under the laws of Singapore, UEN 202234567K, with registered office at 1 Raffles Quay, #30-01, Singapore 048583 ("Apex")
+
+JOINT VENTURE ENTITY: Quantum-Apex Intelligence Ltd. ("JV Entity"), a private limited company to be incorporated under the laws of England and Wales within 30 days of execution of this Agreement.
+
+PURPOSE: Development and commercialisation of an AI-powered financial risk analytics platform ("Platform").
+
+1. CAPITAL CONTRIBUTION
+
+1.1 Initial Capital Contributions
+Each Party shall contribute to the JV Entity as follows:
+
+Quantum's Contribution (50% ownership interest):
+- Cash contribution: EUR 8,000,000, payable in two tranches: EUR 4,000,000 on or before May 15, 2026, and EUR 4,000,000 on or before September 1, 2026.
+- Technology contribution: Quantum's proprietary risk modelling algorithms and associated intellectual property, valued at EUR 5,000,000, to be transferred pursuant to a separate IP Transfer Agreement.
+- Personnel contribution: Dedication of 12 FTE engineers and 2 data scientists for the first 18 months, valued at EUR 3,000,000.
+
+Apex's Contribution (50% ownership interest):
+- Cash contribution: USD 15,000,000 (equivalent to EUR 13,750,000 at the agreed exchange rate of 1.10 USD/EUR), payable in two tranches: USD 7,500,000 on or before May 15, 2026, and USD 7,500,000 on or before September 1, 2026.
+- Data assets: Licensed access to Apex's proprietary financial datasets for a period of 5 years, valued at USD 8,000,000.
+
+1.2 Additional Capital Calls
+If the JV Board determines that additional capital is required, it may make a capital call on both Parties in proportion to their ownership interests. Each Party shall contribute their proportionate share within 45 days of a capital call notice. Failure to meet a capital call shall result in dilution of the defaulting Party's ownership interest.
+
+1.3 Third-Party Funding
+The JV Entity may raise additional capital from third-party investors with the unanimous approval of the JV Board. Such investment shall dilute both Parties proportionately unless otherwise agreed in writing.
+
+2. PROFIT AND LOSS DISTRIBUTION
+
+2.1 Profit Distribution
+Net profits of the JV Entity shall be distributed to the Parties in proportion to their ownership interests (50/50) on an annual basis, within 90 days of the end of each fiscal year, subject to retention of adequate working capital reserves as determined by the JV Board. The JV Board may, by unanimous resolution, determine that profits be re-invested in the Platform rather than distributed.
+
+2.2 Loss Sharing
+Net losses shall be allocated to the Parties in proportion to their ownership interests. Each Party shall be responsible for its proportionate share of losses. Neither Party shall be required to contribute additional capital beyond its agreed contribution obligations solely to cover losses.
+
+2.3 Preferred Returns
+For the first three years of operation, each Party shall be entitled to a preferred return of 6% per annum on unreturned capital contributions before any additional profit distributions are made. Preferred returns shall accrue from the date of each capital contribution.
+
+2.4 Revenue Milestones and Incentive Distributions
+Upon the JV Entity achieving annual recurring revenue milestones of USD 25M, USD 50M, and USD 100M, each Party shall receive a one-time incentive distribution of USD 2M, USD 3M, and USD 5M respectively.
+
+3. GOVERNANCE AND VOTING RIGHTS
+
+3.1 JV Board Composition
+The JV Entity shall be governed by a Board of Directors ("JV Board") consisting of six members: three nominated by Quantum and three nominated by Apex. Each Party shall have the right to nominate and remove its designated directors at any time without cause. The JV Board shall appoint an independent Chairman from outside both Parties' organisations, to be agreed unanimously.
+
+3.2 Meetings and Quorum
+The JV Board shall meet at least quarterly. A quorum requires at least two directors from each Party. Meetings may be held in person, by telephone, or by video conference. Annual General Meetings shall be held within four months of each fiscal year end.
+
+3.3 Ordinary Resolutions
+Ordinary resolutions (including approval of annual budgets, appointment of executives, entering contracts below EUR 2M) require a simple majority of directors present at a duly constituted meeting.
+
+3.4 Reserved Matters (Unanimous Approval Required)
+The following matters shall require unanimous approval of all JV Board directors: (a) amendment of the JV Entity's constitutional documents; (b) issuance of new shares or equity instruments; (c) acquisition or disposal of assets exceeding EUR 5,000,000; (d) entry into contracts exceeding EUR 2,000,000; (e) engagement of related-party transactions; (f) dissolution of the JV Entity; (g) admission of new joint venture partners; (h) commencement of material litigation; (i) change of the JV Entity's principal business.
+
+3.5 Deadlock Resolution
+In the event of a deadlock on a Reserved Matter after two consecutive duly convened JV Board meetings, either Party may request escalation to the CEOs of each Party for a period of 30 days. If the deadlock persists, either Party may invoke the buy-sell mechanism described in Section 4.3.
+
+4. DISSOLUTION AND EXIT
+
+4.1 Term
+This Agreement shall have an initial term of ten (10) years from the date of execution, unless terminated earlier in accordance with this Section 4.
+
+4.2 Voluntary Dissolution
+The JV Entity may be dissolved at any time by unanimous written agreement of both Parties. Upon dissolution, the JV Entity's assets shall be liquidated, liabilities discharged, and the net proceeds distributed to the Parties in proportion to their ownership interests.
+
+4.3 Buy-Sell Mechanism (Shotgun Clause)
+If a deadlock on a Reserved Matter persists for more than 90 days after the CEO escalation period, either Party ("Offering Party") may invoke a buy-sell mechanism by serving written notice specifying a price per share ("Offer Price") for all JV Entity shares. The other Party ("Receiving Party") shall, within 60 days of receipt, elect to either: (a) purchase all of the Offering Party's shares at the Offer Price; or (b) sell all of its own shares to the Offering Party at the Offer Price. This mechanism ensures finality and fairness in exit pricing.
+
+4.4 Transfer Restrictions
+Neither Party may transfer, assign, pledge, or otherwise dispose of any shares in the JV Entity without the prior written consent of the other Party, except for transfers to wholly-owned subsidiaries of the transferring Party, subject to the transferee acceding to this Agreement.
+
+4.5 Compulsory Transfer Events
+A Party's shares shall be subject to compulsory transfer at fair market value in the event of: (a) insolvency or commencement of liquidation proceedings; (b) change of control of a Party without the other Party's consent; (c) material and unremedied breach of this Agreement.
+
+4.6 Winding-Up
+In the event of dissolution, a liquidator shall be appointed by the JV Board to wind up the JV Entity's affairs. After payment of all creditors, the remaining assets shall be distributed to the Parties pro rata to their ownership interests at the time of dissolution.
+
+5. GOVERNING LAW AND DISPUTE RESOLUTION
+This Agreement shall be governed by and construed in accordance with the laws of England and Wales. Any dispute, controversy, or claim arising out of or relating to this Agreement shall be referred to and finally resolved by arbitration under the ICC Rules of Arbitration, with the seat of arbitration in London, England. The arbitral tribunal shall consist of three arbitrators. The language of arbitration shall be English.
+
+IN WITNESS WHEREOF, the authorised representatives of the Parties have executed this Agreement as of the date first written above.
+
+QUANTUM ANALYTICS GMBH
+Signed: ___________________________
+Name: Dr. Heinrich Bauer
+Title: Vorstandsvorsitzender (CEO)
+Date: May 1, 2026
+
+APEX DATA SYSTEMS PTE. LTD.
+Signed: ___________________________
+Name: Tan Wei Liang
+Title: Chief Executive Officer
+Date: May 1, 2026

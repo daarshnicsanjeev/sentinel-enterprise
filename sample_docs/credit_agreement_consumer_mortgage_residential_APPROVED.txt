@@ -1,0 +1,103 @@
+RESIDENTIAL MORTGAGE LOAN AGREEMENT
+
+Loan Reference: RML-2026-047821
+Date: April 5, 2026
+
+LENDER: First National Mortgage Corporation, a federally chartered savings bank ("Lender")
+BORROWER(S): Michael J. Thornton and Susan A. Thornton, jointly and severally ("Borrower")
+PROPERTY ADDRESS: 4821 Oakwood Drive, Austin, Texas 78745 ("Mortgaged Property")
+
+LOAN SUMMARY:
+Loan Amount: USD 485,000
+Loan Type: 30-Year Fixed Rate Conventional Mortgage
+Interest Rate: 6.875% per annum (fixed for the life of the loan)
+Monthly Payment: USD 3,185.23 (principal and interest)
+First Payment Due: June 1, 2026
+Final Payment Due: May 1, 2056
+Loan-to-Value Ratio: 80.83% (Appraised Value: USD 600,000)
+
+1. REPRESENTATIONS AND WARRANTIES
+
+Borrower represents and warrants to Lender as follows:
+
+1.1 Personal and Financial Information
+All information provided to Lender in the mortgage application is true, complete, and accurate in all material respects. Borrower has not omitted any material information that would reasonably affect Lender's decision to make this loan. Specifically: (a) Borrower's combined gross annual income is USD 218,000, as documented by tax returns and employer verification; (b) Borrower has no undisclosed liabilities, debts, or financial obligations that would materially affect their ability to repay this loan; (c) Borrower intends to occupy the Mortgaged Property as their primary residence within 60 days of closing.
+
+1.2 Title and Property Condition
+Borrower represents that, to their knowledge: (a) the Mortgaged Property is not subject to any encumbrances, liens, or claims other than those disclosed in the title insurance commitment; (b) Borrower has no knowledge of any structural defects, environmental hazards, or material conditions affecting the Mortgaged Property that have not been disclosed to Lender; (c) the Mortgaged Property is located in Flood Zone X (minimal flood hazard) as shown on FEMA Flood Insurance Rate Map effective date January 15, 2024.
+
+1.3 No Litigation
+There is no pending litigation, judgment, or claim that could affect Borrower's ability to repay this loan or that would result in a lien on the Mortgaged Property.
+
+1.4 Occupancy Intent
+Borrower intends to use the Mortgaged Property as their primary residence and shall not convert the property to a rental or investment property without prior written consent of the Lender.
+
+2. EVENTS OF DEFAULT
+
+Each of the following shall constitute an "Event of Default":
+
+2.1 Payment Default
+Borrower fails to make any monthly payment within fifteen (15) days of the due date. A late charge of 5% of the overdue monthly payment shall be assessed for each payment received more than 15 days after the due date.
+
+2.2 Abandonment
+Borrower abandons or vacates the Mortgaged Property without Lender's written consent for a period exceeding sixty (60) consecutive days.
+
+2.3 Transfer Without Consent (Due-on-Sale)
+Borrower sells, transfers, or conveys any interest in the Mortgaged Property without Lender's prior written consent. Lender may declare the entire outstanding balance immediately due and payable upon any unauthorized transfer.
+
+2.4 Breach of Representations
+Any material misrepresentation made in the mortgage application or this Agreement is discovered and Lender determines the loan would not have been made had the accurate information been known.
+
+2.5 Hazard Insurance Lapse
+Borrower fails to maintain hazard insurance, flood insurance (if required), and title insurance on the Mortgaged Property with Lender named as loss payee/additional insured.
+
+2.6 Tax Default
+Borrower fails to pay any real property taxes or assessments when due, which creates a lien senior to Lender's mortgage, and such failure continues for more than sixty (60) days.
+
+2.7 Bankruptcy or Insolvency
+Borrower files for voluntary bankruptcy protection, or an involuntary bankruptcy petition is filed against Borrower and not dismissed within sixty (60) days.
+
+2.8 Property Deterioration
+Borrower allows the Mortgaged Property to deteriorate to a degree that materially impairs Lender's security interest, as determined by a licensed appraiser engaged at Lender's discretion.
+
+3. INDEMNIFICATION
+
+3.1 Environmental Indemnification
+Borrower shall indemnify, defend, and hold harmless Lender and its successors, assigns, officers, and employees from and against any and all claims, costs, losses, and liabilities arising from any environmental contamination, hazardous materials, or violation of environmental law at or emanating from the Mortgaged Property during Borrower's ownership. This indemnification shall survive repayment of this loan and satisfaction of the mortgage.
+
+3.2 General Indemnification
+Borrower shall indemnify Lender against any losses, costs, and reasonable legal fees incurred by Lender arising from: (a) any breach of Borrower's representations and warranties; (b) any legal action brought by third parties relating to Borrower's ownership or use of the Mortgaged Property; (c) Lender's exercise of its remedies upon an Event of Default.
+
+3.3 TRID Compliance
+This loan has been originated in compliance with the TILA-RESPA Integrated Disclosure (TRID) rules. Borrower acknowledges receipt of the Loan Estimate on March 20, 2026, and the Closing Disclosure on April 1, 2026, both at least three business days before consummation.
+
+4. GOVERNING LAW
+
+4.1 Applicable Law
+This Agreement shall be governed by federal law and, to the extent not preempted by federal law, by the laws of the State of Texas. This loan is originated in compliance with the Truth in Lending Act (Regulation Z), the Real Estate Settlement Procedures Act (Regulation X), the Equal Credit Opportunity Act, the Fair Housing Act, and the Texas Finance Code.
+
+4.2 Dispute Resolution
+Any dispute arising under this Agreement shall be submitted to mediation before the American Arbitration Association. If mediation fails, disputes shall be resolved in the state or federal courts located in Travis County, Texas.
+
+4.3 SERVICER NOTICE: This loan may be sold or transferred to another lender or loan servicer. Borrower will be notified in writing of any transfer of servicing rights no later than 15 days before the effective transfer date.
+
+ACKNOWLEDGMENT OF RECEIPT OF REQUIRED DISCLOSURES:
+[ ] Loan Estimate (received March 20, 2026)
+[ ] Closing Disclosure (received April 1, 2026)
+[ ] Servicing Disclosure Statement
+[ ] Affiliated Business Arrangement Disclosure
+[ ] HUD-1 Settlement Statement
+
+BORROWER SIGNATURES:
+Signature: _________________________ Date: April 5, 2026
+Michael J. Thornton
+
+Signature: _________________________ Date: April 5, 2026
+Susan A. Thornton
+
+LENDER:
+First National Mortgage Corporation
+By: _________________________
+Name: Patricia Nguyen
+Title: Senior Loan Officer, NMLS# 847291
+Date: April 5, 2026

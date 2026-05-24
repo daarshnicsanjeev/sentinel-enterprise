@@ -19,4 +19,5 @@ class AgentState(TypedDict):
     clause_results_history: list
     expiry_date: str
     language: str
+    compliance_context: str
     logs: Annotated[list, operator.add]

@@ -1,0 +1,49 @@
+TERM LOAN AGREEMENT
+
+This Term Loan Agreement ("Agreement") is entered into as of February 1, 2026, between:
+
+LENDER: Westbrook Commercial Finance, a Delaware limited liability company ("Lender")
+BORROWER: Apex Digital Solutions Inc., a Nevada corporation ("Borrower")
+
+LOAN AMOUNT: USD 750,000
+PURPOSE: General working capital and technology infrastructure investment
+
+NOTE: This agreement intentionally omits an indemnification clause to test compliance rejection.
+
+1. REPRESENTATIONS AND WARRANTIES
+Borrower represents and warrants to Lender that:
+(a) Borrower is a corporation duly incorporated, validly existing, and in good standing under the laws of the State of Nevada.
+(b) Borrower has full corporate power, authority, and legal right to execute, deliver, and perform its obligations under this Agreement.
+(c) This Agreement constitutes the legal, valid, and binding obligation of Borrower, enforceable against it in accordance with its terms, subject to applicable bankruptcy and equitable principles.
+(d) All financial statements, balance sheets, income statements, and other financial documents submitted to Lender are true, complete, and accurate in all material respects and fairly present the financial condition of Borrower.
+(e) There is no pending or, to Borrower's knowledge, threatened litigation, governmental proceeding, or regulatory investigation that could have a material adverse effect on Borrower's financial condition or ability to repay this loan.
+(f) No consent or authorization of, filing with, or other act by or in respect of, any governmental authority is required in connection with the execution, delivery, or performance of this Agreement.
+
+2. EVENTS OF DEFAULT
+The occurrence of any of the following shall constitute an "Event of Default" under this Agreement:
+(a) Borrower fails to pay any principal, interest, or other amount due under this Agreement within five (5) Business Days of the date when due.
+(b) Any representation or warranty made by Borrower in this Agreement or in any certificate, financial statement, or other document delivered in connection herewith shall prove to have been incorrect in any material respect when made.
+(c) Borrower shall fail to comply with any covenant, condition, or agreement contained in this Agreement and such failure shall continue unremedied for a period of thirty (30) days after written notice thereof from Lender.
+(d) Borrower shall: (i) apply for, consent to, or suffer the appointment of a receiver, trustee, liquidator, or custodian of itself or of all or a substantial part of its property; (ii) make a general assignment for the benefit of creditors; (iii) commence a voluntary case under any applicable bankruptcy or insolvency law; or (iv) be adjudicated bankrupt or insolvent.
+(e) A material adverse change occurs in the financial condition, business, operations, or prospects of Borrower that, in Lender's reasonable judgment, materially impairs Borrower's ability to perform its obligations under this Agreement.
+
+3. GOVERNING LAW
+This Agreement shall be governed by, and construed in accordance with, the laws of the State of New York, without giving effect to the conflict of law principles thereof. Each party hereby irrevocably submits to the exclusive jurisdiction of the courts of New York County, New York, and the United States District Court for the Southern District of New York for any action or proceeding arising out of or relating to this Agreement.
+
+INTEREST RATE: Prime Rate plus 3.50% per annum (currently 12.00%), subject to quarterly adjustment.
+MATURITY DATE: February 1, 2029
+MONTHLY PAYMENT: $24,607.14 (principal and interest)
+
+IN WITNESS WHEREOF, the parties hereto have executed this Agreement as of the date first written above.
+
+APEX DIGITAL SOLUTIONS INC.
+By: _________________________
+Name: Jonathan Reyes
+Title: Chief Executive Officer
+Date: February 1, 2026
+
+WESTBROOK COMMERCIAL FINANCE
+By: _________________________
+Name: Patricia Walsh
+Title: Managing Director, Lending
+Date: February 1, 2026

@@ -6,7 +6,7 @@ These tests verify the state machine's conditional logic in isolation.
 Run first: pytest tests/unit/test_graph_routing.py -v
 """
 import pytest
-from agents.graph import _guardrail_route, _eval_route, _increment_retry, _SCORE_THRESHOLD, _MAX_RETRIES
+from agents.graph import _guardrail_route, _eval_route, _increment_retry, _escalate_node, _SCORE_THRESHOLD, _MAX_RETRIES
 from tests.conftest import make_state
 
 
@@ -43,17 +43,17 @@ class TestEvalRoute:
         state = make_state(evaluation_score=0.9, retry_count=0)
         assert _eval_route(state) == "done"
 
-    def test_done_when_retries_exhausted(self):
+    def test_escalate_when_retries_exhausted_and_score_low(self):
         state = make_state(evaluation_score=0.0, retry_count=_MAX_RETRIES)
-        assert _eval_route(state) == "done"
+        assert _eval_route(state) == "escalate"
 
     def test_retry_when_score_low_and_one_retry_used(self):
         state = make_state(evaluation_score=0.0, retry_count=1)
         assert _eval_route(state) == "retry"
 
-    def test_done_when_retries_exceed_max(self):
+    def test_escalate_when_retries_exceed_max_and_score_low(self):
         state = make_state(evaluation_score=0.0, retry_count=_MAX_RETRIES + 1)
-        assert _eval_route(state) == "done"
+        assert _eval_route(state) == "escalate"
 
     def test_missing_score_defaults_to_high_faith_done(self):
         # Missing evaluation_score defaults to 1.0 — should be done
@@ -63,6 +63,25 @@ class TestEvalRoute:
     def test_returns_string(self):
         result = _eval_route(make_state(evaluation_score=0.9, retry_count=0))
         assert isinstance(result, str)
+
+
+    def test_done_when_retries_exhausted_but_score_is_fine(self):
+        state = make_state(evaluation_score=1.0, retry_count=_MAX_RETRIES)
+        assert _eval_route(state) == "done"
+
+
+class TestEscalateNode:
+    def test_sets_final_decision_escalate(self):
+        result = _escalate_node(make_state())
+        assert result["final_decision"] == "ESCALATE"
+
+    def test_appends_escalation_log(self):
+        result = _escalate_node(make_state())
+        assert any("escalat" in log.lower() for log in result["logs"])
+
+    def test_returns_dict(self):
+        result = _escalate_node(make_state())
+        assert isinstance(result, dict)
 
 
 class TestIncrementRetry:

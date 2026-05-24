@@ -8,6 +8,7 @@ import sys
 import os
 import pytest
 from unittest.mock import MagicMock
+from fastapi.testclient import TestClient
 
 # Ensure backend/ is on the path for all tests
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -36,6 +37,7 @@ def make_state(**overrides) -> dict:
         "clause_results_history": [],
         "expiry_date": "",
         "language": "en",
+        "compliance_context": "",
         "logs": [],
     }
     base.update(overrides)
@@ -72,6 +74,45 @@ This Services Agreement is entered into between Provider Ltd and Client Inc.
 2. CONFIDENTIALITY: Both parties agree to maintain confidentiality.
 """
 
+
+# ---------------------------------------------------------------------------
+# HTTP client fixtures (shared by all unit + integration test files)
+# ---------------------------------------------------------------------------
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter():
+    """Reset slowapi in-memory storage before every test."""
+    try:
+        from api.routes import limiter
+        limiter._storage.reset()
+    except Exception:
+        pass
+    yield
+
+
+@pytest.fixture
+def client():
+    from main import app
+    return TestClient(app)
+
+
+@pytest.fixture
+def admin_headers(client):
+    resp = client.post("/api/auth/token", json={"username": "admin", "password": "sentinel123"})
+    token = resp.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def analyst_headers(client):
+    resp = client.post("/api/auth/token", json={"username": "analyst", "password": "analyst123"})
+    token = resp.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
+# ---------------------------------------------------------------------------
+# AgentState factories
+# ---------------------------------------------------------------------------
 
 @pytest.fixture
 def valid_state():

@@ -1,0 +1,37 @@
+EMPLOYEE LOAN APPLICATION
+
+Applicant: John Michael Carpenter
+Social Security Number: 429-18-7634
+Date of Birth: 14 August 1983
+Home Address: 2847 Westfield Drive, Austin TX 78701
+
+Employment Details:
+Employer: DataStream Analytics Inc.
+Position: Senior Data Engineer
+Annual Salary: $142,000
+Years Employed: 4
+
+Loan Request:
+Amount Requested: $45,000
+Purpose: Home renovation
+Requested Term: 60 months
+
+Financial Information:
+Primary Bank Account: Chase Bank — Account ending 7721
+Credit Card Number: 4532 1178 2341 6789 (Visa, expires 09/27)
+Secondary Credit Card: 5412 7534 2890 1234 (Mastercard, expires 03/26)
+Monthly Mortgage Payment: $2,100
+Outstanding Auto Loan Balance: $8,400
+
+References:
+Personal Reference: Sarah Carpenter (spouse) — (512) 555-0182
+Professional Reference: Rajesh Gupta, Manager — (737) 555-0291
+
+I certify that the information provided in this application is true and accurate to the best of my knowledge.
+
+Signature: John M. Carpenter
+Date: May 12, 2026
+
+FOR INTERNAL USE:
+Passport Number: US A72918364
+Driver License: TX DL 87234910

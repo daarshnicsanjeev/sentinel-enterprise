@@ -1,0 +1,98 @@
+ACUERDO DE CONFIDENCIALIDAD Y NO DIVULGACIÓN
+
+Este Acuerdo de Confidencialidad ("Acuerdo") se celebra el 10 de febrero de 2026, entre:
+
+TECNOLATAM S.A. DE C.V., sociedad constituida bajo las leyes de México, con domicilio en
+Paseo de la Reforma 250, Piso 18, Ciudad de México, México C.P. 06600 ("Parte Divulgadora"), y
+
+INNOVACIÓN DIGITAL ARGENTINA S.R.L., sociedad constituida bajo las leyes de Argentina,
+con domicilio en Avenida Corrientes 1234, Piso 7, Buenos Aires, Argentina C.P. C1043AAZ
+("Parte Receptora").
+
+─────────────────────────────────────────────────────────────────────────────────
+CLÁUSULA 1 — OBJETO DEL ACUERDO
+─────────────────────────────────────────────────────────────────────────────────
+
+Las Partes desean intercambiar información confidencial relacionada con el desarrollo
+conjunto de una plataforma de comercio electrónico regional para América Latina (el
+"Proyecto"). El presente Acuerdo tiene por objeto regular las condiciones bajo las cuales
+cada Parte podrá divulgar a la otra información confidencial relativa al Proyecto.
+
+─────────────────────────────────────────────────────────────────────────────────
+CLÁUSULA 2 — INFORMACIÓN CONFIDENCIAL
+─────────────────────────────────────────────────────────────────────────────────
+
+Se entenderá por "Información Confidencial" toda aquella información divulgada por una Parte
+(la "Parte Divulgadora") a la otra Parte (la "Parte Receptora"), ya sea de forma oral,
+escrita, electrónica o por cualquier otro medio, que sea designada como confidencial o que
+razonablemente deba entenderse como confidencial dada su naturaleza y las circunstancias de
+su divulgación. Incluye, sin limitarse a: planes de negocio, estrategias comerciales, datos
+financieros, listas de clientes, algoritmos de software, especificaciones técnicas, e
+información sobre empleados y proveedores.
+
+─────────────────────────────────────────────────────────────────────────────────
+CLÁUSULA 3 — OBLIGACIONES DE CONFIDENCIALIDAD
+─────────────────────────────────────────────────────────────────────────────────
+
+La Parte Receptora se compromete a:
+
+(a) Mantener la Información Confidencial en estricta reserva, utilizando el mismo grado de
+    cuidado que emplea para proteger su propia información confidencial, pero en ningún caso
+    menor a un cuidado razonable;
+(b) No divulgar, publicar ni transmitir la Información Confidencial a terceros sin el
+    consentimiento previo y escrito de la Parte Divulgadora;
+(c) Utilizar la Información Confidencial únicamente para los fines previstos en el Proyecto;
+(d) Limitar el acceso a la Información Confidencial únicamente al personal que necesite
+    conocerla para el desarrollo del Proyecto, quienes deberán estar obligados por acuerdos
+    de confidencialidad no menos restrictivos que el presente.
+
+─────────────────────────────────────────────────────────────────────────────────
+CLÁUSULA 4 — CLÁUSULA DE FUERZA MAYOR
+─────────────────────────────────────────────────────────────────────────────────
+
+Ninguna de las Partes será responsable por cualquier incumplimiento de sus obligaciones bajo
+este Acuerdo en la medida en que dicho incumplimiento sea causado por circunstancias de
+fuerza mayor o caso fortuito, incluyendo pero sin limitarse a: desastres naturales, actos
+de autoridades gubernamentales, guerra, pandemia, o cualquier otro acontecimiento fuera
+del control razonable de la Parte afectada. La Parte afectada deberá notificar a la otra
+Parte por escrito dentro de los cinco (5) días hábiles siguientes a la ocurrencia del evento.
+
+─────────────────────────────────────────────────────────────────────────────────
+CLÁUSULA 5 — LIMITACIÓN DE RESPONSABILIDAD
+─────────────────────────────────────────────────────────────────────────────────
+
+EN NINGÚN CASO NINGUNA DE LAS PARTES SERÁ RESPONSABLE ANTE LA OTRA POR DAÑOS INDIRECTOS,
+INCIDENTALES, ESPECIALES O CONSECUENTES, INCLUYENDO PÉRDIDA DE INGRESOS, PÉRDIDA DE
+BENEFICIOS O PÉRDIDA DE DATOS, AUNQUE SE HAYA INFORMADO DE LA POSIBILIDAD DE DICHOS DAÑOS.
+La responsabilidad total acumulada de cada Parte bajo este Acuerdo no excederá la cantidad
+de USD 100,000 (cien mil dólares estadounidenses).
+
+─────────────────────────────────────────────────────────────────────────────────
+CLÁUSULA 6 — RESOLUCIÓN DE DISPUTAS
+─────────────────────────────────────────────────────────────────────────────────
+
+Cualquier controversia o disputa que surja de o en relación con este Acuerdo que no pueda
+ser resuelta amigablemente por las Partes dentro de treinta (30) días, será sometida a
+arbitraje ante el Centro de Arbitraje de México (CAM), de conformidad con su Reglamento
+de Arbitraje vigente. El arbitraje se realizará en la Ciudad de México. El idioma del
+arbitraje será el español. El laudo arbitral será definitivo y vinculante para ambas Partes.
+
+─────────────────────────────────────────────────────────────────────────────────
+CLÁUSULA 7 — VIGENCIA Y TERMINACIÓN
+─────────────────────────────────────────────────────────────────────────────────
+
+Este Acuerdo tendrá una vigencia de tres (3) años a partir de la fecha de firma, pudiendo
+ser prorrogado por mutuo acuerdo escrito de las Partes. Las obligaciones de confidencialidad
+subsistirán por un período adicional de cinco (5) años tras la terminación del Acuerdo.
+
+─────────────────────────────────────────────────────────────────────────────────
+FIRMAS
+─────────────────────────────────────────────────────────────────────────────────
+
+TECNOLATAM S.A. DE C.V.                   INNOVACIÓN DIGITAL ARGENTINA S.R.L.
+Firmado: ____________________             Firmado: ____________________
+Nombre: Ing. Ricardo Sánchez Vega         Nombre: Lic. Valentina Morales Cruz
+Cargo: Director General                   Cargo: Gerente General
+Fecha: 10 de febrero de 2026              Fecha: 10 de febrero de 2026
+
+Referencia del Acuerdo: NDA-TL-IDA-2026-001

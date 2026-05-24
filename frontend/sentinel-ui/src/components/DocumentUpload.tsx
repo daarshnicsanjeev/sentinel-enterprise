@@ -24,7 +24,7 @@ export function DocumentUpload({ onFile, disabled }: Props) {
       onClick={() => !disabled && inputRef.current?.click()}
       role="button"
       tabIndex={0}
-      aria-label="Upload document — click or drag and drop a PDF or TXT file"
+      aria-label="Upload document — click or drag and drop a file. Supported formats: PDF, Word, Excel, PowerPoint, HTML, plain text, and scanned images (PNG, JPG, TIFF)"
       aria-disabled={disabled}
       className="upload-zone"
       onKeyDown={(e) => {
@@ -47,15 +47,15 @@ export function DocumentUpload({ onFile, disabled }: Props) {
     >
       <div style={{ fontSize: "2.5rem", marginBottom: "8px" }}>📄</div>
       <p style={{ margin: 0, color: "#475569", fontWeight: 500 }}>
-        Drag &amp; drop a <strong>.pdf</strong> or <strong>.txt</strong> document here, or click to browse
+        Drag &amp; drop a document here, or click to browse
       </p>
       <p style={{ margin: "4px 0 0", color: "#94a3b8", fontSize: "0.8rem" }}>
-        Supports: credit agreements, legal contracts, regulatory filings
+        PDF, TXT, DOCX, XLSX, PPTX, HTML, PNG, JPG, TIFF &middot; max 5 MB
       </p>
       <input
         ref={inputRef}
         type="file"
-        accept=".pdf,.txt,application/pdf,text/plain"
+        accept=".pdf,.txt,.docx,.xlsx,.pptx,.html,.htm,.png,.jpg,.jpeg,.tiff,.tif"
         style={{ display: "none" }}
         onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }}
         disabled={disabled}

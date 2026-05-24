@@ -7,6 +7,7 @@ All extractors raise ValueError on invalid / unreadable input.
 import io
 import os
 import re
+import zipfile
 from pathlib import Path
 
 # Point pytesseract at the Windows installer path if not already on PATH.
@@ -18,24 +19,85 @@ if os.name == "nt" and os.path.exists(_TESSERACT_WIN):
     except ImportError:
         pass
 
+# Maximum uncompressed size for ZIP-based formats (DOCX/XLSX/PPTX) — zip bomb protection
+_MAX_ZIP_UNCOMPRESSED_BYTES = 50 * 1024 * 1024  # 50 MB
+
+# Maximum extracted text length fed to agents — prevents FAISS OOM on text-heavy files
+_MAX_EXTRACTED_CHARS = 200_000  # ~100 pages of text
+
+# Magic byte signatures for format validation
+_MAGIC_PDF  = b"%PDF"
+_MAGIC_ZIP  = b"PK\x03\x04"   # DOCX / XLSX / PPTX are all ZIP containers
+_MAGIC_PNG  = b"\x89PNG\r\n\x1a\n"
+_MAGIC_JPEG = b"\xff\xd8\xff"
+_MAGIC_TIFF_LE = b"II*\x00"   # little-endian TIFF
+_MAGIC_TIFF_BE = b"MM\x00*"   # big-endian TIFF
+
+# Maximum image pixels — explicit guard against PIL decompression bombs
+# Default PIL limits are ~178M (warning) / ~357M (error); we set a tighter bound.
+_MAX_IMAGE_PIXELS = 89_478_485  # 89M pixels (~9500×9500)
+
+
+def _safe_filename(filename: str) -> str:
+    """Return only the basename, rejecting path-traversal filenames.
+
+    Normalises both forward and backward slashes so Windows-style paths like
+    C:\\evil\\file.pdf are stripped correctly on Linux servers too.
+    """
+    normalized = filename.replace("\\", "/")
+    safe = Path(normalized).name
+    if not safe or safe in (".", ".."):
+        raise ValueError("Invalid filename.")
+    return safe
+
+
+def _check_zip_bomb(content: bytes, fmt: str) -> None:
+    """Reject ZIP-based documents whose uncompressed payload exceeds the limit."""
+    try:
+        with zipfile.ZipFile(io.BytesIO(content)) as zf:
+            total = sum(info.file_size for info in zf.infolist())
+            if total > _MAX_ZIP_UNCOMPRESSED_BYTES:
+                mb = total // (1024 * 1024)
+                raise ValueError(
+                    f"{fmt} would decompress to {mb} MB, exceeding the 50 MB limit."
+                )
+    except zipfile.BadZipFile as exc:
+        raise ValueError(f"not a valid {fmt}: {exc}") from exc
+
+
+def _assert_magic(content: bytes, expected: bytes, fmt: str) -> None:
+    """Verify file starts with expected magic bytes (guards against spoofed extensions)."""
+    if not content[:len(expected)] == expected:
+        raise ValueError(
+            f"File does not appear to be a valid {fmt} (magic bytes mismatch)."
+        )
+
 
 def extract_text(filename: str, content: bytes) -> str:
     """Extract plain text from file bytes based on the file extension."""
+    filename = _safe_filename(filename)
     ext = Path(filename.lower()).suffix
+
     if ext == ".pdf":
-        return _from_pdf(content)
+        text = _from_pdf(content)
     elif ext == ".docx":
-        return _from_docx(content)
+        text = _from_docx(content)
     elif ext in (".xlsx", ".xls"):
-        return _from_excel(content)
+        text = _from_excel(content)
     elif ext == ".pptx":
-        return _from_pptx(content)
+        text = _from_pptx(content)
     elif ext in (".html", ".htm"):
-        return _from_html(content)
+        text = _from_html(content)
     elif ext in (".png", ".jpg", ".jpeg", ".tiff", ".tif"):
-        return _ocr_image(content)
+        text = _ocr_image(content, _ext=ext)
     else:
-        return _from_text(content)
+        text = _from_text(content)
+
+    # Truncate to protect downstream FAISS indexing and LLM calls from huge inputs
+    if len(text) > _MAX_EXTRACTED_CHARS:
+        text = text[:_MAX_EXTRACTED_CHARS]
+
+    return text
 
 
 # ---------------------------------------------------------------------------
@@ -43,14 +105,19 @@ def extract_text(filename: str, content: bytes) -> str:
 # ---------------------------------------------------------------------------
 
 def _from_pdf(content: bytes) -> str:
+    _assert_magic(content, _MAGIC_PDF, "PDF")
     from data.pdf_extractor import extract_text_from_pdf
     return extract_text_from_pdf(content)
 
 
 def _from_docx(content: bytes) -> str:
+    _assert_magic(content, _MAGIC_ZIP, "DOCX")
+    _check_zip_bomb(content, "DOCX")
     try:
         import docx
         doc = docx.Document(io.BytesIO(content))
+    except zipfile.BadZipFile as exc:
+        raise ValueError(f"not a valid DOCX: {exc}") from exc
     except Exception as exc:
         raise ValueError(f"not a valid DOCX: {exc}") from exc
 
@@ -71,9 +138,13 @@ def _from_docx(content: bytes) -> str:
 
 
 def _from_excel(content: bytes) -> str:
+    _assert_magic(content, _MAGIC_ZIP, "XLSX")
+    _check_zip_bomb(content, "XLSX")
     try:
         import openpyxl
         wb = openpyxl.load_workbook(io.BytesIO(content), read_only=True, data_only=True)
+    except zipfile.BadZipFile as exc:
+        raise ValueError(f"not a valid XLSX: {exc}") from exc
     except Exception as exc:
         raise ValueError(f"not a valid XLSX: {exc}") from exc
 
@@ -92,9 +163,13 @@ def _from_excel(content: bytes) -> str:
 
 
 def _from_pptx(content: bytes) -> str:
+    _assert_magic(content, _MAGIC_ZIP, "PPTX")
+    _check_zip_bomb(content, "PPTX")
     try:
         from pptx import Presentation
         prs = Presentation(io.BytesIO(content))
+    except zipfile.BadZipFile as exc:
+        raise ValueError(f"not a valid PPTX: {exc}") from exc
     except Exception as exc:
         raise ValueError(f"not a valid PPTX: {exc}") from exc
 
@@ -145,24 +220,42 @@ def _from_html(content: bytes) -> str:
     return text.strip()
 
 
-def _ocr_image(content: bytes) -> str:
+def _assert_image_magic(content: bytes, ext: str) -> None:
+    """Verify image magic bytes to prevent content-type spoofing."""
+    if ext in (".png",):
+        if not content[:8] == _MAGIC_PNG:
+            raise ValueError(f"File does not appear to be a valid PNG (magic bytes mismatch).")
+    elif ext in (".jpg", ".jpeg"):
+        if not content[:3] == _MAGIC_JPEG:
+            raise ValueError(f"File does not appear to be a valid JPEG (magic bytes mismatch).")
+    elif ext in (".tiff", ".tif"):
+        if content[:4] not in (_MAGIC_TIFF_LE, _MAGIC_TIFF_BE):
+            raise ValueError(f"File does not appear to be a valid TIFF (magic bytes mismatch).")
+
+
+def _ocr_image(content: bytes, _ext: str = "") -> str:
+    _assert_image_magic(content, _ext)
     try:
         import pytesseract
         from PIL import Image
+        Image.MAX_IMAGE_PIXELS = _MAX_IMAGE_PIXELS
         img = Image.open(io.BytesIO(content))
     except ImportError as exc:
         raise ValueError(
             "OCR not available: install Pillow and pytesseract, and ensure Tesseract is installed."
         ) from exc
+    except Image.DecompressionBombError as exc:
+        raise ValueError(f"Image size exceeds safe limit: {exc}") from exc
     except Exception as exc:
         raise ValueError(f"not a valid image: {exc}") from exc
 
     try:
         text = pytesseract.image_to_string(img)
+        return text.strip()
     except Exception as exc:
         raise ValueError(f"OCR failed: {exc}") from exc
-
-    return text.strip()
+    finally:
+        img.close()  # explicitly free PIL image memory
 
 
 def _from_text(content: bytes) -> str:

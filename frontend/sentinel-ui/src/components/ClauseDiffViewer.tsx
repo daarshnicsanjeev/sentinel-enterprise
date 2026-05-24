@@ -14,10 +14,15 @@ export function ClauseDiffViewer({ history }: Props) {
   const attempt1 = history[history.length - 2]
   const attempt2 = history[history.length - 1]
 
-  const clauses = attempt2.map((c) => c.clause)
+  // Use the shorter list to avoid index-out-of-bounds when clause counts differ between retries
+  const count = Math.min(attempt1.length, attempt2.length)
+  const clauses = attempt2.slice(0, count).map((c) => c.clause)
 
-  const statusColor = (s: string) =>
-    s === 'PRESENT' ? '#15803d' : '#b91c1c'
+  const statusColor = (s: string) => {
+    if (s === 'PRESENT') return '#15803d'
+    if (s === 'MISSING') return '#b91c1c'
+    return '#6b7280' // neutral grey for any unexpected server value
+  }
 
   return (
     <div style={{ marginTop: '20px' }}>
@@ -46,8 +51,8 @@ export function ClauseDiffViewer({ history }: Props) {
           </thead>
           <tbody>
             {clauses.map((clause, idx) => {
-              const s1 = attempt1[idx]?.status ?? '—'
-              const s2 = attempt2[idx]?.status ?? '—'
+              const s1 = attempt1[idx].status
+              const s2 = attempt2[idx].status
               const changed = s1 !== s2
               return (
                 <tr

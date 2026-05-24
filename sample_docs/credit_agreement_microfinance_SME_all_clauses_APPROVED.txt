@@ -1,0 +1,63 @@
+SMALL BUSINESS TERM LOAN AGREEMENT
+
+This Small Business Term Loan Agreement ("Agreement") is made as of April 10, 2026, between:
+
+LENDER: Horizon Community Bank, N.A., a national banking association chartered under the laws of the United States ("Lender")
+BORROWER: Sunrise Bakery & Café LLC, a California limited liability company ("Borrower")
+GUARANTOR: Maria Elena Vasquez, an individual ("Guarantor")
+
+LOAN AMOUNT: USD 185,000
+LOAN PURPOSE: Equipment purchase and working capital
+
+1. REPRESENTATIONS AND WARRANTIES
+Borrower represents and warrants that:
+(a) Borrower is a validly existing limited liability company in good standing under the laws of the State of California, duly qualified to conduct business in each jurisdiction where such qualification is required.
+(b) Borrower has full legal capacity, right, power and authority to execute, deliver and perform its obligations under this Agreement and all related documents.
+(c) This Agreement constitutes the legal, valid and binding obligation of the Borrower, enforceable against it in accordance with its terms.
+(d) All financial statements, tax returns, and other documents submitted to the Lender in connection with this loan are true, accurate, and complete in all material respects and fairly represent the financial condition of the Borrower as of the respective dates thereof.
+(e) No material adverse change has occurred in the financial condition, business or operations of the Borrower since the date of the most recent financial statements submitted to Lender.
+(f) No litigation, arbitration, governmental investigation or proceeding is pending or, to Borrower's knowledge, threatened that would reasonably be expected to have a material adverse effect on Borrower's ability to repay this loan.
+(g) Borrower has filed all required federal, state and local tax returns and has paid all taxes due except those being contested in good faith.
+
+2. EVENTS OF DEFAULT
+Each of the following events or conditions shall constitute an "Event of Default":
+(a) Borrower fails to make any payment of principal or interest within ten (10) calendar days of when due.
+(b) Borrower breaches any representation, warranty, covenant or other obligation under this Agreement and fails to cure such breach within thirty (30) days after written notice from Lender.
+(c) Borrower becomes insolvent, makes an assignment for the benefit of creditors, or commences or has commenced against it any bankruptcy, insolvency, reorganization, or similar proceeding.
+(d) Any judgment in excess of $25,000 is entered against Borrower and remains unsatisfied for thirty (30) days.
+(e) Borrower ceases to conduct business operations in the ordinary course.
+(f) Any material adverse change in the financial condition of Borrower that, in the reasonable judgment of Lender, impairs the prospect of repayment of the loan.
+(g) The Guarantor revokes or challenges the validity of the Guaranty, or a material adverse change occurs in the financial condition of the Guarantor.
+
+3. INDEMNIFICATION
+Borrower shall defend, indemnify and hold harmless Lender, and its officers, directors, employees, agents, successors and assigns (collectively, "Indemnified Parties") from and against any and all claims, damages, losses, costs and expenses (including reasonable attorneys' fees) arising out of or related to: (a) any breach by Borrower of any representation, warranty or covenant contained herein; (b) any claim by a third party relating to the collateral or the use of loan proceeds; (c) any violation by Borrower of any applicable law or regulation; or (d) any environmental contamination at Borrower's place of business. This indemnification shall survive the repayment of the loan and termination of this Agreement.
+
+4. GOVERNING LAW AND JURISDICTION
+This Agreement shall be governed by and construed in accordance with the laws of the State of California, without regard to conflicts of law principles. The Borrower and Guarantor hereby irrevocably submit to the exclusive jurisdiction of the state and federal courts located in Santa Clara County, California, for the resolution of any dispute arising under this Agreement.
+
+5. INTEREST RATE AND REPAYMENT
+Interest Rate: Prime Rate plus 2.75% per annum (currently 11.25%), adjusting quarterly.
+Monthly Payment: $4,127.88 (principal and interest)
+Term: 48 months
+First Payment Due: May 10, 2026
+Final Payment Due: April 10, 2030
+Prepayment: Borrower may prepay without penalty after the 12th month.
+
+6. COLLATERAL
+The loan is secured by a first priority security interest in: (a) all commercial kitchen equipment purchased with loan proceeds; (b) all accounts receivable; (c) all inventory; (d) a personal guarantee from Maria Elena Vasquez limited to $185,000.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+SUNRISE BAKERY & CAFÉ LLC
+By: _________________________
+Name: Maria Elena Vasquez
+Title: Managing Member
+Date: April 10, 2026
+
+HORIZON COMMUNITY BANK, N.A.
+By: _________________________
+Name: David Kim
+Title: Vice President, Commercial Lending
+Date: April 10, 2026
+
+PERSONAL GUARANTY acknowledged by: Maria Elena Vasquez, April 10, 2026

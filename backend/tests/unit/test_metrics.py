@@ -79,3 +79,32 @@ class TestMetricsRender:
         m.increment("sentinel_analyses_total")
         result = m.render_prometheus()
         assert result.endswith("\n")
+
+
+class TestLabelEscaping:
+    def test_escape_newline_in_label(self):
+        import data.metrics as m
+        m._counters.clear()
+        m.increment("sentinel_analyses_total", labels={"decision": "APPROVED\nfake"})
+        result = m.render_prometheus()
+        assert "\n" not in result.split("\n")[0].split("=")[1]  # no raw newline in label value
+
+    def test_escape_backslash_in_label(self):
+        from data.metrics import _escape_label_value
+        assert _escape_label_value("path\\file") == "path\\\\file"
+
+    def test_escape_quote_in_label(self):
+        from data.metrics import _escape_label_value
+        assert _escape_label_value('say "hi"') == 'say \\"hi\\"'
+
+    def test_escape_newline_char(self):
+        from data.metrics import _escape_label_value
+        assert _escape_label_value("a\nb") == "a\\nb"
+
+    def test_escape_all_three(self):
+        from data.metrics import _escape_label_value
+        assert _escape_label_value('a\nb"c\\d') == 'a\\nb\\"c\\\\d'
+
+    def test_clean_label_unchanged(self):
+        from data.metrics import _escape_label_value
+        assert _escape_label_value("APPROVED") == "APPROVED"

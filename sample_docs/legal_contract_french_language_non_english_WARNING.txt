@@ -1,0 +1,35 @@
+CONTRAT DE PRESTATION DE SERVICES
+
+Le présent Contrat de Prestation de Services (ci-après le « Contrat ») est conclu le 1er avril 2026 entre :
+
+PRESTATAIRE : TechSolutions France SAS, société par actions simplifiée au capital de 50 000 euros, immatriculée au Registre du Commerce et des Sociétés de Paris sous le numéro 812 347 291, dont le siège social est situé au 47 rue de la Paix, 75002 Paris (ci-après le « Prestataire »)
+
+CLIENT : EuroConsult GmbH, société à responsabilité limitée de droit allemand, immatriculée au Registre du Commerce de Berlin sous le numéro HRB 198234, dont le siège social est situé Unter den Linden 21, 10117 Berlin, Allemagne (ci-après le « Client »)
+
+ARTICLE 1 — OBJET DU CONTRAT
+Le Prestataire s'engage à fournir au Client des services de développement logiciel, de conseil en transformation numérique et de maintenance applicative, tels que détaillés dans chaque Bon de Commande signé entre les parties. Ces services seront réalisés conformément aux règles de l'art et aux meilleures pratiques du secteur informatique.
+
+ARTICLE 2 — DURÉE
+Le présent Contrat entre en vigueur à la date de sa signature et est conclu pour une durée initiale de vingt-quatre (24) mois. Il sera reconduit tacitement pour des périodes successives de douze (12) mois, sauf dénonciation par l'une des parties par lettre recommandée avec accusé de réception, adressée au moins quatre-vingt-dix (90) jours avant l'échéance.
+
+ARTICLE 3 — PRIX ET CONDITIONS DE PAIEMENT
+Les prix applicables sont ceux figurant dans le Bon de Commande correspondant. Les factures sont émises mensuellement et payables à trente (30) jours date de facture. Tout retard de paiement entraîne de plein droit l'application de pénalités de retard au taux de trois (3) fois le taux d'intérêt légal en vigueur.
+
+ARTICLE 4 — FORCE MAJEURE
+Aucune des parties ne pourra être tenue responsable de l'inexécution de ses obligations contractuelles si cette inexécution résulte d'un cas de force majeure au sens de l'article 1218 du Code civil français, notamment en cas d'actes de Dieu, de guerre, d'émeutes, de pandémie, de grèves générales, d'actes gouvernementaux ou de défaillances des réseaux de télécommunication.
+
+ARTICLE 5 — LIMITATION DE RESPONSABILITÉ
+La responsabilité du Prestataire ne pourra excéder le montant total des sommes effectivement versées par le Client au titre du présent Contrat au cours des six (6) derniers mois précédant la survenance du dommage. En aucun cas, le Prestataire ne pourra être tenu responsable des dommages indirects, des pertes d'exploitation, de données ou de chiffre d'affaires.
+
+ARTICLE 6 — RÉSOLUTION DES LITIGES
+Tout litige relatif à la formation, à l'interprétation ou à l'exécution du présent Contrat sera soumis à la médiation préalable du Centre de Médiation et d'Arbitrage de Paris (CMAP). En cas d'échec de la médiation dans un délai de soixante (60) jours, le litige sera tranché par le Tribunal de Commerce de Paris, auquel les parties attribuent compétence exclusive.
+
+ARTICLE 7 — LOI APPLICABLE
+Le présent Contrat est soumis au droit français. Les parties se soumettent à la compétence exclusive des tribunaux français pour tout litige né de son interprétation ou de son exécution.
+
+Fait en deux exemplaires originaux, à Paris, le 1er avril 2026.
+
+Pour TechSolutions France SAS                    Pour EuroConsult GmbH
+Signature : ___________________                  Signature : ___________________
+Nom : Pierre Durand                              Nom : Klaus Hoffmann
+Titre : Directeur Général                        Titre : Geschäftsführer

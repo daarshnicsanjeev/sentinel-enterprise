@@ -2,11 +2,16 @@
 Unit tests for agents/compliance_agent.py — query_regulatory_db()
 
 TDD spec: the regulatory DB tool is the authoritative source for required clauses.
+Each clause is now a dict with 'name' and 'risk_level' fields.
 Any change to regulatory_db.json must break these tests first, forcing deliberate review.
 Run first: pytest tests/unit/test_regulatory_db.py -v
 """
 import pytest
 from agents.compliance_agent import query_regulatory_db
+
+
+def _names(clauses: list[dict]) -> list[str]:
+    return [c["name"] for c in clauses]
 
 
 class TestCreditAgreementClauses:
@@ -15,20 +20,16 @@ class TestCreditAgreementClauses:
         assert len(clauses) == 4
 
     def test_contains_governing_law(self):
-        clauses = query_regulatory_db("CREDIT_AGREEMENT")
-        assert "governing law clause" in clauses
+        assert "governing law clause" in _names(query_regulatory_db("CREDIT_AGREEMENT"))
 
     def test_contains_events_of_default(self):
-        clauses = query_regulatory_db("CREDIT_AGREEMENT")
-        assert "events of default clause" in clauses
+        assert "events of default clause" in _names(query_regulatory_db("CREDIT_AGREEMENT"))
 
     def test_contains_indemnification(self):
-        clauses = query_regulatory_db("CREDIT_AGREEMENT")
-        assert "indemnification clause" in clauses
+        assert "indemnification clause" in _names(query_regulatory_db("CREDIT_AGREEMENT"))
 
     def test_contains_representations_and_warranties(self):
-        clauses = query_regulatory_db("CREDIT_AGREEMENT")
-        assert "representations and warranties" in clauses
+        assert "representations and warranties" in _names(query_regulatory_db("CREDIT_AGREEMENT"))
 
 
 class TestLegalContractClauses:
@@ -37,16 +38,13 @@ class TestLegalContractClauses:
         assert len(clauses) == 3
 
     def test_contains_force_majeure(self):
-        clauses = query_regulatory_db("LEGAL_CONTRACT")
-        assert "force majeure clause" in clauses
+        assert "force majeure clause" in _names(query_regulatory_db("LEGAL_CONTRACT"))
 
     def test_contains_limitation_of_liability(self):
-        clauses = query_regulatory_db("LEGAL_CONTRACT")
-        assert "limitation of liability" in clauses
+        assert "limitation of liability" in _names(query_regulatory_db("LEGAL_CONTRACT"))
 
     def test_contains_dispute_resolution(self):
-        clauses = query_regulatory_db("LEGAL_CONTRACT")
-        assert "dispute resolution clause" in clauses
+        assert "dispute resolution clause" in _names(query_regulatory_db("LEGAL_CONTRACT"))
 
 
 class TestRegulatoryFilingClauses:
@@ -55,16 +53,13 @@ class TestRegulatoryFilingClauses:
         assert len(clauses) == 3
 
     def test_contains_material_disclosure(self):
-        clauses = query_regulatory_db("REGULATORY_FILING")
-        assert "material disclosure statement" in clauses
+        assert "material disclosure statement" in _names(query_regulatory_db("REGULATORY_FILING"))
 
     def test_contains_risk_factor_disclosures(self):
-        clauses = query_regulatory_db("REGULATORY_FILING")
-        assert "risk factor disclosures" in clauses
+        assert "risk factor disclosures" in _names(query_regulatory_db("REGULATORY_FILING"))
 
     def test_contains_auditor_certification(self):
-        clauses = query_regulatory_db("REGULATORY_FILING")
-        assert "auditor certification" in clauses
+        assert "auditor certification" in _names(query_regulatory_db("REGULATORY_FILING"))
 
 
 class TestEdgeCases:
@@ -84,20 +79,20 @@ class TestEdgeCases:
         result = query_regulatory_db("CREDIT_AGREEMENT")
         assert isinstance(result, list)
 
-    def test_all_clauses_are_strings(self):
+    def test_all_clauses_are_dicts(self):
         for doc_type in ["CREDIT_AGREEMENT", "LEGAL_CONTRACT", "REGULATORY_FILING"]:
             for clause in query_regulatory_db(doc_type):
-                assert isinstance(clause, str), f"Clause '{clause}' in {doc_type} must be a string"
+                assert isinstance(clause, dict), f"Clause {clause!r} in {doc_type} must be a dict"
+
+    def test_all_clauses_have_name_and_risk_level(self):
+        for doc_type in ["CREDIT_AGREEMENT", "LEGAL_CONTRACT", "REGULATORY_FILING"]:
+            for clause in query_regulatory_db(doc_type):
+                assert "name" in clause and "risk_level" in clause
 
     def test_case_sensitive_lookup(self):
-        # Lowercase should not match
         clauses = query_regulatory_db("credit_agreement")
         assert clauses == []
 
-
-# ---------------------------------------------------------------------------
-# C3: Multi-tenant regulatory profiles
-# ---------------------------------------------------------------------------
 
 class TestMultiTenant:
     def test_eu_tenant_has_credit_agreement_clauses(self):
@@ -109,8 +104,8 @@ class TestMultiTenant:
         assert len(clauses) > 0
 
     def test_eu_tenant_has_gdpr_clause(self):
-        clauses = query_regulatory_db("CREDIT_AGREEMENT", tenant_id="EU")
-        assert any("gdpr" in c.lower() or "data protection" in c.lower() for c in clauses)
+        names = _names(query_regulatory_db("CREDIT_AGREEMENT", tenant_id="EU"))
+        assert any("gdpr" in n.lower() or "data protection" in n.lower() for n in names)
 
     def test_unknown_tenant_falls_back_to_default(self):
         default_clauses = query_regulatory_db("CREDIT_AGREEMENT")

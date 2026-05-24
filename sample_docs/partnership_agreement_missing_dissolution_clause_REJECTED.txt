@@ -1,0 +1,78 @@
+LIMITED LIABILITY COMPANY OPERATING AGREEMENT
+
+This Operating Agreement ("Agreement") of Ironclad Ventures LLC, a Delaware limited liability company ("Company"), is entered into as of April 15, 2026, by and among the following members:
+
+MEMBER 1: Castlegate Capital Partners LP ("Castlegate") — 55% membership interest
+MEMBER 2: Brightfield Innovations Inc. ("Brightfield") — 45% membership interest
+
+NOTE: This agreement intentionally omits a dissolution and exit clause to test compliance rejection.
+
+RECITALS
+The Members desire to form the Company for the purpose of acquiring, developing, and operating commercial real estate assets in the Mid-Atlantic region of the United States. The Members hereby agree to the terms and conditions set forth in this Agreement.
+
+1. CAPITAL CONTRIBUTIONS
+
+1.1 Initial Capital Contributions
+The Members shall contribute capital to the Company as follows:
+- Castlegate: USD 11,000,000 cash (55% of total initial capital of USD 20,000,000), due and payable within 10 business days of execution.
+- Brightfield: USD 9,000,000 cash (45% of total initial capital), due and payable within 10 business days of execution.
+
+1.2 Membership Interests
+In exchange for the capital contributions specified above, each Member shall hold the following membership interest percentages: Castlegate — 55%; Brightfield — 45%. Membership interests represent each Member's proportionate rights to profits, losses, and distributions.
+
+1.3 Additional Capital Calls
+The Managing Member (as defined below) may, with the approval of Members holding at least 75% of the membership interests, make capital calls on all Members in proportion to their membership interests. Each Member shall fund its share of a capital call within 30 days of written notice. In the event of a Member's failure to fund, the contributing Members may elect to either: (a) treat the deficiency as a loan to the defaulting Member bearing interest at the prime rate plus 4%; or (b) dilute the defaulting Member's interest accordingly.
+
+2. PROFIT AND LOSS DISTRIBUTION
+
+2.1 Distribution Policy
+The Company shall make quarterly distributions of available cash to the Members in proportion to their membership interests, after retaining adequate reserves for operations, capital expenditures, and contingencies as determined by the Managing Member. "Available Cash" means gross cash receipts less operating expenses, debt service payments, capital expenditures, and operating reserves.
+
+2.2 Preferred Return
+Each Member shall be entitled to a cumulative preferred return of 8% per annum on its unreturned capital contributions before any residual distributions are made. Preferred returns shall accrue from the date of each capital contribution and shall be compounded quarterly.
+
+2.3 Waterfall Distribution
+After the preferred return has been paid in full, remaining cash shall be distributed: (a) 70% to Members in proportion to membership interests until cumulative distributions equal a 15% IRR on invested capital; (b) thereafter 80% to Members proportionately and 20% to the Managing Member as a promoted interest.
+
+2.4 Tax Distributions
+Prior to any discretionary distributions, the Company shall make quarterly tax distributions to each Member equal to that Member's estimated federal and state income tax liability attributable to the Company's taxable income, calculated at the highest marginal rate applicable to any individual Member.
+
+3. GOVERNANCE AND VOTING RIGHTS
+
+3.1 Managing Member
+Castlegate shall serve as the initial Managing Member and shall have authority to manage the day-to-day operations of the Company. The Managing Member may be removed by Members holding at least 65% of membership interests upon 90 days' written notice in the event of gross negligence, fraud, or material breach of this Agreement.
+
+3.2 Major Decisions Requiring Member Approval
+The following actions shall require approval of Members holding at least 75% of the membership interests: (a) acquisition of assets exceeding USD 5,000,000; (b) disposition of Company assets; (c) incurrence of indebtedness exceeding USD 10,000,000; (d) execution of leases with terms exceeding 5 years; (e) admission of new Members; (f) amendment of this Agreement; (g) commencement of material litigation; (h) engagement of the Managing Member or its affiliates in transactions involving the Company.
+
+3.3 Annual Meetings
+The Members shall hold an annual meeting within 120 days of the end of each fiscal year to review financial statements, approve the operating budget for the upcoming year, and address any matters requiring Member approval.
+
+3.4 Voting
+Each Member shall have the right to vote in proportion to its membership interest. Except as otherwise expressly provided, matters requiring Member approval shall be decided by the affirmative vote of Members holding the specified percentage of membership interests.
+
+4. CONFIDENTIALITY AND REPRESENTATIONS
+
+4.1 Confidentiality
+Each Member agrees to keep confidential all proprietary information of the Company, including financial data, business plans, property information, and tenant details, both during the term of this Agreement and for a period of 3 years after any transfer of membership interests.
+
+4.2 Representations and Warranties
+Each Member represents and warrants that: (a) it has the legal authority to enter into this Agreement; (b) the execution of this Agreement does not violate any other agreement to which it is bound; (c) no consent or approval of any governmental authority is required for execution of this Agreement that has not already been obtained; (d) its capital contribution is free and clear of all encumbrances.
+
+5. GOVERNING LAW
+This Agreement shall be governed by the laws of the State of Delaware. Any disputes shall be resolved by binding arbitration administered by the American Arbitration Association under its Commercial Arbitration Rules, with venue in Wilmington, Delaware.
+
+SIGNATURES
+
+CASTLEGATE CAPITAL PARTNERS LP
+By: Castlegate GP LLC, its general partner
+Signed: ___________________________
+Name: Harrison Blake
+Title: Managing Director
+Date: April 15, 2026
+
+BRIGHTFIELD INNOVATIONS INC.
+Signed: ___________________________
+Name: Amanda Chow
+Title: Chief Executive Officer
+Date: April 15, 2026

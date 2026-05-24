@@ -23,12 +23,31 @@ def _eval_route(state: AgentState) -> str:
     """
     Feedback loop: if faithfulness score is low and retries remain,
     re-route back to compliance for another attempt.
+    If retries are exhausted and score is still low, escalate for human review.
     """
-    score = state.get("evaluation_score", 1.0)
-    retries = state.get("retry_count", 0)
-    if score < _EVAL_THRESHOLD and retries < _MAX_RETRIES:
-        return "retry"
+    raw_score = state.get("evaluation_score", 1.0)
+    # Guard against None or non-numeric values from a malformed LLM response
+    try:
+        score = float(raw_score)
+    except (TypeError, ValueError):
+        score = 1.0
+    try:
+        retries = int(state.get("retry_count", 0))
+    except (TypeError, ValueError):
+        retries = 0
+    if score < _EVAL_THRESHOLD:
+        if retries < _MAX_RETRIES:
+            return "retry"
+        return "escalate"
     return "done"
+
+
+def _escalate_node(state: AgentState) -> dict:
+    """Mark the decision as ESCALATE when faithfulness is still low after all retries."""
+    return {
+        "final_decision": "ESCALATE",
+        "logs": ["[Graph] Faithfulness below threshold after max retries — escalated for human review."],
+    }
 
 
 def _route_after_router(state: AgentState) -> str:
@@ -51,6 +70,7 @@ def build_graph() -> StateGraph:
     builder.add_node("compliance", compliance_node)
     builder.add_node("evaluator", eval_node)
     builder.add_node("increment_retry", _increment_retry)
+    builder.add_node("escalate", _escalate_node)
     builder.add_node("expiry", expiry_node)
 
     builder.set_entry_point("guardrail")
@@ -72,10 +92,11 @@ def build_graph() -> StateGraph:
     builder.add_conditional_edges(
         "evaluator",
         _eval_route,
-        {"retry": "increment_retry", "done": END},
+        {"retry": "increment_retry", "done": END, "escalate": "escalate"},
     )
 
     builder.add_edge("increment_retry", "compliance")
+    builder.add_edge("escalate", END)
 
     return builder.compile()
 

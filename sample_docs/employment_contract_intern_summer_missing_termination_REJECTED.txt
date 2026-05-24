@@ -1,0 +1,109 @@
+SUMMER INTERNSHIP AGREEMENT
+
+This Internship Agreement ("Agreement") is entered into as of May 1, 2026, between:
+
+BRIGHTPATH CONSULTING GROUP, INC., a California corporation with offices at 350 California
+Street, Suite 1200, San Francisco, CA 94104 ("Company"), and
+
+ALEXANDER T. NGUYEN, an individual residing in Berkeley, California ("Intern").
+
+─────────────────────────────────────────────────────────────────────────────────
+1. INTERNSHIP POSITION AND DURATION
+─────────────────────────────────────────────────────────────────────────────────
+
+The Company hereby engages the Intern as a Summer Business Analyst Intern, commencing on
+June 1, 2026, and concluding on August 31, 2026 (the "Internship Period"). The internship
+is a temporary, educational engagement and does not create an employment relationship or
+guarantee future employment.
+
+─────────────────────────────────────────────────────────────────────────────────
+2. COMPENSATION AND BENEFITS CLAUSE
+─────────────────────────────────────────────────────────────────────────────────
+
+2.1  Stipend: The Intern shall receive a monthly stipend of USD 3,500, payable on the
+last business day of each calendar month during the Internship Period.
+
+2.2  Benefits: The Intern shall be eligible for the following during the Internship Period:
+     (a) Access to the Company's employee assistance program (EAP);
+     (b) Subsidized cafeteria meals at the San Francisco office;
+     (c) A one-time technology allowance of USD 500 for software tools required for assigned
+         projects, subject to prior written approval from the internship manager;
+     (d) Participation in the Company's summer speaker series and professional development
+         workshops at no cost.
+
+2.3  Expenses: Pre-approved business travel expenses will be reimbursed in accordance with
+the Company's expense reimbursement policy. The Intern must submit expense reports within
+fifteen (15) days of incurring any reimbursable expense.
+
+2.4  Taxes: The Intern is responsible for payment of all applicable taxes on the stipend.
+The Company will issue an IRS Form 1099-NEC for any stipend amounts paid during the tax year.
+
+─────────────────────────────────────────────────────────────────────────────────
+3. INTELLECTUAL PROPERTY ASSIGNMENT CLAUSE
+─────────────────────────────────────────────────────────────────────────────────
+
+3.1  Work Product: Any and all work product, inventions, discoveries, developments,
+improvements, processes, software, source code, documentation, analyses, reports, or other
+materials created, conceived, or developed by the Intern, solely or jointly with others, in
+connection with or arising from the Intern's activities during the Internship Period
+(collectively, "Work Product") shall be the sole and exclusive property of the Company.
+
+3.2  Assignment: The Intern hereby irrevocably assigns to the Company all right, title, and
+interest in and to all Work Product, including all patents, copyrights, trade secrets, and
+other intellectual property rights therein, throughout the world, in perpetuity.
+
+3.3  Moral Rights Waiver: To the maximum extent permitted by applicable law, the Intern
+hereby waives any and all moral rights or rights of attribution in connection with the
+Work Product.
+
+3.4  Further Assurances: The Intern agrees to execute any additional documents and take
+any further actions as may be reasonably requested by the Company to evidence or perfect
+the intellectual property assignment set forth herein.
+
+─────────────────────────────────────────────────────────────────────────────────
+4. NON-COMPETE AND CONFIDENTIALITY CLAUSE
+─────────────────────────────────────────────────────────────────────────────────
+
+4.1  Confidentiality: During and after the Internship Period, the Intern shall maintain
+in strict confidence all Confidential Information of the Company, its clients, and its
+business partners. "Confidential Information" includes: client identities, project details,
+proprietary methodologies, financial information, personnel data, business strategies,
+and any information designated as confidential.
+
+4.2  Non-Disclosure: The Intern shall not disclose, publish, or disseminate any Confidential
+Information to any third party without the prior written consent of the Company.
+
+4.3  Non-Solicitation: For a period of twelve (12) months following the end of the
+Internship Period, the Intern shall not solicit, recruit, or induce any employee of the
+Company to leave their employment.
+
+4.4  Non-Competition: For a period of six (6) months following the end of the Internship
+Period within a fifty (50) mile radius of San Francisco, CA, the Intern shall not accept
+employment with or provide consulting services to any direct competitor of the Company in
+the management consulting sector.
+
+─────────────────────────────────────────────────────────────────────────────────
+5. GENERAL PROVISIONS
+─────────────────────────────────────────────────────────────────────────────────
+
+5.1  Independent Contractor: The Intern shall perform services as an independent contractor.
+Nothing in this Agreement shall create an employer-employee relationship.
+
+5.2  Governing Law: This Agreement shall be governed by the laws of the State of California.
+
+5.3  Entire Agreement: This Agreement constitutes the entire agreement between the parties
+with respect to the subject matter hereof and supersedes all prior negotiations.
+
+[NOTE: This internship agreement does not include a formal termination and severance clause
+specifying grounds for early termination, notice periods, or severance entitlements. This
+omission renders the agreement non-compliant with standard employment contract requirements.]
+
+─────────────────────────────────────────────────────────────────────────────────
+SIGNATURES
+─────────────────────────────────────────────────────────────────────────────────
+
+BRIGHTPATH CONSULTING GROUP, INC.          INTERN
+By: ________________________               By: ________________________
+Name: Sarah M. Reyes                       Name: Alexander T. Nguyen
+Title: Director of People Operations      Date: May 1, 2026
+Date: May 1, 2026

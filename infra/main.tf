@@ -4,7 +4,7 @@
 #
 # Resources:
 #   1. S3 bucket — public static website hosting for the React frontend
-#   2. EC2 t2.micro — FastAPI backend with Ollama pre-installed via user_data
+#   2. EC2 t3.micro — FastAPI backend with Ollama pre-installed via user_data
 #
 # Usage:
 #   terraform init
@@ -87,7 +87,7 @@ resource "aws_s3_bucket_policy" "frontend_public_read" {
 }
 
 # =============================================================================
-# 2. BACKEND — EC2 t2.micro (Free Tier)
+# 2. BACKEND — EC2 t2.micro (Free Tier eligible)
 # =============================================================================
 
 # Latest Ubuntu 24.04 LTS AMI for ap-south-1
@@ -109,7 +109,7 @@ data "aws_ami" "ubuntu_24_04" {
 # Security group — SSH (22) + FastAPI (8000) inbound, all outbound
 resource "aws_security_group" "sentinel_api" {
   name        = "sentinel-api-sg"
-  description = "Sentinel FastAPI backend — SSH + port 8000"
+  description = "Sentinel FastAPI backend SSH and port 8000"
 
   # SSH — for manual debugging
   ingress {
@@ -143,16 +143,16 @@ resource "aws_security_group" "sentinel_api" {
   }
 }
 
-# EC2 t2.micro — runs on first boot via user_data
+# EC2 t3.micro — runs on first boot via user_data
 resource "aws_instance" "sentinel_api" {
   ami                    = data.aws_ami.ubuntu_24_04.id
-  instance_type          = var.instance_type  # t2.micro (Free Tier)
+  instance_type          = var.instance_type  # t3.micro (Free Tier eligible in ap-south-1)
   vpc_security_group_ids = [aws_security_group.sentinel_api.id]
   key_name               = var.key_pair_name  # set to your existing EC2 key pair name
 
-  # 8 GB gp3 root volume (Free Tier gives 30 GB EBS total)
+  # 20 GB gp3 root volume (Free Tier gives 30 GB EBS total — needs 20GB for torch+sentence-transformers)
   root_block_device {
-    volume_size           = 8
+    volume_size           = 25
     volume_type           = "gp3"
     delete_on_termination = true
   }
@@ -174,14 +174,106 @@ resource "aws_instance" "sentinel_api" {
 
     # ── Pull Ollama model in the background so it's ready when you deploy ───
     # Uncomment the model you want (requires enough RAM / disk):
-    # ollama pull gemma3:4b      # ~3 GB — runs fine on t2.micro swap
+    # ollama pull gemma3:4b      # ~3 GB — runs fine on t3.micro swap
     # ollama pull llama3.2:3b   # ~2 GB alternative
+
+    # ── Write a minimal .env so the service can start before deploy-backend.sh ─
+    mkdir -p /opt/sentinel/backend
+    cat > /opt/sentinel/backend/.env <<ENVEOF
+LLM_PROVIDER=ollama
+OLLAMA_MODEL=gemma3:4b
+OLLAMA_BASE_URL=http://localhost:11434
+RATE_LIMIT=20
+EVAL_THRESHOLD=0.7
+REVIEW_MIN_EVIDENCE=${var.review_min_evidence}
+SENTINEL_API_KEY=
+ENVEOF
 
     echo "Sentinel EC2 bootstrap complete." >> /var/log/sentinel-bootstrap.log
   EOF
 
   tags = {
     Name    = "sentinel-api"
+    Project = "sentinel"
+  }
+}
+
+# =============================================================================
+# 3. CLOUDFRONT — HTTPS CDN in front of the S3 frontend (free tier: 1TB/month)
+# =============================================================================
+
+locals {
+  s3_origin_id = "sentinel-s3-frontend"
+}
+
+resource "aws_cloudfront_distribution" "frontend" {
+  enabled             = true
+  is_ipv6_enabled     = true
+  default_root_object = "index.html"
+  price_class         = "PriceClass_All"
+
+  comment = "Sentinel frontend CDN"
+
+  origin {
+    domain_name = aws_s3_bucket_website_configuration.frontend.website_endpoint
+    origin_id   = local.s3_origin_id
+
+    # S3 website endpoint is HTTP-only; CloudFront terminates HTTPS and talks
+    # HTTP to the origin — this is the standard pattern for S3 static sites.
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  default_cache_behavior {
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+  }
+
+  # React Router — all 404s from S3 get rewritten to index.html
+  custom_error_response {
+    error_code            = 403
+    response_code         = 200
+    response_page_path    = "/index.html"
+    error_caching_min_ttl = 0
+  }
+
+  custom_error_response {
+    error_code            = 404
+    response_code         = 200
+    response_page_path    = "/index.html"
+    error_caching_min_ttl = 0
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  # Use the default CloudFront certificate (*.cloudfront.net) — no custom domain needed
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+
+  tags = {
+    Name    = "sentinel-frontend-cdn"
     Project = "sentinel"
   }
 }

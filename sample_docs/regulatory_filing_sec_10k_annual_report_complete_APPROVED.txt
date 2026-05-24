@@ -1,0 +1,91 @@
+ANNUAL REPORT ON FORM 10-K
+
+UNITED STATES SECURITIES AND EXCHANGE COMMISSION
+Washington, D.C. 20549
+
+FORM 10-K
+ANNUAL REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934
+
+For the fiscal year ended December 31, 2025
+
+Commission file number: 001-38742
+
+NEXAGEN BIOMEDICAL CORPORATION
+(Exact name of registrant as specified in its charter)
+
+Delaware | EIN: 47-2831654
+Principal Executive Offices: 1200 Harbor Boulevard, Weehawken, NJ 07086
+Telephone: (201) 555-0147
+Securities registered: Common Stock, $0.001 par value — NASDAQ: NXGB
+
+MATERIAL DISCLOSURES
+
+ITEM 1A. RISK FACTOR DISCLOSURES
+Investing in our common stock involves a high degree of risk. You should carefully consider the following risk factors, as well as the other information contained in this Annual Report, before making an investment decision.
+
+REGULATORY AND CLINICAL RISKS:
+Our product candidates are subject to extensive regulation by the FDA and comparable foreign regulatory bodies. We cannot guarantee that any of our product candidates will receive regulatory approval. If we fail to obtain regulatory approval for our product candidates, we will be unable to commercialize them, and our business will be materially adversely affected.
+
+Our clinical trials may fail to demonstrate the safety and efficacy of our product candidates to the satisfaction of applicable regulatory authorities. Positive results in preclinical studies or earlier clinical trials do not necessarily mean that later clinical trials will succeed. If our clinical trials fail or produce inconclusive results, we may be required to conduct additional clinical trials, which would result in significant delays and increased costs.
+
+COMPETITION AND MARKET RISKS:
+The biopharmaceutical industry is highly competitive. We face competition from major pharmaceutical companies including Pfizer, Merck, AstraZeneca, and numerous biotechnology companies. Many of our competitors have substantially greater financial resources, larger research and development staffs, and more extensive manufacturing and marketing capabilities than we do.
+
+FINANCIAL RISKS:
+We have incurred significant losses since our inception and expect to incur losses for the foreseeable future. As of December 31, 2025, we had an accumulated deficit of $478.3 million. We will need substantial additional funding to continue our operations, and such funding may not be available on acceptable terms, or at all.
+
+ITEM 9A. AUDITOR CERTIFICATION AND CONTROLS
+
+MANAGEMENT'S REPORT ON INTERNAL CONTROL OVER FINANCIAL REPORTING
+
+Management of NexaGen Biomedical Corporation is responsible for establishing and maintaining adequate internal control over financial reporting as defined in Rule 13a-15(f) under the Securities Exchange Act of 1934. Our internal control over financial reporting is a process designed to provide reasonable assurance regarding the reliability of financial reporting and the preparation of financial statements for external purposes in accordance with generally accepted accounting principles.
+
+Because of its inherent limitations, internal control over financial reporting may not prevent or detect misstatements. Also, projections of any evaluation of effectiveness to future periods are subject to the risk that controls may become inadequate because of changes in conditions, or that the degree of compliance with the policies or procedures may deteriorate.
+
+Management assessed the effectiveness of NexaGen's internal control over financial reporting as of December 31, 2025. In making this assessment, management used the criteria set forth by the Committee of Sponsoring Organizations of the Treadway Commission (COSO) in "Internal Control — Integrated Framework" (2013). Based on that assessment, management has concluded that, as of December 31, 2025, the Company's internal control over financial reporting is effective.
+
+INDEPENDENT REGISTERED PUBLIC ACCOUNTING FIRM ATTESTATION
+
+To the Shareholders and Board of Directors of NexaGen Biomedical Corporation:
+
+Opinion on Internal Control Over Financial Reporting
+We have audited NexaGen Biomedical Corporation's internal control over financial reporting as of December 31, 2025, based on criteria established in Internal Control—Integrated Framework issued by the Committee of Sponsoring Organizations of the Treadway Commission (2013 framework) (the COSO criteria).
+
+In our opinion, NexaGen Biomedical Corporation maintained, in all material respects, effective internal control over financial reporting as of December 31, 2025, based on the COSO criteria.
+
+Deloitte & Touche LLP
+New York, New York
+February 20, 2026
+
+ITEM 8. FINANCIAL STATEMENTS
+
+CONSOLIDATED BALANCE SHEET (in thousands)
+                                    December 31, 2025    December 31, 2024
+Cash and cash equivalents           $   234,817          $   312,445
+Short-term investments              $   189,322          $   156,780
+Accounts receivable, net            $    12,441          $     8,223
+Total current assets                $   451,890          $   492,817
+Total assets                        $   673,445          $   701,228
+Total liabilities                   $   198,334          $   187,221
+Total stockholders' equity          $   475,111          $   514,007
+
+CONSOLIDATED STATEMENTS OF OPERATIONS (in thousands)
+                                    Year ended December 31,
+                                    2025            2024
+Revenue                             $  47,832       $  31,445
+Research and development            $ 112,441       $  98,334
+General and administrative          $  34,221       $  29,887
+Net loss                            $ (98,830)      $ (96,776)
+Net loss per share (basic/diluted)  $   (1.82)      $   (1.79)
+
+ITEM 7. MANAGEMENT'S DISCUSSION AND ANALYSIS OF FINANCIAL CONDITION
+
+OVERVIEW
+NexaGen Biomedical Corporation is a clinical-stage biopharmaceutical company focused on discovering, developing, and commercializing novel therapeutics for autoimmune and inflammatory diseases. Our lead product candidate, NXG-401, is currently in Phase 3 clinical trials for moderate-to-severe rheumatoid arthritis.
+
+LIQUIDITY AND CAPITAL RESOURCES
+As of December 31, 2025, we had cash, cash equivalents, and short-term investments of $424.1 million. We believe this is sufficient to fund operations into the first quarter of 2028. We have never generated positive cash flow from operations.
+
+This Annual Report on Form 10-K contains forward-looking statements within the meaning of Section 27A of the Securities Act of 1933 and Section 21E of the Securities Exchange Act of 1934. These statements involve known and unknown risks, uncertainties and other factors that may cause our actual results, performance or achievements to differ materially.
+
+Filed with the Securities and Exchange Commission on February 28, 2026.

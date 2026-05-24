@@ -1,9 +1,10 @@
 interface Props {
   confidence: number  // 0.0 – 1.0
+  hideLabel?: boolean
 }
 
-export function ConfidenceGauge({ confidence }: Props) {
-  if (!confidence || confidence <= 0) return null
+export function ConfidenceGauge({ confidence, hideLabel = false }: Props) {
+  if (confidence == null || confidence < 0 || confidence > 1) return null
 
   const pct = Math.round(confidence * 100)
 
@@ -16,7 +17,7 @@ export function ConfidenceGauge({ confidence }: Props) {
   const circumference = Math.PI * r  // half-circle arc length
 
   // Fill based on pct (clockwise from left to right along top half)
-  const filled = (pct / 100) * circumference
+  const filled = Math.min((pct / 100) * circumference, circumference)
 
   // Arc color
   const arcColor =
@@ -35,7 +36,8 @@ export function ConfidenceGauge({ confidence }: Props) {
         width={size}
         height={size / 2 + strokeWidth}
         viewBox={`0 0 ${size} ${size / 2 + strokeWidth}`}
-        aria-label={`Confidence ${pct}%`}
+        role="img"
+        aria-label={hideLabel ? `${pct}%` : `Confidence ${pct}%`}
       >
         {/* background arc */}
         <path
@@ -65,7 +67,7 @@ export function ConfidenceGauge({ confidence }: Props) {
           {pct}%
         </text>
       </svg>
-      <span style={{ fontSize: '10px', color: '#94a3b8' }}>Confidence</span>
+      {!hideLabel && <span style={{ fontSize: '10px', color: '#94a3b8' }}>Confidence</span>}
     </div>
   )
 }

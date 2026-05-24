@@ -27,7 +27,7 @@ export function StatusBadge({ decision }: Props) {
         letterSpacing: "0.05em",
         textTransform: "uppercase",
       }}
-      aria-label={`Status: ${decision}`}
+      aria-label={decision.charAt(0).toUpperCase() + decision.slice(1).toLowerCase()}
     >
       {decision}
     </span>
