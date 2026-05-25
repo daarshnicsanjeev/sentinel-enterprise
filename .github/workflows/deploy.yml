@@ -151,7 +151,8 @@ jobs:
           rsync -az --delete \
             -e "ssh -i /tmp/sentinel-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=20" \
             --exclude=".env" \
-            --exclude="sentinel.db" \
+            --exclude="*.db" \
+            --exclude="*.sqlite" \
             --exclude="*.jsonl" \
             --exclude="__pycache__/" \
             --exclude=".pytest_cache/" \

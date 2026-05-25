@@ -82,6 +82,22 @@ function RecCard({ rec, onAction }: { rec: Recommendation; onAction: () => void 
   const [msg, setMsg] = useState("");
 
   const call = async (action: "approve" | "reject" | "undo") => {
+    // Require confirmation before any destructive / irreversible action
+    const confirmMessages: Record<typeof action, string> = {
+      approve:
+        rec.rec_type === "missing_rule"
+          ? `Add "${proposedLabel(rec)}" as a required clause for ${formatDocType(rec.doc_type)}? All future analyses will check for this clause.`
+          : `Apply this comprehension correction for ${formatDocType(rec.doc_type)}? The phrase will be injected into the compliance prompt.`,
+      reject: `Reject this recommendation? It won't be suggested again for ${formatDocType(rec.doc_type)}.`,
+      undo:
+        rec.status === "approved"
+          ? rec.rec_type === "missing_rule"
+            ? `Remove "${proposedLabel(rec)}" from required clauses? This will revert the regulatory database change.`
+            : `Remove this comprehension correction from the compliance prompt?`
+          : `Re-open this rejected recommendation and move it back to Pending?`,
+    };
+    if (!window.confirm(confirmMessages[action])) return;
+
     setLoading(action);
     setMsg("");
     try {
