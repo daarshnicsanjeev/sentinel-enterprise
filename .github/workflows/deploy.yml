@@ -25,6 +25,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:   # allows EC2 self-heal script to trigger redeploy after tunnel URL change
 
 env:
   PYTHON_VERSION: "3.12"
