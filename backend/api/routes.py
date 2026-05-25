@@ -424,13 +424,18 @@ def reload_reg_db() -> None:
 
 
 def _remove_clause_from_reg_db(doc_type: str, clause_name: str) -> None:
-    """Remove a previously approved clause from regulatory_db.json by name match."""
+    """Remove a previously approved clause from regulatory_db.json by name match.
+
+    The file is structured as {tenant_id: {doc_type: [clauses]}}.
+    Removes the clause from every tenant that contains it.
+    """
     data = json.loads(_REG_DB_PATH.read_text())
-    if doc_type in data and isinstance(data[doc_type], list):
-        data[doc_type] = [
-            c for c in data[doc_type]
-            if c.get("name", "").lower().strip() != clause_name.lower().strip()
-        ]
+    for tenant_data in data.values():
+        if isinstance(tenant_data, dict) and doc_type in tenant_data:
+            tenant_data[doc_type] = [
+                c for c in tenant_data[doc_type]
+                if c.get("name", "").lower().strip() != clause_name.lower().strip()
+            ]
     _REG_DB_PATH.write_text(json.dumps(data, indent=2))
     reload_reg_db()
 
@@ -1599,12 +1604,17 @@ async def approve_recommendation(request: Request, rec_id: str):
 
         data = json.loads(_REG_DB_PATH.read_text())
         doc_type = rec["doc_type"]
-        if doc_type not in data:
-            data[doc_type] = []
+        # The file is structured as {tenant_id: {doc_type: [clauses]}}.
+        # Recommendations are generated from the "default" tenant pipeline.
+        tenant_key = "default"
+        if tenant_key not in data:
+            data[tenant_key] = {}
+        if doc_type not in data[tenant_key]:
+            data[tenant_key][doc_type] = []
         # Only add if not already present
-        existing_names = [c.get("name", "").lower() for c in data[doc_type]]
+        existing_names = [c.get("name", "").lower() for c in data[tenant_key][doc_type]]
         if clause_name.lower() not in existing_names:
-            data[doc_type].append({"name": clause_name, "risk_level": risk_level})
+            data[tenant_key][doc_type].append({"name": clause_name, "risk_level": risk_level})
         _REG_DB_PATH.write_text(json.dumps(data, indent=2))
         reload_reg_db()
         _log.info("recommendation_approved_missing_rule", rec_id=rec_id, clause=clause_name, doc_type=doc_type)

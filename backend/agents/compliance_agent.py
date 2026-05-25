@@ -57,29 +57,43 @@ _VALID_RISK_LEVELS = {"HIGH", "MEDIUM", "LOW"}
 
 
 def _load_and_validate_regulatory_db(path: Path) -> dict:
+    """Load regulatory_db.json and validate its structure.
+
+    The expected structure is: {tenant_id: {doc_type: [{name, risk_level}, ...]}}
+
+    Invalid top-level entries (e.g. a doc_type key written at the wrong level by
+    a previous bug) are silently dropped so the service can still start up.
+    Only well-formed tenant → doc_type → clause entries are returned.
+    """
     raw = json.loads(path.read_text())
     if not isinstance(raw, dict):
         raise ValueError(f"regulatory_db.json must be a JSON object, got {type(raw).__name__}")
+    clean: dict = {}
     for tenant, tenant_data in raw.items():
         if not isinstance(tenant_data, dict):
-            raise ValueError(f"regulatory_db[{tenant!r}] must be a dict, got {type(tenant_data).__name__}")
+            # Malformed entry (e.g. doc_type key at wrong nesting level) — skip it
+            _log.warning(
+                "regulatory_db_invalid_entry_skipped",
+                key=tenant,
+                got=type(tenant_data).__name__,
+            )
+            continue
+        clean[tenant] = {}
         for doc_type, clauses in tenant_data.items():
             if not isinstance(clauses, list):
-                raise ValueError(f"regulatory_db[{tenant!r}][{doc_type!r}] must be a list")
+                _log.warning("regulatory_db_invalid_clauses_skipped", tenant=tenant, doc_type=doc_type)
+                continue
+            valid_clauses = []
             for i, clause in enumerate(clauses):
-                if not isinstance(clause, dict):
-                    raise ValueError(
-                        f"regulatory_db[{tenant!r}][{doc_type!r}][{i}] must be a dict with 'name' and 'risk_level'"
-                    )
-                if not clause.get("name", "").strip():
-                    raise ValueError(
-                        f"regulatory_db[{tenant!r}][{doc_type!r}][{i}] missing non-empty 'name'"
-                    )
+                if not isinstance(clause, dict) or not clause.get("name", "").strip():
+                    _log.warning("regulatory_db_invalid_clause_skipped", tenant=tenant, doc_type=doc_type, index=i)
+                    continue
                 if clause.get("risk_level") not in _VALID_RISK_LEVELS:
-                    raise ValueError(
-                        f"regulatory_db[{tenant!r}][{doc_type!r}][{i}] 'risk_level' must be HIGH/MEDIUM/LOW"
-                    )
-    return raw
+                    _log.warning("regulatory_db_invalid_risk_level", tenant=tenant, doc_type=doc_type, index=i, risk_level=clause.get("risk_level"))
+                    continue
+                valid_clauses.append(clause)
+            clean[tenant][doc_type] = valid_clauses
+    return clean
 
 
 _regulatory_db: dict = _load_and_validate_regulatory_db(_REG_DB_PATH)

@@ -501,17 +501,18 @@ class TestUndoRecommendation:
         rec_id = "550e8400-e29b-41d4-a716-446655550022"
         _seed_pending_recommendation(client, rec_id, "missing_rule", "remove_me_clause")
         reg_path = tmp_path / "regulatory_db.json"
-        reg_path.write_text('{"LEGAL_CONTRACT": []}')
+        # Use the correct nested {tenant: {doc_type: [clauses]}} structure
+        reg_path.write_text('{"default": {"LEGAL_CONTRACT": []}}')
         monkeypatch.setattr("api.routes._REG_DB_PATH", reg_path)
         client.post(f"/api/admin/insights/{rec_id}/approve")
-        # Verify clause was added
+        # Verify clause was added under default/LEGAL_CONTRACT
         data = _json.loads(reg_path.read_text())
-        names = [c["name"] for c in data.get("LEGAL_CONTRACT", [])]
+        names = [c["name"] for c in data.get("default", {}).get("LEGAL_CONTRACT", [])]
         assert "remove_me_clause" in names
         # Now undo
         client.post(f"/api/admin/insights/{rec_id}/undo")
         data_after = _json.loads(reg_path.read_text())
-        names_after = [c["name"] for c in data_after.get("LEGAL_CONTRACT", [])]
+        names_after = [c["name"] for c in data_after.get("default", {}).get("LEGAL_CONTRACT", [])]
         assert "remove_me_clause" not in names_after
 
     def test_undo_rejected_reverts_to_pending(self, client):

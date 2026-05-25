@@ -155,8 +155,20 @@ jobs:
             --exclude="*.jsonl" \
             --exclude="__pycache__/" \
             --exclude=".pytest_cache/" \
+            --exclude="data/regulatory_db.json" \
             backend/ \
             ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/sentinel/backend/
+
+      - name: Seed regulatory_db.json on EC2 (only if absent)
+        run: |
+          ssh -i /tmp/sentinel-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=20 \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "[ -f /opt/sentinel/backend/data/regulatory_db.json ] && echo 'regulatory_db.json already exists — skipping seed' || echo 'File missing — copying seed'"
+          rsync -az \
+            -e "ssh -i /tmp/sentinel-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=20" \
+            --ignore-existing \
+            backend/data/regulatory_db.json \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/sentinel/backend/data/regulatory_db.json
 
       - name: rsync sample_docs to EC2
         run: |
