@@ -112,6 +112,12 @@ function makeSseStream(messages: { type: string; message: string }[]) {
   })
 }
 
+beforeEach(() => {
+  // All action tests expect the user to confirm — default to true.
+  // Individual tests that want to test cancellation can override with mockReturnValue(false).
+  vi.spyOn(window, 'confirm').mockReturnValue(true)
+})
+
 afterEach(() => {
   vi.restoreAllMocks()
 })
