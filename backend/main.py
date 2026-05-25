@@ -56,13 +56,19 @@ _default_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://sentinel-ui-sanjeev-2026.s3-website.ap-south-1.amazonaws.com",
+    # Vercel deployments — both preview and production
+    "https://sentinel-enterprise.vercel.app",
+    "https://sentinel-enterprise-daarshnicsanjeev.vercel.app",
 ]
 _extra = os.getenv("ALLOWED_ORIGINS", "")
+# Also support wildcard Vercel preview URLs via pattern matching below
 _origins = _default_origins + [o.strip() for o in _extra.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_origins,
+    # Allow all Vercel preview + production deployments
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["content-type", "x-api-key", "authorization"],
