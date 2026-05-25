@@ -104,7 +104,11 @@ function RecCard({ rec, onAction }: { rec: Recommendation; onAction: () => void 
       const res = await fetch(`${API_BASE}/api/admin/insights/${rec.rec_id}/${action}`, { method: "POST" });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        setMsg(err.detail || `Error ${res.status}`);
+        // 409 = duplicate clause already in DB — surface the server message directly
+        setMsg(res.status === 409
+          ? `⚠ ${err.detail || "Duplicate: this clause already exists in the regulatory database."}`
+          : err.detail || `Error ${res.status}`
+        );
       } else {
         const data = await res.json();
         if (data.action === "reopened") setMsg("↩ Re-opened — recommendation moved back to Pending.");
@@ -190,6 +194,7 @@ export function InsightsDashboard() {
   const [reviewLog, setReviewLog] = useState<string[]>([]);
   const [reviewRunning, setReviewRunning] = useState(false);
   const [minEvidence, setMinEvidence] = useState(1);
+  const [ignoringId, setIgnoringId] = useState<string | null>(null);
   const logRef = useRef<HTMLUListElement>(null);
 
   const loadData = async () => {
@@ -253,6 +258,26 @@ export function InsightsDashboard() {
     }
   };
 
+  const ignoreFeedback = async (trace_id: string) => {
+    if (!window.confirm("Ignore this feedback entry? It will be removed from the feedback log and won't be used by the Review Agent.")) return;
+    setIgnoringId(trace_id);
+    try {
+      const res = await fetch(`${API_BASE}/api/feedback/${trace_id}/ignore`, { method: "POST" });
+      if (res.ok) {
+        // Remove from local state immediately
+        setFeedbackRows((prev) => prev.filter((r) => r.trace_id !== trace_id));
+        // Refresh stats since the count changed
+        const metricsRes = await fetch(`${API_BASE}/api/metrics/summary`);
+        if (metricsRes.ok) {
+          const m = await metricsRes.json();
+          setStats(m.feedback ?? null);
+        }
+      }
+    } catch { /* silent */ } finally {
+      setIgnoringId(null);
+    }
+  };
+
   const pending  = recs.filter((r) => r.status === "pending");
   const approved = recs.filter((r) => r.status === "approved");
   const rejected = recs.filter((r) => r.status === "rejected");
@@ -285,7 +310,7 @@ export function InsightsDashboard() {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.82rem", color: "#e2e8f0" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid #334155" }}>
-                {["Rating", "Filename", "Decision", "Comment", "Date"].map((h) => (
+                {["Rating", "Filename", "Decision", "Comment", "Date", ""].map((h) => (
                   <th key={h} scope="col" style={{ textAlign: "left", padding: "6px 10px", color: "#64748b", fontWeight: 600, fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
                 ))}
               </tr>
@@ -298,6 +323,24 @@ export function InsightsDashboard() {
                   <td style={{ padding: "6px 10px" }}>{f.decision ?? "—"}</td>
                   <td style={{ padding: "6px 10px", color: "#94a3b8" }}>{f.comment || <em>no comment</em>}</td>
                   <td style={{ padding: "6px 10px", color: "#64748b" }}>{new Date(f.created_at).toLocaleDateString()}</td>
+                  <td style={{ padding: "6px 10px" }}>
+                    {f.rating === "negative" && (
+                      <button
+                        onClick={() => ignoreFeedback(f.trace_id)}
+                        disabled={ignoringId === f.trace_id}
+                        aria-label={`Ignore feedback for ${f.filename ?? f.trace_id}`}
+                        title="Remove from feedback log — Review Agent won't use this entry"
+                        style={{
+                          background: "none", border: "1px solid #334155", borderRadius: "4px",
+                          color: "#64748b", padding: "2px 8px", fontSize: "0.72rem",
+                          cursor: ignoringId === f.trace_id ? "not-allowed" : "pointer",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {ignoringId === f.trace_id ? "…" : "Ignore"}
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

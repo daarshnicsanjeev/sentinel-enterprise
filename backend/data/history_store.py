@@ -503,6 +503,19 @@ async def insert_feedback(trace_id: str, rating: str, comment: str = "") -> None
         await db.commit()
 
 
+async def delete_feedback_by_trace_id(trace_id: str) -> int:
+    """Delete all feedback rows for a given trace_id (ignore action).
+
+    Returns the number of rows deleted so the caller can 404 if nothing matched.
+    """
+    async with _connect() as db:
+        cursor = await db.execute(
+            "DELETE FROM feedback WHERE trace_id = ?", (trace_id,)
+        )
+        await db.commit()
+        return cursor.rowcount
+
+
 async def update_decision(trace_id: str, decision: str) -> None:
     """Persist a compliance officer decision override to the analyses table."""
     async with _connect() as db:

@@ -467,6 +467,31 @@ def _append_correction_jsonl(entry: dict) -> None:
         _log.error("correction_jsonl_write_failed", error=str(exc))
 
 
+def _remove_correction_jsonl_entries(trace_id: str) -> int:
+    """Remove all correction-JSONL entries for a given trace_id.
+
+    Returns the number of lines removed.  Called when a compliance officer
+    ignores a specific feedback entry so the review agent won't process it.
+    """
+    if not _CORRECTION_JSONL_PATH.exists():
+        return 0
+    lines = _CORRECTION_JSONL_PATH.read_text(encoding="utf-8").splitlines()
+    kept, removed = [], 0
+    for line in lines:
+        if not line.strip():
+            continue
+        try:
+            entry = json.loads(line)
+            if entry.get("trace_id") == trace_id:
+                removed += 1
+            else:
+                kept.append(line)
+        except json.JSONDecodeError:
+            kept.append(line)
+    _CORRECTION_JSONL_PATH.write_text("\n".join(kept) + ("\n" if kept else ""), encoding="utf-8")
+    return removed
+
+
 def _load_tenant_clauses(tenant_id: str) -> dict | None:
     """Return clauses for tenant_id. Custom file overrides built-in DB. None = tenant not found."""
     custom_file = _CUSTOM_CLAUSES_DIR / f"{tenant_id}.json"
@@ -863,6 +888,28 @@ async def submit_feedback(
         background_tasks.add_task(_append_correction_jsonl, entry)
 
     return {"status": "recorded"}
+
+
+@router.post("/feedback/{trace_id}/ignore", status_code=200)
+@limiter.limit("30/minute")
+async def ignore_feedback(
+    request: Request,
+    trace_id: str,
+    background_tasks: BackgroundTasks,
+):
+    """Ignore all feedback for a trace_id.
+
+    Removes the entry from both the SQLite feedback table and the correction
+    JSONL file so the AI review agent won't include it in future recommendations.
+    """
+    if not _UUID_RE.match(trace_id):
+        raise HTTPException(status_code=422, detail="trace_id must be a valid UUID.")
+    deleted = await history_store.delete_feedback_by_trace_id(trace_id)
+    if deleted == 0:
+        raise HTTPException(status_code=404, detail="No feedback found for this trace_id.")
+    background_tasks.add_task(_remove_correction_jsonl_entries, trace_id)
+    _log.info("feedback_ignored", trace_id=trace_id, rows_deleted=deleted)
+    return {"status": "ignored", "trace_id": trace_id, "rows_deleted": deleted}
 
 
 @router.post("/history/{trace_id}/set-decision", status_code=200)
@@ -1611,10 +1658,14 @@ async def approve_recommendation(request: Request, rec_id: str):
             data[tenant_key] = {}
         if doc_type not in data[tenant_key]:
             data[tenant_key][doc_type] = []
-        # Only add if not already present
+        # Reject duplicate — clause already exists in DB
         existing_names = [c.get("name", "").lower() for c in data[tenant_key][doc_type]]
-        if clause_name.lower() not in existing_names:
-            data[tenant_key][doc_type].append({"name": clause_name, "risk_level": risk_level})
+        if clause_name.lower() in existing_names:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Clause '{clause_name}' already exists in the regulatory database for {doc_type}. No change was made.",
+            )
+        data[tenant_key][doc_type].append({"name": clause_name, "risk_level": risk_level})
         _REG_DB_PATH.write_text(json.dumps(data, indent=2))
         reload_reg_db()
         _log.info("recommendation_approved_missing_rule", rec_id=rec_id, clause=clause_name, doc_type=doc_type)
