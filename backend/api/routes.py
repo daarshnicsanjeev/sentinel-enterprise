@@ -872,17 +872,28 @@ async def submit_feedback(
     comment = body.comment.strip()[:500]
     await history_store.insert_feedback(trace_id, body.rating, comment)
 
-    # Log every negative feedback to JSONL for the review agent (non-blocking)
-    if body.rating == "negative":
-        record = await history_store.get_history_record(trace_id)
+    # Log actionable feedback to JSONL for the review agent (non-blocking).
+    # Direction matters:
+    #   👎 always logged — could be missing rule or comprehension failure
+    #   👍 on REJECTED/ESCALATE logged — indicates over-strict detection
+    #   👍 on APPROVED skipped — pure confirmation, nothing to fix
+    #   👍 on unknown decision skipped — can't infer direction
+    record = await history_store.get_history_record(trace_id)
+    doc_decision = (record.get("decision", "") if record else "").upper()
+    _OVER_STRICT_DECISIONS = {"REJECTED", "ESCALATE"}
+    _log_this_feedback = (
+        body.rating == "negative"
+        or (body.rating == "positive" and doc_decision in _OVER_STRICT_DECISIONS)
+    )
+    if _log_this_feedback:
         entry = {
             "trace_id": trace_id,
             "filename": record.get("filename", "") if record else "",
-            "decision": record.get("decision", "") if record else "",
+            "decision": doc_decision,
             "doc_type": record.get("doc_type", "") if record else "",
             "faithfulness": record.get("faithfulness", 0.0) if record else 0.0,
             "comment": comment,
-            "rating": "negative",
+            "rating": body.rating,
             "logged_at": datetime.now(timezone.utc).isoformat(),
         }
         background_tasks.add_task(_append_correction_jsonl, entry)

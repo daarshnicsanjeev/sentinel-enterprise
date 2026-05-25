@@ -366,7 +366,7 @@ async def get_history(limit: int = 50) -> list[dict]:
 
 
 async def get_feedback_stats() -> dict:
-    """Return aggregate counts: total, positive, negative, negative_rate_pct."""
+    """Return aggregate counts including directional breakdown (rating × decision)."""
     try:
         async with _connect() as db:
             cursor = await db.execute(
@@ -380,14 +380,50 @@ async def get_feedback_stats() -> dict:
                 counts[rating] = cnt
         total = counts["positive"] + counts["negative"]
         rate = round(counts["negative"] / total * 100, 1) if total else 0.0
+
+        # Directional breakdown: JOIN feedback with analyses to get decision context
+        async with _connect() as db:
+            cursor = await db.execute(
+                """
+                SELECT f.rating, UPPER(COALESCE(a.decision, 'UNKNOWN')) as decision,
+                       COUNT(*) as cnt
+                FROM feedback f
+                LEFT JOIN analyses a ON f.trace_id = a.trace_id
+                GROUP BY f.rating, decision
+                """
+            )
+            dir_rows = await cursor.fetchall()
+
+        direction: dict[str, int] = {
+            "wrong_approvals": 0,    # 👎 on APPROVED — potential missing rule
+            "wrong_rejections": 0,   # 👎 on REJECTED/ESCALATE — potential comprehension failure
+            "confirmed_approvals": 0, # 👍 on APPROVED — system working correctly
+            "over_strict": 0,        # 👍 on REJECTED — system may be too strict
+        }
+        for row in dir_rows:
+            rating, decision, cnt = row[0], row[1], row[2]
+            if rating == "negative" and decision == "APPROVED":
+                direction["wrong_approvals"] += cnt
+            elif rating == "negative" and decision in ("REJECTED", "ESCALATE"):
+                direction["wrong_rejections"] += cnt
+            elif rating == "positive" and decision == "APPROVED":
+                direction["confirmed_approvals"] += cnt
+            elif rating == "positive" and decision in ("REJECTED", "ESCALATE"):
+                direction["over_strict"] += cnt
+
         return {
             "total": total,
             "positive": counts["positive"],
             "negative": counts["negative"],
             "negative_rate_pct": rate,
+            "direction": direction,
         }
     except Exception:
-        return {"total": 0, "positive": 0, "negative": 0, "negative_rate_pct": 0.0}
+        return {
+            "total": 0, "positive": 0, "negative": 0, "negative_rate_pct": 0.0,
+            "direction": {"wrong_approvals": 0, "wrong_rejections": 0,
+                          "confirmed_approvals": 0, "over_strict": 0},
+        }
 
 
 async def get_feedback_summary(limit: int = 100) -> list[dict]:

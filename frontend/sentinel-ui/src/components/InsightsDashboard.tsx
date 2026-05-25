@@ -9,6 +9,12 @@ interface FeedbackStats {
   positive: number;
   negative: number;
   negative_rate_pct: number;
+  direction?: {
+    wrong_approvals: number;    // 👎 on APPROVED — potential missing rule
+    wrong_rejections: number;   // 👎 on REJECTED — potential comprehension failure
+    confirmed_approvals: number; // 👍 on APPROVED — system correct
+    over_strict: number;        // 👍 on REJECTED — system may be too strict
+  };
 }
 
 interface FeedbackEntry {
@@ -294,12 +300,43 @@ export function InsightsDashboard() {
       <h2 style={{ color: "#e2e8f0", marginBottom: "20px" }}>AI Insights &amp; Feedback Loop</h2>
 
       {/* ── Section A: Stats ── */}
-      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "28px" }}>
+      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "12px" }}>
         <StatCard label="Total Feedback" value={stats?.total ?? "—"} />
         <StatCard label="👍 Positive" value={stats?.positive ?? "—"} />
         <StatCard label="👎 Negative" value={stats?.negative ?? "—"} />
         <StatCard label="Negative Rate" value={stats ? `${stats.negative_rate_pct}%` : "—"} />
       </div>
+
+      {/* ── Section A2: Direction breakdown ── */}
+      {stats && (
+        <div style={{ marginBottom: "28px" }}>
+          <div style={{ fontSize: "0.72rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "#64748b", marginBottom: "8px" }}>
+            Feedback Direction
+          </div>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <div style={{ background: "#1e293b", borderRadius: "10px", padding: "12px 16px", flex: 1, minWidth: "160px", borderLeft: "3px solid #b91c1c" }}>
+              <div style={{ fontSize: "0.68rem", textTransform: "uppercase", color: "#94a3b8", marginBottom: "4px", fontWeight: 600 }}>👎 Wrong Approvals</div>
+              <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#f87171" }}>{stats.direction?.wrong_approvals ?? 0}</div>
+              <div style={{ fontSize: "0.7rem", color: "#64748b", marginTop: "2px" }}>→ may need new rules</div>
+            </div>
+            <div style={{ background: "#1e293b", borderRadius: "10px", padding: "12px 16px", flex: 1, minWidth: "160px", borderLeft: "3px solid #d97706" }}>
+              <div style={{ fontSize: "0.68rem", textTransform: "uppercase", color: "#94a3b8", marginBottom: "4px", fontWeight: 600 }}>👎 Wrong Rejections</div>
+              <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#fbbf24" }}>{stats.direction?.wrong_rejections ?? 0}</div>
+              <div style={{ fontSize: "0.7rem", color: "#64748b", marginTop: "2px" }}>→ comprehension failures</div>
+            </div>
+            <div style={{ background: "#1e293b", borderRadius: "10px", padding: "12px 16px", flex: 1, minWidth: "160px", borderLeft: "3px solid #d97706" }}>
+              <div style={{ fontSize: "0.68rem", textTransform: "uppercase", color: "#94a3b8", marginBottom: "4px", fontWeight: 600 }}>👍 Over-Strict</div>
+              <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#fbbf24" }}>{stats.direction?.over_strict ?? 0}</div>
+              <div style={{ fontSize: "0.7rem", color: "#64748b", marginTop: "2px" }}>👍 on rejected — too strict</div>
+            </div>
+            <div style={{ background: "#1e293b", borderRadius: "10px", padding: "12px 16px", flex: 1, minWidth: "160px", borderLeft: "3px solid #15803d" }}>
+              <div style={{ fontSize: "0.68rem", textTransform: "uppercase", color: "#94a3b8", marginBottom: "4px", fontWeight: 600 }}>👍 Confirmed Correct</div>
+              <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#4ade80" }}>{stats.direction?.confirmed_approvals ?? 0}</div>
+              <div style={{ fontSize: "0.7rem", color: "#64748b", marginTop: "2px" }}>👍 on approved — working</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Section B: Feedback Detail Table ── */}
       <h3 style={sectionHd}>Feedback Details</h3>

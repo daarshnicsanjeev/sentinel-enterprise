@@ -293,9 +293,11 @@ class TestCorrectionJsonlLogging:
             assert entry["rating"] == "negative"
             assert "trace_id" in entry
 
-    def test_positive_feedback_does_not_write_jsonl(self, client, tmp_path, monkeypatch):
+    def test_positive_feedback_on_unknown_decision_does_not_write_jsonl(self, client, tmp_path, monkeypatch):
+        """👍 with no analysis record (unknown decision) is skipped — can't infer direction."""
         jsonl_path = tmp_path / "correction_examples.jsonl"
         monkeypatch.setattr("api.routes._CORRECTION_JSONL_PATH", str(jsonl_path))
+        # Trace ID has no analysis record → decision is unknown → should NOT log
         client.post(
             "/api/feedback/550e8400-e29b-41d4-a716-446655443001",
             json={"rating": "positive"},

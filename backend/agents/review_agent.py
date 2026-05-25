@@ -28,9 +28,19 @@ _CORRECTION_JSONL_PATH = _DATA_DIR / "correction_examples.jsonl"
 _REG_DB_PATH = _DATA_DIR / "regulatory_db.json"
 
 _META_SYSTEM_PROMPT = """\
-You are an AI system architect analysing failure patterns in an automated
-compliance engine. Your job is to identify recurring problems from user
-complaints and propose concrete fixes.
+You are an AI system architect analysing feedback patterns in an automated
+compliance engine. Your job is to identify recurring problems and propose fixes.
+
+Each feedback entry has a RATING (positive/negative) and a DECISION (what the
+system decided). The combination tells you what went wrong:
+
+  👎 negative + APPROVED  → system approved a doc it should have rejected
+                             → likely a MISSING RULE (clause not in required list)
+  👎 negative + REJECTED  → system rejected a doc it should have approved
+                             → likely a COMPREHENSION FAILURE (clause present but missed)
+  👍 positive + REJECTED  → user agrees the doc should have passed
+                             → likely a COMPREHENSION FAILURE (over-strict detection)
+  👍 positive + APPROVED  → confirmed correct decision — not included in this prompt
 
 Respond ONLY with valid JSON — no prose, no markdown fences.
 """
@@ -41,10 +51,11 @@ DOC_TYPE: {doc_type}
 CURRENT REQUIRED CLAUSES:
 {current_clauses}
 
-USER COMPLAINTS ({n} negative feedback entries):
+USER FEEDBACK ({n} entries):
 {complaints}
 
-Analyse the complaints and return a JSON object with this exact structure:
+Analyse the feedback using the direction rules above and return a JSON object
+with this exact structure:
 {{
   "recommendations": [
     {{
@@ -70,11 +81,12 @@ Analyse the complaints and return a JSON object with this exact structure:
 
 Rules:
 - "missing_rule": the clause does not appear in CURRENT REQUIRED CLAUSES at all.
+  Only propose for 👎+APPROVED patterns.
 - "comprehension_failure": the clause IS in CURRENT REQUIRED CLAUSES but was
-  missed because of unusual phrasing in the document.
-- Omit recommendation types that are not supported by the evidence.
+  missed because of unusual phrasing. Propose for 👎+REJECTED or 👍+REJECTED.
+- Omit recommendation types not supported by the evidence.
 - Output an empty recommendations list if no clear pattern exists.
-- Never invent clause names. Base every recommendation on the complaints.
+- Never invent clause names. Base every recommendation on the feedback.
 """
 
 
@@ -104,12 +116,36 @@ def _group_by_doc_type(entries: list[dict]) -> dict[str, list[dict]]:
 
 
 def _current_clauses_for(doc_type: str) -> list[str]:
+    """Return required clause names for doc_type from the active regulatory DB.
+
+    The file is structured as {tenant_id: {doc_type: [clauses]}}.
+    Searches all tenants and returns the first match (default tenant first).
+    """
     try:
         db = json.loads(_REG_DB_PATH.read_text())
-        clauses = db.get(doc_type) or db.get(doc_type.upper()) or []
-        return [c.get("name", "") for c in clauses if isinstance(c, dict)]
+        # Prefer "default" tenant, then fall back to any tenant that has it
+        for tenant_key in (["default"] + [k for k in db if k != "default"]):
+            tenant_data = db.get(tenant_key, {})
+            if isinstance(tenant_data, dict):
+                clauses = tenant_data.get(doc_type) or tenant_data.get(doc_type.upper())
+                if clauses:
+                    return [c.get("name", "") for c in clauses if isinstance(c, dict)]
+        return []
     except Exception:
         return []
+
+
+def _direction_label(rating: str, decision: str) -> str:
+    """Human-readable label for the feedback direction shown in the LLM prompt."""
+    rating = (rating or "").lower()
+    decision = (decision or "").upper()
+    if rating == "negative" and decision == "APPROVED":
+        return "👎 APPROVED (system should have rejected)"
+    if rating == "negative" and decision in ("REJECTED", "ESCALATE"):
+        return "👎 REJECTED (system should have approved)"
+    if rating == "positive" and decision in ("REJECTED", "ESCALATE"):
+        return "👍 REJECTED (user agrees: should have been approved)"
+    return f"{rating.upper()} {decision}"
 
 
 def _sse(msg: str, event: str = "log") -> str:
@@ -129,9 +165,9 @@ async def run_review(min_evidence: int = 1) -> AsyncGenerator[str, None]:
         yield _sse("Review complete — 0 recommendations generated.", event="done")
         return
 
-    yield _sse(f"Loaded {len(entries)} correction entries from feedback log.")
+    yield _sse(f"Loaded {len(entries)} feedback entr{'y' if len(entries) == 1 else 'ies'} from feedback log.")
     grouped = _group_by_doc_type(entries)
-    yield _sse(f"Found {len(grouped)} doc type(s) with negative feedback.")
+    yield _sse(f"Found {len(grouped)} doc type(s) with actionable feedback.")
 
     total_new = 0
     llm = None  # lazy — only created if at least one doc_type meets min_evidence
@@ -144,13 +180,14 @@ async def run_review(min_evidence: int = 1) -> AsyncGenerator[str, None]:
         if llm is None:
             llm = create_llm(temperature=0.0)
 
-        yield _sse(f"Analysing {doc_type} — {n} complaint{'s' if n > 1 else ''}…")
+        yield _sse(f"Analysing {doc_type} — {n} feedback entr{'y' if n == 1 else 'ies'}…")
 
         current_clauses = _current_clauses_for(doc_type)
         clauses_text = "\n".join(f"  - {c}" for c in current_clauses) or "  (none defined)"
 
         complaints_text = "\n".join(
-            f"  {i+1}. [{e.get('decision','')}] {e.get('comment','(no comment)') or '(no comment)'}"
+            f"  {i+1}. [{_direction_label(e.get('rating','negative'), e.get('decision',''))}]"
+            f" {e.get('comment','(no comment)') or '(no comment)'}"
             for i, e in enumerate(doc_entries)
         )
 
