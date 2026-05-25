@@ -84,6 +84,18 @@ def _load_and_validate_regulatory_db(path: Path) -> dict:
 
 _regulatory_db: dict = _load_and_validate_regulatory_db(_REG_DB_PATH)
 
+
+def reload_regulatory_db() -> None:
+    """Re-read regulatory_db.json from disk and update the compliance agent's in-memory cache.
+
+    Called by routes.reload_reg_db() after any write to regulatory_db.json so that
+    subsequent analyses immediately see the updated clause list without a service restart.
+    """
+    global _regulatory_db
+    _regulatory_db = _load_and_validate_regulatory_db(_REG_DB_PATH)
+    _log.info("compliance_regulatory_db_reloaded", doc_types=list(_regulatory_db.keys()))
+
+
 _llm = create_llm(temperature=0)
 _VERSION = _prompt_cfg.get("version", "1.0.0")
 

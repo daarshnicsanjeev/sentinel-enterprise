@@ -406,10 +406,21 @@ _REG_DB: dict = json.loads(_REG_DB_PATH.read_text())
 
 
 def reload_reg_db() -> None:
-    """Re-read regulatory_db.json from disk and update the in-memory cache."""
+    """Re-read regulatory_db.json from disk and update all in-memory caches.
+
+    Updates both routes._REG_DB (used by the /clauses API endpoints) AND
+    compliance_agent._regulatory_db (used by the compliance pipeline), so that
+    subsequent analyses immediately pick up approved/undone recommendations
+    without requiring a service restart.
+    """
     global _REG_DB
     _REG_DB = json.loads(_REG_DB_PATH.read_text())
     _log.info("regulatory_db_reloaded", doc_types=list(_REG_DB.keys()))
+    try:
+        from agents.compliance_agent import reload_regulatory_db
+        reload_regulatory_db()
+    except Exception as exc:  # pragma: no cover
+        _log.error("compliance_agent_reload_failed", error=str(exc))
 
 
 def _remove_clause_from_reg_db(doc_type: str, clause_name: str) -> None:
