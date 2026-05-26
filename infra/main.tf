@@ -1,10 +1,24 @@
 # =============================================================================
-# Project Sentinel — AWS Free Tier Deployment (PoC)
+# Project Sentinel — AWS Free Tier Deployment
 # Region: ap-south-1 (Mumbai)
 #
-# Resources:
-#   1. S3 bucket — public static website hosting for the React frontend
-#   2. EC2 t3.micro — FastAPI backend with Ollama pre-installed via user_data
+# Live architecture (as of 2026-05-25):
+#   Frontend: Vercel (HTTPS CDN, free Hobby tier) — NOT S3/CloudFront
+#   Backend:  EC2 t3.micro running FastAPI, exposed via Cloudflare Quick Tunnel
+#             (trycloudflare.com HTTPS — no domain, no port 8000 public exposure)
+#
+# Resources managed here:
+#   1. EC2 t3.micro — FastAPI backend
+#   2. S3 bucket    — RETAINED for reference / fallback only; NOT the live frontend host.
+#                     Vercel replaced S3 to provide HTTPS (S3 static sites are HTTP-only
+#                     which causes Mixed Content errors from an HTTPS frontend).
+#   3. CloudFront   — RETAINED for reference / fallback only; Vercel is the live CDN.
+#
+# NOTE: Port 8000 does NOT need to be open in the security group when using
+#       the Cloudflare Quick Tunnel — the tunnel establishes an outbound QUIC
+#       connection from EC2 to Cloudflare's edge. Only port 22 (SSH) is needed
+#       for administration. The port 8000 ingress rule below is kept for local
+#       development / health-check convenience only.
 #
 # Usage:
 #   terraform init
@@ -48,8 +62,15 @@ provider "aws" {
   region = var.aws_region  # ap-south-1 (Mumbai)
 }
 
+# Used to inject the AWS account ID into the OpenSearch access policy ARN
+data "aws_caller_identity" "current" {}
+
 # =============================================================================
-# 1. FRONTEND — S3 Static Website Hosting
+# 1. FRONTEND — S3 Static Website Hosting (RETAINED FOR REFERENCE / FALLBACK)
+#    The live frontend is hosted on Vercel, not S3.
+#    S3 static websites are HTTP-only; Mixed Content errors block API calls
+#    from an HTTPS page. Vercel provides HTTPS + global CDN for free.
+#    To use Vercel: cd frontend/sentinel-ui && vercel --prod
 # =============================================================================
 
 resource "aws_s3_bucket" "frontend" {
@@ -219,7 +240,96 @@ ENVEOF
 }
 
 # =============================================================================
-# 3. CLOUDFRONT — HTTPS CDN in front of the S3 frontend (free tier: 1TB/month)
+# 3. OPENSEARCH SERVICE — Persistent Vector Store (optional, free tier 12 months)
+# =============================================================================
+#
+# Activated by: enable_opensearch = true in terraform.tfvars (or -var flag).
+#
+# Free-tier entitlements used:
+#   • t2.small.search — 750 instance-hours/month for 12 months
+#   • 10 GB gp2 EBS   — included in free tier
+#
+# Authentication: Fine-Grained Access Control (FGAC) with an internal
+#   master user (admin / opensearch_master_password).  The EC2 backend
+#   connects with HTTP basic auth over HTTPS — no IAM signing required.
+#
+# After provisioning, inject into EC2 backend/.env (see deploy-backend.sh):
+#   VECTOR_STORE=opensearch
+#   OPENSEARCH_HOST=<opensearch_endpoint output>
+#   OPENSEARCH_PORT=443
+#   OPENSEARCH_USER=admin
+#   OPENSEARCH_PASSWORD=<opensearch_master_password>
+#   OPENSEARCH_USE_SSL=true
+# =============================================================================
+
+resource "aws_opensearch_domain" "vectors" {
+  count          = var.enable_opensearch ? 1 : 0
+  domain_name    = "sentinel-vectors"
+  engine_version = "OpenSearch_2.13"
+
+  cluster_config {
+    instance_type            = "t2.small.search" # free tier: 750 hrs/month for 12 months
+    instance_count           = 1
+    dedicated_master_enabled = false
+    zone_awareness_enabled   = false # single-AZ — no HA needed for demo
+  }
+
+  ebs_options {
+    ebs_enabled = true
+    volume_type = "gp2"
+    volume_size = 10 # GB — free tier maximum
+  }
+
+  # Fine-Grained Access Control — enables HTTP basic auth with a master user.
+  # FGAC requires encrypt_at_rest + node_to_node_encryption + enforce_https.
+  advanced_security_options {
+    enabled                        = true
+    anonymous_auth_enabled         = false
+    internal_user_database_enabled = true
+    master_user_options {
+      master_user_name     = "admin"
+      master_user_password = var.opensearch_master_password
+    }
+  }
+
+  encrypt_at_rest {
+    enabled = true # required for FGAC
+  }
+
+  node_to_node_encryption {
+    enabled = true # required for FGAC
+  }
+
+  domain_endpoint_options {
+    enforce_https       = true                    # required for FGAC
+    tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
+  }
+
+  # Domain-level access policy: allow all requests.
+  # Actual user-level enforcement is handled by FGAC (username + password).
+  access_policies = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = { AWS = "*" }
+        Action    = "es:*"
+        Resource  = "arn:aws:es:${var.aws_region}:${data.aws_caller_identity.current.account_id}:domain/sentinel-vectors/*"
+      }
+    ]
+  })
+
+  tags = {
+    Name    = "sentinel-vectors"
+    Project = "sentinel"
+  }
+}
+
+# =============================================================================
+# 5. CLOUDFRONT — RETAINED FOR REFERENCE / FALLBACK
+#    The live CDN is Vercel. CloudFront is defined here in case the team
+#    wants to switch back to S3 hosting (e.g. if Vercel free tier limits are hit).
+#    CloudFront free tier: 1 TB transfer/month, 10M requests/month.
 # =============================================================================
 
 locals {

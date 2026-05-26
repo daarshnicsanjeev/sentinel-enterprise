@@ -1,6 +1,30 @@
 version: "3.9"
 
 services:
+  # ── OpenSearch (vector store — optional, activated by VECTOR_STORE=opensearch) ──
+  # Free tier on AWS: t2.small.search, 1 GB RAM, 10 GB EBS — 12 months free.
+  # For local development, this Docker image is a drop-in equivalent.
+  # To enable: set VECTOR_STORE=opensearch in backend environment below.
+  opensearch:
+    image: opensearchproject/opensearch:2.13.0
+    container_name: sentinel-opensearch
+    environment:
+      - discovery.type=single-node
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@1234!
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - DISABLE_SECURITY_PLUGIN=true     # no TLS for local dev
+    ports:
+      - "9200:9200"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    profiles:
+      - opensearch   # only started when: docker compose --profile opensearch up
+
   ollama:
     image: ollama/ollama
     container_name: sentinel-ollama
@@ -23,6 +47,13 @@ services:
       - "8000:8000"
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
+      # Uncomment and set to 'opensearch' to use OpenSearch vector store:
+      # - VECTOR_STORE=opensearch
+      # - OPENSEARCH_HOST=opensearch
+      # - OPENSEARCH_PORT=9200
+      # - OPENSEARCH_USER=admin
+      # - OPENSEARCH_PASSWORD=admin
+      # - OPENSEARCH_USE_SSL=false
     depends_on:
       ollama:
         condition: service_healthy
@@ -45,3 +76,4 @@ services:
 
 volumes:
   ollama_data:
+  opensearch_data:

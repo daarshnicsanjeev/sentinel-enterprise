@@ -14,18 +14,27 @@
 #   the full resource graph and can destroy/recreate EC2 or S3 unexpectedly.
 #
 # REQUIRED GITHUB SECRETS
-#   AWS_ACCESS_KEY_ID        IAM key with EC2, S3, CloudFront, IAM permissions
-#   AWS_SECRET_ACCESS_KEY    IAM secret
-#   AWS_REGION               e.g. ap-south-1
-#   TF_STATE_BUCKET          S3 bucket that holds terraform.tfstate
-#                            (create once: see infra/main.tf bootstrap comment)
-#   EC2_KEY_PAIR_NAME        Name of your EC2 key pair (not the .pem file)
-#   FRONTEND_BUCKET_NAME     S3 bucket for the React frontend
-#   REVIEW_MIN_EVIDENCE      Min 👎 per doc type before review agent acts (e.g. 1)
+#   AWS_ACCESS_KEY_ID           IAM key — needs es:*, ec2:*, s3:*, cloudfront:* permissions
+#   AWS_SECRET_ACCESS_KEY       IAM secret
+#   AWS_REGION                  e.g. ap-south-1
+#   TF_STATE_BUCKET             S3 bucket that holds terraform.tfstate
+#                               (create once: see infra/main.tf bootstrap comment)
+#   EC2_KEY_PAIR_NAME           Name of your EC2 key pair (not the .pem file)
+#   EC2_HOST                    Public IP of the EC2 instance (shared with deploy.yml)
+#   EC2_SSH_KEY                 Full contents of the .pem SSH key (shared with deploy.yml)
+#   EC2_USER                    ubuntu (shared with deploy.yml)
+#   FRONTEND_BUCKET_NAME        S3 bucket for the React frontend
+#   REVIEW_MIN_EVIDENCE         Min 👎 per doc type before review agent acts (e.g. 1)
+#   OPENSEARCH_MASTER_PASSWORD  Master password for the OpenSearch internal user.
+#                               Min 8 chars, uppercase+lowercase+number+symbol.
+#                               Example: Admin@1234!
+#                               Used when enable_opensearch=true (see infra/terraform.tfvars).
+#                               NOTE: After the first apply the password is stored in AWS
+#                               OpenSearch — do not change it without updating the domain.
 #
 # OPTIONAL SECRETS
-#   OLLAMA_BASE_URL          Leave empty to use local Ollama on EC2
-#   OLLAMA_MODEL             Default: gemma3:4b
+#   OLLAMA_BASE_URL             Leave empty to use local Ollama on EC2
+#   OLLAMA_MODEL                Default: gemma3:4b
 # =============================================================================
 
 name: Infrastructure — Terraform Plan & Apply
@@ -128,6 +137,8 @@ jobs:
             -var="key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}" \
             -var="review_min_evidence=${{ secrets.REVIEW_MIN_EVIDENCE || '1' }}" \
             -var="ollama_base_url=${{ secrets.OLLAMA_BASE_URL || '' }}" \
+            -var="enable_opensearch=true" \
+            -var="opensearch_master_password=${{ secrets.OPENSEARCH_MASTER_PASSWORD || '' }}" \
             -input=false \
             -out=tfplan \
             -detailed-exitcode
@@ -173,6 +184,62 @@ jobs:
           github.event.inputs.action == 'apply'
         run: terraform output
 
+      # ── Configure EC2 .env with OpenSearch endpoint (after apply) ────────────
+      # Reads the opensearch_endpoint output and patches the backend .env on EC2
+      # so sentinel.service connects to OpenSearch on next restart.
+      # Only runs when enable_opensearch=true (output is not "not provisioned").
+      - name: Configure OpenSearch on EC2
+        if: >-
+          (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
+          github.event.inputs.action == 'apply'
+        env:
+          OPENSEARCH_PASSWORD: ${{ secrets.OPENSEARCH_MASTER_PASSWORD }}
+        run: |
+          ENDPOINT=$(terraform output -raw opensearch_endpoint 2>/dev/null || echo "")
+          if [ -z "$ENDPOINT" ] || [ "$ENDPOINT" = "not provisioned" ]; then
+            echo "OpenSearch not provisioned (enable_opensearch=false) — skipping EC2 .env update."
+            exit 0
+          fi
+
+          echo "OpenSearch endpoint: $ENDPOINT"
+          echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/infra-key.pem
+          chmod 600 /tmp/infra-key.pem
+
+          ssh -i /tmp/infra-key.pem \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=30 \
+              ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+              "set -euo pipefail
+               ENV_FILE=/opt/sentinel/backend/.env
+
+               update_env() {
+                 local KEY=\$1
+                 local VAL=\$2
+                 if sudo grep -q \"^\${KEY}=\" \"\$ENV_FILE\"; then
+                   sudo sed -i \"s|^\${KEY}=.*|\${KEY}=\${VAL}|\" \"\$ENV_FILE\"
+                   echo \"  Updated \${KEY}\"
+                 else
+                   echo \"\${KEY}=\${VAL}\" | sudo tee -a \"\$ENV_FILE\" > /dev/null
+                   echo \"  Added \${KEY}\"
+                 fi
+               }
+
+               echo '=== Configuring OpenSearch env vars ==='
+               update_env VECTOR_STORE opensearch
+               update_env OPENSEARCH_HOST $ENDPOINT
+               update_env OPENSEARCH_PORT 443
+               update_env OPENSEARCH_USER admin
+               update_env OPENSEARCH_PASSWORD '$OPENSEARCH_PASSWORD'
+               update_env OPENSEARCH_USE_SSL true
+
+               echo 'Restarting sentinel.service...'
+               sudo systemctl restart sentinel
+               sleep 10
+               curl -sf http://localhost:8000/api/health | python3 -m json.tool || echo 'Health check pending...'
+               echo '=== OpenSearch configuration complete ==='"
+
+          rm -f /tmp/infra-key.pem
+
       # ── Destroy — ONLY when manually requested via workflow_dispatch ──────────
       #    Never triggered automatically — requires a human to choose "destroy"
       - name: Terraform Destroy
@@ -185,4 +252,6 @@ jobs:
             -var="key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}" \
             -var="review_min_evidence=${{ secrets.REVIEW_MIN_EVIDENCE || '1' }}" \
             -var="ollama_base_url=${{ secrets.OLLAMA_BASE_URL || '' }}" \
+            -var="enable_opensearch=true" \
+            -var="opensearch_master_password=${{ secrets.OPENSEARCH_MASTER_PASSWORD || '' }}" \
             -input=false

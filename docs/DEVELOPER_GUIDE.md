@@ -1,6 +1,6 @@
 # Project Sentinel — Developer Guide
 
-**Version:** Phase G (May 2026)  
+**Version:** Phase H (May 2026)  
 **Audience:** Backend engineers, frontend developers, DevOps
 
 ---
@@ -73,7 +73,7 @@ LangGraph StateGraph
       │
       ├── guardrail node   — PII / injection detection (no LLM call)
       ├── router node      — LLM document classification + auto-detects tenant (EU/US/default)
-      ├── compliance node  — FAISS clause RAG + LLM detection + few-shot injection
+      ├── compliance node  — vector-store clause RAG + LLM detection + few-shot injection
       ├── evaluator node   — LLM-as-a-Judge: faithfulness + hallucination risk
       └── retry loop       — up to 3 re-runs when faithfulness < 0.7
             │
@@ -86,7 +86,10 @@ LangGraph StateGraph
         ├── batch_jobs        — batch processing state
         ├── recommendations   — AI review agent proposals
         └── recommendation_blacklist — rejected proposals (never re-suggested)
-      FAISS  — in-process embedding index for clause retrieval
+      Vector Store — selected by VECTOR_STORE env var (default: faiss)
+        ├── FAISS (default)   — in-process, per-request build, disk-cached by SHA-256
+        └── OpenSearch        — AWS OpenSearch Service (t2.small.search, free tier 12 mo.)
+                                persistent, server-side, k-NN index per doc_hash
       LLM factory (create_llm) — ChatOllama local or Ollama Cloud via OLLAMA_BASE_URL
 
 AI Feedback Loop (on-demand, no scheduling):
@@ -105,7 +108,7 @@ AI Feedback Loop (on-demand, no scheduling):
 | Backend framework | FastAPI | Async-native, SSE support, OpenAPI docs |
 | AI orchestration | LangGraph | Stateful graph with retry feedback loops |
 | LLM | Ollama (ChatOllama) | Local-first; env-var switchable to Ollama Cloud |
-| Vector search | FAISS | Fast in-process, no external service |
+| Vector search | FAISS (default) / OpenSearch | FAISS: fast in-process; OpenSearch: persistent AWS service, free tier |
 | Database | SQLite + aiosqlite | Zero-ops, WAL mode for concurrent reads |
 | Frontend | React 19 + Vite + TypeScript | Fast HMR, strict types |
 | Testing (backend) | pytest + pytest-asyncio | Async-first |
@@ -141,7 +144,7 @@ AI Feedback Loop (on-demand, no scheduling):
 │   │   ├── few_shot_examples.jsonl  # Approved comprehension corrections (runtime)
 │   │   ├── correction_examples.jsonl # Negative feedback log (runtime, gitignored)
 │   │   ├── guardrails.py          # PII regexes + injection pattern lists
-│   │   ├── embeddings.py          # FAISS index build + search
+│   │   ├── embeddings.py          # Vector store abstraction: FAISS (default) / OpenSearch dual backend
 │   │   ├── history_store.py       # SQLite CRUD: analyses, feedback, cache, recs
 │   │   ├── pdf_extractor.py       # PDF → text (pdfminer + Tesseract OCR fallback)
 │   │   ├── file_extractor.py      # docx/xlsx/pptx/html/image → text dispatch
@@ -188,11 +191,11 @@ AI Feedback Loop (on-demand, no scheduling):
 │       ├── StatusBadge.test.tsx
 │       └── WorkflowStream.test.tsx
 ├── infra/
-│   ├── main.tf                    # Terraform: EC2 t3.micro, S3, CloudFront, security groups
-│   ├── variables.tf               # Input variables (region, instance_type, ollama_*)
-│   ├── outputs.tf                 # cloudfront_url, ec2_public_ip
-│   ├── user_data.sh               # EC2 bootstrap: Docker + app startup
-│   └── deploy-backend.sh          # Idempotent EC2 deploy script (git pull + systemd restart)
+│   ├── main.tf                    # Terraform: EC2 t3.micro, S3, CloudFront, OpenSearch (free tier)
+│   ├── variables.tf               # Input variables (region, instance_type, enable_opensearch, …)
+│   ├── outputs.tf                 # ec2_public_ip, opensearch_endpoint, cloudfront_url
+│   ├── terraform.tfvars           # Local overrides — gitignored; CI passes vars via -var flags
+│   └── deploy-backend.sh          # Idempotent 12-step EC2 deploy (systemd + OpenSearch .env injection)
 ├── sample_docs/                   # 55+ labelled test documents (all types + formats)
 │   ├── fl_test_s*.txt             # Feedback loop test documents (5 files)
 │   └── ...                        # All other sample documents
@@ -864,6 +867,49 @@ OLLAMA_MODEL=gemma3:27b
 ALLOWED_ORIGINS=https://your-cloudfront-url.cloudfront.net
 ```
 
+### Vector Store — OpenSearch (optional)
+
+Set `VECTOR_STORE=opensearch` to switch the clause retrieval backend from FAISS to AWS OpenSearch Service. All other variables remain unchanged.
+
+```env
+# ── Vector Store Backend ─────────────────────────────────────────────────────
+# faiss (default) — in-process, per-request build, SHA-256 disk cache.
+# opensearch      — AWS OpenSearch Service, persistent server-side indices.
+VECTOR_STORE=faiss
+
+# Required when VECTOR_STORE=opensearch:
+OPENSEARCH_HOST=search-sentinel-vectors-xxxx.ap-south-1.es.amazonaws.com  # from terraform output
+OPENSEARCH_PORT=443
+OPENSEARCH_USER=admin
+OPENSEARCH_PASSWORD=Admin@1234!   # value of opensearch_master_password Terraform variable
+OPENSEARCH_USE_SSL=true
+```
+
+| Variable | FAISS mode | OpenSearch mode |
+|----------|-----------|----------------|
+| `VECTOR_STORE` | `faiss` (default) | `opensearch` |
+| `OPENSEARCH_HOST` | ignored | AWS endpoint — `terraform output opensearch_endpoint` |
+| `OPENSEARCH_PORT` | ignored | `443` (HTTPS) |
+| `OPENSEARCH_USER` | ignored | `admin` |
+| `OPENSEARCH_PASSWORD` | ignored | value of `opensearch_master_password` Terraform var |
+| `OPENSEARCH_USE_SSL` | ignored | `true` |
+
+**How the backend selects the backend at runtime:**
+
+```python
+# backend/data/embeddings.py
+def _get_vector_store() -> str:
+    return os.getenv("VECTOR_STORE", "faiss").lower()
+```
+
+The env var is read at call-time (not module load), so tests can monkeypatch it without `importlib.reload`.
+
+**Index naming:**  
+Each document produces one OpenSearch index named `sentinel-{doc_hash[:16]}` where `doc_hash` is the SHA-256 of the document bytes. This maps 1:1 with the FAISS disk cache directory naming.
+
+**Caching behaviour:**  
+Both backends use the same `build_index_async` caching path — `load_index()` checks for an existing index first (disk for FAISS, `indices.exists()` for OpenSearch). If found, the index is returned immediately without re-embedding.
+
 ---
 
 ## 9. Database Schema
@@ -1066,14 +1112,14 @@ node_modules\.bin\vitest run
 node_modules\.bin\vitest
 ```
 
-### Test Counts (Phase G)
+### Test Counts (Phase H)
 
 | Suite | Tests | Coverage |
 |-------|-------|---------|
-| Backend unit | ~480 | All agent nodes, data layer, auth + RBAC, guardrails, metrics, feedback loop, review agent, insights endpoints, PDF report, email ingestion, clause API |
-| Backend integration | ~115 | Full pipeline end-to-end, all API routes, JWT auth flow |
+| Backend unit | ~428 | All agent nodes, data layer, auth + RBAC, guardrails, metrics, feedback loop, review agent, insights endpoints, PDF report, email ingestion, clause API, FAISS persistence, OpenSearch dual backend |
+| Backend integration | ~173 | Full pipeline end-to-end, all API routes, JWT auth flow |
 | Frontend | 173 | All 11 components + App (SSE, override, re-analyse, approve/reject/undo) |
-| **Total** | **~768** | |
+| **Total** | **774** | |
 
 All LLM calls are mocked — no Ollama required to run tests.
 
@@ -1101,6 +1147,8 @@ backend/tests/
 │   ├── test_pdf_extractor.py       # PDF → text + OCR fallback
 │   ├── test_regulatory_db.py       # Schema validation + tenant structure
 │   ├── test_review_agent.py        # Review meta-agent (mocked LLM + mocked DB)
+│   ├── test_faiss_persistence.py   # FAISS disk cache (save_index / load_index)
+│   ├── test_opensearch.py          # OpenSearch dual backend (16 tests, all mocked — no server needed)
 │   └── test_structured_logging.py  # structlog JSON output + trace_id threading
 └── integration/
     ├── test_graph_flow.py          # End-to-end pipeline runs (mocked LLM)
@@ -1126,137 +1174,37 @@ docker compose up --build
 # FastAPI on port 8000; Ollama must run separately
 ```
 
-### AWS Free Tier (Terraform + manual rsync)
-
-Infrastructure is defined in `infra/`. Provisions EC2 t3.micro + S3 + CloudFront.
-
-```bash
-cd infra
-terraform init
-terraform plan -var="ollama_base_url=https://your-cloud-ollama-url"
-terraform apply -auto-approve \
-  -var="ollama_base_url=https://your-cloud-ollama-url" \
-  -var="ollama_model=gemma3:27b"
-
-terraform output cloudfront_url   # Frontend URL
-terraform output ec2_public_ip    # Backend SSH / health check
-
-# Tear down (avoid charges)
-terraform destroy -auto-approve
-```
-
-### Idempotent EC2 Backend Deploy
-
-`infra/deploy-backend.sh` is safe to re-run at any time:
-
-```bash
-bash infra/deploy-backend.sh
-```
-
-The script:
-1. Detects the public IP dynamically (`curl checkip.amazonaws.com`)
-2. `git reset --hard origin/main` on the EC2 (idempotent, no merge conflicts)
-3. Creates Python virtualenv at `/opt/sentinel-venv` (first run only)
-4. Installs `requirements.txt` (skips if unchanged)
-5. Creates `/opt/sentinel/backend/.env` (first run only); patches `REVIEW_MIN_EVIDENCE` if missing
-6. Installs + starts `sentinel.service` via systemd
-7. Retries `GET /api/health` up to 5 times (3 s apart) before declaring success
-
-### GitHub Actions CI/CD — Two Separate Workflows
-
-There are two workflows, each with a distinct responsibility:
+### Live Architecture (as of 2026-05-26)
 
 ```
-infra/**  changed  →  infra.yml   (terraform plan/apply — provision AWS resources)
-src/ or backend/ changed  →  deploy.yml  (rsync code to existing EC2)
+Internet
+    │
+    ▼
+Vercel (HTTPS CDN, free Hobby tier)        ← React SPA
+    │  VITE_API_BASE_URL = trycloudflare URL
+    ▼
+Cloudflare Edge (Quick Tunnel)             ← HTTPS termination, no domain needed
+    │  outbound QUIC connection from EC2
+    ▼
+EC2 t3.micro — FastAPI :8000               ← backend, not publicly reachable on port 8000
+    │
+    ├── SQLite (aiosqlite, WAL mode)       ← analysis history, feedback, batch jobs
+    ├── Vector Store (env-var selected)
+    │     ├── FAISS          — default; in-process; disk-cached by SHA-256 hash
+    │     └── OpenSearch     — VECTOR_STORE=opensearch; AWS managed; persistent indices
+    │           └── sentinel-vectors (t2.small.search) — ap-south-1, free tier 12 mo.
+    └── Ollama Cloud (OLLAMA_BASE_URL) or local Ollama
 ```
 
-This separation is intentional. Running `terraform apply` on every code push is dangerous — it re-evaluates the full resource graph and can destroy/recreate EC2 or S3 unexpectedly. Terraform only runs when infrastructure files actually change.
+**Why not S3 + CloudFront?**  
+S3 static website endpoints are HTTP-only. An HTTPS page (Vercel) making API calls to an HTTP endpoint is blocked by the browser as Mixed Content. Vercel solves this — it's free, provides a global edge network, and deploys in under 60 seconds.
+
+**Why Cloudflare Quick Tunnel?**  
+Port 8000 on EC2 doesn't need to be public. The tunnel opens an outbound QUIC connection from EC2 to Cloudflare's edge — no inbound firewall rule, no SSL certificate management, no domain required. The `trycloudflare.com` subdomain is ephemeral (changes on process restart), which the self-heal automation handles automatically.
 
 ---
 
-#### `deploy.yml` — Code Delivery (triggers on every push to `main`)
-
-**Job 1 — `backend-tests`:**
-- Sets up Python 3.12 + pip cache
-- Installs Tesseract and libmagic
-- Runs `python -m pytest tests/ -v --tb=short`
-
-**Job 2 — `frontend-build`:**
-- Sets up Node 20 + npm cache
-- Runs `npx vitest run`
-- Runs `npx vite build` with `VITE_API_BASE_URL` injected from GitHub Secret
-- Uploads `dist/` as a build artifact
-
-**Job 3 — `deploy`** (push to `main` only, not PRs):
-- Downloads the frontend artifact
-- `aws s3 sync` assets — long TTL (`max-age=31536000,immutable`)
-- `aws s3 sync` HTML — short TTL (`max-age=0,must-revalidate`) + `--delete`
-- `rsync` backend to EC2 (excludes `.env`, `*.db`, `*.jsonl`, `__pycache__`)
-- SSH `sudo systemctl restart sentinel` + health check
-
-**Required secrets for `deploy.yml`:**
-
-| Secret | Example |
-|--------|---------|
-| `AWS_ACCESS_KEY_ID` | IAM key (S3 PutObject + ListBucket) |
-| `AWS_SECRET_ACCESS_KEY` | IAM secret |
-| `AWS_REGION` | `ap-south-1` |
-| `S3_BUCKET` | `sentinel-ui-951066974179` |
-| `EC2_HOST` | `65.2.181.197` |
-| `EC2_SSH_KEY` | Full contents of the `.pem` file |
-| `EC2_USER` | `ubuntu` |
-| `VITE_API_BASE_URL` | `http://65.2.181.197:8000` |
-
----
-
-#### `infra.yml` — Infrastructure Provisioning (triggers on `infra/**` changes only)
-
-**When it runs:**
-- **Push to `main`** with changes under `infra/` → plan + apply automatically
-- **Pull request** with changes under `infra/` → plan only (no apply; plan posted as PR comment)
-- **`workflow_dispatch`** → manual trigger from GitHub Actions UI with action choice: `plan` / `apply` / `destroy`
-
-**Jobs:**
-1. `terraform init` — initialises with S3 remote backend (bucket injected via secret)
-2. `terraform validate` + `fmt -check`
-3. `terraform plan -out=tfplan` — always runs; exit code 2 (changes pending) treated as non-error
-4. `terraform apply -auto-approve tfplan` — only on push to `main` or manual `apply`
-5. `terraform output` — prints EC2 IP + CloudFront URL to the Actions log after apply
-6. `terraform destroy` — only on manual `destroy` dispatch; **never triggered automatically**
-
-**Concurrency lock:** `cancel-in-progress: false` — if two infra runs queue up, the second waits rather than cancelling, preventing state corruption.
-
-**Required secrets for `infra.yml`:**
-
-| Secret | Example |
-|--------|---------|
-| `AWS_ACCESS_KEY_ID` | IAM key (EC2, S3, CloudFront, IAM) |
-| `AWS_SECRET_ACCESS_KEY` | IAM secret |
-| `AWS_REGION` | `ap-south-1` |
-| `TF_STATE_BUCKET` | `sentinel-tf-state-951066974179` |
-| `FRONTEND_BUCKET_NAME` | `sentinel-ui-951066974179` |
-| `EC2_KEY_PAIR_NAME` | `sentinel-key` (name only, not `.pem`) |
-| `REVIEW_MIN_EVIDENCE` | `1` |
-| `OLLAMA_BASE_URL` | *(empty for local Ollama on EC2)* |
-
-**One-time state bucket bootstrap** (run once before the first `terraform init`):
-
-```bash
-aws s3api create-bucket \
-  --bucket sentinel-tf-state-<your-account-id> \
-  --region ap-south-1 \
-  --create-bucket-configuration LocationConstraint=ap-south-1
-
-# Enable versioning so you can recover from bad applies
-aws s3api put-bucket-versioning \
-  --bucket sentinel-tf-state-<your-account-id> \
-  --versioning-configuration Status=Enabled
-```
-
-Then add `TF_STATE_BUCKET=sentinel-tf-state-<your-account-id>` to GitHub Secrets.
-
-**Local init with S3 backend:**
+### AWS Free Tier (Terraform — EC2 + OpenSearch)
 
 ```bash
 cd infra
@@ -1265,20 +1213,231 @@ terraform init \
   -backend-config="key=sentinel/terraform.tfstate" \
   -backend-config="region=ap-south-1" \
   -backend-config="encrypt=true"
+
+# Plan — pass the master password as a var (never store in tfvars)
+terraform plan \
+  -var="opensearch_master_password=Admin@1234!"
+
+# Apply — provisions EC2 t3.micro (25 GB) + OpenSearch t2.small.search (10 GB)
+# ⚠️  OpenSearch domain creation takes 15–30 minutes — this is normal AWS behaviour
+terraform apply \
+  -var="opensearch_master_password=Admin@1234!" \
+  -auto-approve
+
+# Show outputs
+terraform output ec2_public_ip        # SSH target
+terraform output opensearch_endpoint  # OpenSearch domain endpoint
+
+# Tear down (avoids ongoing charges)
+terraform destroy \
+  -var="opensearch_master_password=Admin@1234!" \
+  -auto-approve
 ```
 
-### Frontend Build (manual)
+S3 + CloudFront are defined in `infra/main.tf` but are not the live frontend. They are retained as a fallback.
 
-```powershell
-cd frontend\sentinel-ui
-npm run build
-# dist/ → deploy to S3
+**One-time state bucket bootstrap:**
 
-aws s3 sync dist/assets/ s3://your-bucket/assets/ \
-  --cache-control "public,max-age=31536000,immutable"
-aws s3 sync dist/ s3://your-bucket/ --delete \
-  --exclude "assets/*" \
-  --cache-control "public,max-age=0,must-revalidate"
+```bash
+aws s3api create-bucket \
+  --bucket sentinel-tf-state-<your-account-id> \
+  --region ap-south-1 \
+  --create-bucket-configuration LocationConstraint=ap-south-1
+aws s3api put-bucket-versioning \
+  --bucket sentinel-tf-state-<your-account-id> \
+  --versioning-configuration Status=Enabled
+```
+
+**IAM permissions needed** (add to the IAM user/role used by Terraform):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    { "Effect": "Allow", "Action": ["es:*"], "Resource": "arn:aws:es:*:*:domain/sentinel-vectors*" },
+    { "Effect": "Allow", "Action": ["ec2:*", "s3:*", "cloudfront:*", "iam:GetUser"], "Resource": "*" }
+  ]
+}
+```
+
+---
+
+### OpenSearch Service — Provisioning Details
+
+| Property | Value |
+|----------|-------|
+| Domain name | `sentinel-vectors` |
+| Engine version | OpenSearch 2.13 |
+| Instance type | `t2.small.search` (free tier: 750 hrs/month, 12 months) |
+| EBS storage | 10 GB gp2 (free tier maximum) |
+| Auth | Fine-Grained Access Control (FGAC), master user `admin` |
+| Transport | HTTPS only (port 443), TLS 1.2+ |
+| Index naming | `sentinel-{doc_hash[:16]}` — one index per unique document |
+| k-NN engine | `nmslib`, `cosinesimil` space |
+
+**After provisioning**, the GitHub Actions `infra.yml` workflow automatically:
+1. Reads `terraform output -raw opensearch_endpoint`
+2. SSHes to EC2 and updates `/opt/sentinel/backend/.env` with all `OPENSEARCH_*` vars
+3. Sets `VECTOR_STORE=opensearch`
+4. Restarts `sentinel.service`
+
+**Manual activation** (if running `deploy-backend.sh` directly):
+
+```bash
+ENDPOINT=$(cd infra && terraform output -raw opensearch_endpoint)
+
+OPENSEARCH_HOST="$ENDPOINT" \
+OPENSEARCH_PASSWORD="Admin@1234!" \
+bash infra/deploy-backend.sh
+```
+
+**Verify OpenSearch is working:**
+
+```bash
+# Check health from EC2
+curl -k -u admin:Admin@1234! \
+  "https://<opensearch_endpoint>/_cluster/health?pretty"
+
+# Check a document index exists after first analysis
+curl -k -u admin:Admin@1234! \
+  "https://<opensearch_endpoint>/_cat/indices?v"
+```
+
+**OpenSearch Dashboards (optional):**
+
+Browse to `https://<opensearch_endpoint>/_dashboards` and log in with `admin / <password>` to explore the k-NN indices visually.
+
+---
+
+### Idempotent EC2 Backend Deploy (Backend + Cloudflare Tunnel)
+
+`infra/deploy-backend.sh` is safe to re-run at any time:
+
+```bash
+ssh -i ~/.ssh/sentinel-key.pem ubuntu@<EC2_IP> 'bash -s' < infra/deploy-backend.sh
+```
+
+The script (12 steps):
+1. Installs system packages (Python 3, git, Tesseract, libmagic, curl)
+2. `git reset --hard origin/main` (idempotent, no merge conflicts)
+3. Creates Python virtualenv at `/opt/sentinel-venv` (first run only)
+4. Installs `requirements.txt` (includes `opensearch-py>=2.4.0`)
+5. Creates `/opt/sentinel/backend/.env` (first run only); patches `REVIEW_MIN_EVIDENCE` if missing
+5b. Injects/updates OpenSearch env vars (`VECTOR_STORE`, `OPENSEARCH_HOST`, etc.) if `OPENSEARCH_HOST` is set
+6. Writes and enables `sentinel.service` via systemd
+7. Installs `cloudflared` from Cloudflare's apt repo (skips if already installed)
+8. Writes and enables `cloudflared-tunnel.service` via systemd
+9. Creates `/opt/sentinel/update-tunnel-url.sh` (self-heal script — see below)
+10. Starts both services; health-checks FastAPI
+11. Prints the Cloudflare `trycloudflare.com` tunnel URL
+12. Prints deployment summary including active vector store
+
+### Cloudflare Quick Tunnel + Self-Heal Automation
+
+The tunnel URL is ephemeral — it changes every time `cloudflared-tunnel.service` restarts. The self-heal script handles this automatically:
+
+```
+cloudflared-tunnel.service starts
+    │
+    └─ ExecStartPost fires update-tunnel-url.sh after 20 s
+           │
+           ├─ Reads new trycloudflare.com URL from journalctl
+           ├─ PATCH https://api.vercel.com/v9/projects/{id}/env/{envVarId}
+           │    → updates VITE_API_BASE_URL in Vercel production env
+           └─ POST https://api.github.com/.../actions/workflows/deploy.yml/dispatches
+                → triggers GitHub Actions to rebuild frontend with new URL
+```
+
+The script requires four tokens stored on the EC2 instance (e.g. in `/etc/environment`):
+
+| Variable | How to obtain |
+|----------|--------------|
+| `VERCEL_TOKEN` | vercel.com → Settings → Tokens |
+| `VERCEL_PROJECT_ID` | `cat frontend/sentinel-ui/.vercel/project.json` |
+| `VERCEL_ENV_VAR_ID` | `GET /v9/projects/{id}/env` → find `VITE_API_BASE_URL` → copy `id` field |
+| `GH_TOKEN` | GitHub → Settings → Developer Settings → PAT → `repo` + `actions:write` |
+
+---
+
+### GitHub Actions CI/CD (`deploy.yml`)
+
+Triggers: push to `main`, `workflow_dispatch` (invoked by the self-heal script on tunnel URL change).
+
+**Job 1 — `backend-tests`:**
+- Sets up Python 3.12 + pip cache
+- Installs Tesseract and libmagic
+- Downloads spaCy `en_core_web_sm`
+- Runs `python -m pytest tests/ -v --tb=short`
+
+**Job 2 — `frontend-build`:**
+- Sets up Node 20 + npm cache
+- Runs `npx vitest run`
+- Runs `npx vite build` with `VITE_API_BASE_URL` injected from GitHub Secret
+  - On `workflow_dispatch`: the Vercel env var was already patched by the self-heal script; the build picks up the new URL automatically
+- Uploads `dist/` as a build artifact
+
+**Job 3 — `deploy`** (push to `main` + `workflow_dispatch` only, not PRs):
+- Deploys frontend to Vercel via Vercel CLI (`vercel pull` → `vercel build --prod` → `vercel deploy --prebuilt --prod`)
+- `rsync` backend to EC2 (excludes `.env`, `*.db`, `*.jsonl`, `__pycache__`)
+- SSH `sudo systemctl restart sentinel && sudo systemctl restart cloudflared-tunnel`
+- Polls `GET /api/health` until up (12 attempts, 5 s apart)
+- Prints the live tunnel URL to the Actions log
+
+**Required secrets for `deploy.yml`:**
+
+| Secret | Description |
+|--------|-------------|
+| `EC2_HOST` | Public IP of the EC2 instance |
+| `EC2_SSH_KEY` | Full contents of the `.pem` SSH key file |
+| `EC2_USER` | `ubuntu` |
+| `VERCEL_TOKEN` | From vercel.com → Settings → Tokens |
+| `VERCEL_ORG_ID` | From `.vercel/project.json` → `orgId` |
+| `VERCEL_PROJECT_ID` | From `.vercel/project.json` → `projectId` |
+| `VITE_API_BASE_URL` | Current Cloudflare tunnel URL — auto-updated by self-heal script |
+
+> **No AWS credentials are needed for the frontend deploy** — Vercel CLI handles deployment. AWS credentials are only needed if you use `infra.yml` to run Terraform.
+
+**Required secrets for `infra.yml`** (Terraform):
+
+| Secret | Description |
+|--------|-------------|
+| `AWS_ACCESS_KEY_ID` | IAM key — needs `es:*`, `ec2:*`, `s3:*`, `cloudfront:*` permissions |
+| `AWS_SECRET_ACCESS_KEY` | IAM secret |
+| `AWS_REGION` | `ap-south-1` |
+| `TF_STATE_BUCKET` | S3 bucket name for Terraform remote state |
+| `EC2_KEY_PAIR_NAME` | EC2 key pair name (not the `.pem` file) |
+| `EC2_HOST` | Public IP (shared with `deploy.yml`) — used to patch EC2 `.env` after OpenSearch apply |
+| `EC2_SSH_KEY` | `.pem` file contents (shared with `deploy.yml`) |
+| `EC2_USER` | `ubuntu` (shared with `deploy.yml`) |
+| `FRONTEND_BUCKET_NAME` | S3 bucket for the React frontend |
+| `REVIEW_MIN_EVIDENCE` | `1` for demo, `3`–`5` for production |
+| `OPENSEARCH_MASTER_PASSWORD` | Master password for OpenSearch FGAC (e.g. `Admin@1234!`). Injected into both Terraform (`opensearch_master_password` var) and the EC2 `.env` (`OPENSEARCH_PASSWORD`). **Never commit this value anywhere.** |
+
+---
+
+### Frontend Deploy (manual / first-time setup)
+
+```bash
+cd frontend/sentinel-ui
+npm install
+npx vercel login          # authenticate once
+npx vercel link           # links the project (creates .vercel/project.json)
+npx vercel --prod         # deploy to production
+```
+
+Subsequent deploys are handled automatically by GitHub Actions on every push to `main`.
+
+To update the backend URL manually (e.g. after an EC2 restart without the self-heal script):
+
+```bash
+# Get the new tunnel URL
+ssh -i ~/.ssh/key.pem ubuntu@<EC2_IP> \
+  "journalctl -u cloudflared-tunnel --no-pager -n 100 | grep -o 'https://[a-z0-9-]*.trycloudflare.com' | tail -1"
+
+# Update the Vercel env var (VITE_API_BASE_URL) and redeploy
+npx vercel env rm VITE_API_BASE_URL production
+echo "https://new-url.trycloudflare.com" | npx vercel env add VITE_API_BASE_URL production
+npx vercel --prod
 ```
 
 ---
@@ -1392,17 +1551,21 @@ Adjust via `RATE_LIMIT` env var.
 | Limitation | Impact | Notes |
 |-----------|--------|-------|
 | Single SQLite file | Not suitable for high concurrent write loads | Replace with PostgreSQL for multi-instance deployments |
-| FAISS in-process | Index rebuilt per request (no cross-restart persistence) | FAISS index persistence is a future enhancement |
+| FAISS in-process | Index rebuilt per request on first access (no cross-restart persistence) | Mitigated: FAISS disk cache persists by SHA-256. For full persistence across restarts, use `VECTOR_STORE=opensearch` |
 | Single-file 5 MB cap | Large PDFs (scanned books, etc.) are rejected | Split before upload; batch ZIP can hold multiple 5 MB files |
 
 ### Deployment Limitations
 
 | Limitation | Detail |
 |-----------|--------|
-| EC2 t3.micro RAM | 1 GB RAM is sufficient for FastAPI + SQLite but cannot run Ollama locally. Ollama Cloud or a larger instance is required for production LLM inference. |
+| EC2 t3.micro RAM | 1 GB RAM is sufficient for FastAPI + SQLite but cannot run Ollama locally. Set `OLLAMA_BASE_URL` to an Ollama Cloud endpoint for production LLM inference. |
 | Ollama Cloud costs | ~$0.05 per demo session. Not covered by AWS Free Tier. |
-| Terraform state | Default setup stores `terraform.tfstate` locally. For team deployments, configure an S3 backend in `infra/main.tf`. |
-| Cold start | First request after EC2 restart is slower (~5–10 s) while the LLM loads. |
+| Cloudflare tunnel URL instability | Quick tunnel URLs change on every `cloudflared` process restart. The self-heal script (`update-tunnel-url.sh`) handles this automatically via Vercel API + GitHub Actions dispatch. |
+| Terraform state | Default setup stores `terraform.tfstate` locally. For team deployments, configure an S3 backend in `infra/main.tf` (instructions in Section 12). |
+| Cold start | First request after EC2 restart is slower (~5–10 s) while sentence-transformers loads; cloudflared health poll in deploy.yml waits up to 60 s. |
+| Vercel free tier | Hobby plan supports 1 concurrent build, 100 GB bandwidth/month. Sufficient for demos; upgrade to Pro for production traffic. |
+| OpenSearch provisioning time | AWS OpenSearch domain creation takes 15–30 minutes. `terraform apply` blocks until the domain is active — this is normal. Subsequent `apply` runs are near-instant (no-op if domain is unchanged). |
+| OpenSearch free tier window | t2.small.search is free for 12 months from the month of first creation. After 12 months it costs ~$25/month. Set `enable_opensearch=false` in `terraform.tfvars` and run `terraform apply` to destroy the domain when not needed. |
 
 ### Known Bugs / Rough Edges
 

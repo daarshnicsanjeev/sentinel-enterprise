@@ -34,3 +34,30 @@ variable "review_min_evidence" {
   type        = number
   default     = 1
 }
+
+# =============================================================================
+# OpenSearch Vector Store (optional — free tier for 12 months)
+# =============================================================================
+
+variable "enable_opensearch" {
+  description = <<-EOT
+    Set to true to provision an AWS OpenSearch Service domain (t2.small.search).
+    Free tier includes 750 instance-hours/month and 10 GB EBS for 12 months.
+    When enabled, the domain endpoint is printed as the 'opensearch_endpoint'
+    output — inject it into the EC2 .env as OPENSEARCH_HOST (see deploy-backend.sh).
+  EOT
+  type    = bool
+  default = false
+}
+
+variable "opensearch_master_password" {
+  description = <<-EOT
+    Master password for the OpenSearch internal user database.
+    Must be at least 8 characters and contain uppercase, lowercase, a number,
+    and a special character (e.g. Admin@1234!).
+    Treat as a secret — pass via CI secret or -var flag; do NOT commit in tfvars.
+  EOT
+  type      = string
+  default   = ""
+  sensitive = true
+}

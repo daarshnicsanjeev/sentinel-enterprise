@@ -3,11 +3,32 @@
 # Sentinel Backend Deployment Script
 # Runs on EC2 (Ubuntu 24.04) — safe to re-run; idempotent.
 #
-# Usage (from developer machine):
-#   EC2_IP=<ip> KEY=~/.ssh/sentinel-key.pem bash infra/deploy-backend.sh
+# Sets up:
+#   • FastAPI backend (sentinel.service via systemd)
+#   • Cloudflare Quick Tunnel (cloudflared-tunnel.service via systemd)
+#   • Self-heal script (/opt/sentinel/update-tunnel-url.sh) that auto-updates
+#     the Vercel env var when the tunnel URL changes on restart
 #
-# Usage (directly on EC2, e.g. from GitHub Actions via SSH):
-#   bash /tmp/deploy-backend.sh
+# Usage (from developer machine via SSH):
+#   ssh -i ~/.ssh/sentinel-key.pem ubuntu@<EC2_IP> 'bash -s' < infra/deploy-backend.sh
+#
+# Usage (directly on EC2):
+#   bash /opt/sentinel/infra/deploy-backend.sh
+#
+# Required env vars (set before running, or pass inline):
+#   VERCEL_TOKEN         — from vercel.com → Settings → Tokens
+#   VERCEL_PROJECT_ID    — from .vercel/project.json
+#   VERCEL_ENV_VAR_ID    — ID of the VITE_API_BASE_URL env var (from Vercel API)
+#   GH_TOKEN             — GitHub PAT with repo + actions:write scope
+#
+# Optional env vars for OpenSearch vector store (pass to activate):
+#   OPENSEARCH_HOST      — AWS OpenSearch endpoint (from: terraform output opensearch_endpoint)
+#   OPENSEARCH_PORT      — 443 (default for AWS OpenSearch Service)
+#   OPENSEARCH_USER      — admin
+#   OPENSEARCH_PASSWORD  — value of opensearch_master_password Terraform variable
+#   OPENSEARCH_USE_SSL   — true
+#
+# If OPENSEARCH_HOST is not set, the script leaves VECTOR_STORE=faiss (default).
 # =============================================================================
 set -euo pipefail
 
@@ -15,21 +36,36 @@ APP_DIR="/opt/sentinel"
 VENV_DIR="/opt/sentinel-venv"
 REPO_URL="https://github.com/daarshnicsanjeev/sentinel-enterprise.git"
 
+# Optional: Vercel + GitHub tokens for self-heal automation
+VERCEL_TOKEN="${VERCEL_TOKEN:-}"
+VERCEL_PROJECT_ID="${VERCEL_PROJECT_ID:-}"
+VERCEL_ENV_VAR_ID="${VERCEL_ENV_VAR_ID:-}"
+GH_TOKEN="${GH_TOKEN:-}"
+
+# Optional: OpenSearch vector store connection
+# Set OPENSEARCH_HOST to activate. Leave empty to keep VECTOR_STORE=faiss (default).
+OPENSEARCH_HOST="${OPENSEARCH_HOST:-}"
+OPENSEARCH_PORT="${OPENSEARCH_PORT:-443}"
+OPENSEARCH_USER="${OPENSEARCH_USER:-admin}"
+OPENSEARCH_PASSWORD="${OPENSEARCH_PASSWORD:-}"
+OPENSEARCH_USE_SSL="${OPENSEARCH_USE_SSL:-true}"
+
 # Detect public IP dynamically (used only for the success message)
 PUBLIC_IP=$(curl -sf http://checkip.amazonaws.com 2>/dev/null || echo "localhost")
 
 echo "=== Sentinel Backend Deployment ==="
-echo "    App dir : $APP_DIR"
-echo "    Public IP: $PUBLIC_IP"
+echo "    App dir    : $APP_DIR"
+echo "    Public IP  : $PUBLIC_IP"
+echo "    Vector store: ${OPENSEARCH_HOST:+opensearch (host=$OPENSEARCH_HOST)}${OPENSEARCH_HOST:-faiss (default)}"
 echo ""
 
-# ── [1/8] System packages ─────────────────────────────────────────────────────
-echo "[1/8] Checking system packages..."
+# ── [1/12] System packages ────────────────────────────────────────────────────
+echo "[1/12] Checking system packages..."
 sudo apt-get update -qq
 sudo apt-get install -y python3-pip python3-venv git curl tesseract-ocr libmagic1 2>/dev/null || true
 
-# ── [2/8] Clone or update repo ───────────────────────────────────────────────
-echo "[2/8] Deploying application code..."
+# ── [2/12] Clone or update repo ──────────────────────────────────────────────
+echo "[2/12] Deploying application code..."
 if [ -d "$APP_DIR/.git" ]; then
     echo "  Updating existing repo..."
     cd "$APP_DIR"
@@ -45,17 +81,17 @@ fi
 
 cd "$APP_DIR/backend"
 
-# ── [3/8] Python virtual environment ─────────────────────────────────────────
-echo "[3/8] Setting up Python venv..."
+# ── [3/12] Python virtual environment ────────────────────────────────────────
+echo "[3/12] Setting up Python venv..."
 sudo python3 -m venv "$VENV_DIR"
 sudo "$VENV_DIR/bin/pip" install --upgrade pip --quiet
 
-# ── [4/8] Install Python dependencies ────────────────────────────────────────
-echo "[4/8] Installing Python dependencies..."
+# ── [4/12] Install Python dependencies ───────────────────────────────────────
+echo "[4/12] Installing Python dependencies (includes opensearch-py)..."
 sudo "$VENV_DIR/bin/pip" install -r requirements.txt --quiet
 
-# ── [5/8] Environment file (create on first run, never overwrite) ─────────────
-echo "[5/8] Configuring environment..."
+# ── [5/12] Environment file (create on first run, never overwrite) ────────────
+echo "[5/12] Configuring environment..."
 if [ ! -f "$APP_DIR/backend/.env" ]; then
     echo "  Creating .env from defaults..."
     sudo tee "$APP_DIR/backend/.env" > /dev/null <<ENVEOF
@@ -80,8 +116,42 @@ else
     fi
 fi
 
-# ── [6/8] Systemd service ─────────────────────────────────────────────────────
-echo "[6/8] Installing systemd service..."
+# ── [5b/12] OpenSearch vector store configuration ────────────────────────────
+# If OPENSEARCH_HOST is provided, inject/update all OpenSearch env vars in .env.
+# The infra.yml GitHub Actions workflow does this automatically after terraform apply.
+# When running deploy-backend.sh manually, pass OPENSEARCH_HOST=<endpoint> as an
+# environment variable:
+#   OPENSEARCH_HOST=xxx.es.amazonaws.com bash deploy-backend.sh
+echo "[5b/12] Configuring vector store..."
+if [ -n "$OPENSEARCH_HOST" ]; then
+    echo "  OpenSearch host detected — activating opensearch vector store."
+    _update_env() {
+        local KEY="$1" VAL="$2"
+        if sudo grep -q "^${KEY}=" "$APP_DIR/backend/.env" 2>/dev/null; then
+            sudo sed -i "s|^${KEY}=.*|${KEY}=${VAL}|" "$APP_DIR/backend/.env"
+            echo "  Updated ${KEY}"
+        else
+            echo "${KEY}=${VAL}" | sudo tee -a "$APP_DIR/backend/.env" > /dev/null
+            echo "  Added ${KEY}"
+        fi
+    }
+    _update_env VECTOR_STORE   "opensearch"
+    _update_env OPENSEARCH_HOST    "$OPENSEARCH_HOST"
+    _update_env OPENSEARCH_PORT    "$OPENSEARCH_PORT"
+    _update_env OPENSEARCH_USER    "$OPENSEARCH_USER"
+    _update_env OPENSEARCH_PASSWORD "$OPENSEARCH_PASSWORD"
+    _update_env OPENSEARCH_USE_SSL  "$OPENSEARCH_USE_SSL"
+    echo "  OpenSearch configuration complete."
+else
+    echo "  OPENSEARCH_HOST not set — VECTOR_STORE=faiss (default, in-process)."
+    echo "  To activate OpenSearch, re-run with:"
+    echo "    OPENSEARCH_HOST=<endpoint from: terraform output opensearch_endpoint> \\"
+    echo "    OPENSEARCH_PASSWORD=<opensearch_master_password> \\"
+    echo "    bash deploy-backend.sh"
+fi
+
+# ── [6/12] Systemd service (FastAPI) ─────────────────────────────────────────
+echo "[6/12] Installing sentinel.service..."
 sudo tee /etc/systemd/system/sentinel.service > /dev/null <<'SVCEOF'
 [Unit]
 Description=Sentinel FastAPI Backend
@@ -101,28 +171,175 @@ StandardError=journal
 WantedBy=multi-user.target
 SVCEOF
 
-# ── [7/8] Start / restart service ────────────────────────────────────────────
-echo "[7/8] Starting sentinel service..."
+# ── [7/12] Install cloudflared ────────────────────────────────────────────────
+echo "[7/12] Installing cloudflared..."
+if ! command -v cloudflared &>/dev/null; then
+    curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg \
+        | sudo gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg
+    echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] \
+https://pkg.cloudflare.com/cloudflared $(lsb_release -cs) main" \
+        | sudo tee /etc/apt/sources.list.d/cloudflared.list > /dev/null
+    sudo apt-get update -qq
+    sudo apt-get install -y cloudflared
+    echo "  cloudflared installed: $(cloudflared --version)"
+else
+    echo "  cloudflared already installed: $(cloudflared --version)"
+fi
+
+# ── [8/12] Cloudflare Quick Tunnel systemd service ────────────────────────────
+echo "[8/12] Installing cloudflared-tunnel.service..."
+# ExecStartPost fires update-tunnel-url.sh 20 s after the tunnel starts,
+# which patches the Vercel env var and triggers a GitHub Actions redeploy.
+sudo tee /etc/systemd/system/cloudflared-tunnel.service > /dev/null <<'SVCEOF'
+[Unit]
+Description=Cloudflare Quick Tunnel for Sentinel API
+After=network-online.target sentinel.service
+Wants=network-online.target
+
+[Service]
+User=ubuntu
+ExecStart=/usr/bin/cloudflared tunnel --url http://localhost:8000 --no-autoupdate
+ExecStartPost=/bin/bash -c 'sleep 20 && /opt/sentinel/update-tunnel-url.sh >> /home/ubuntu/tunnel-update.log 2>&1 &'
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=cloudflared-tunnel
+Environment=HOME=/home/ubuntu
+
+[Install]
+WantedBy=multi-user.target
+SVCEOF
+
+# ── [9/12] Self-heal script ───────────────────────────────────────────────────
+echo "[9/12] Installing update-tunnel-url.sh..."
+sudo tee "$APP_DIR/update-tunnel-url.sh" > /dev/null <<HEALEOF
+#!/bin/bash
+# =============================================================================
+# Self-heal: reads new trycloudflare.com URL, patches Vercel env var,
+# triggers GitHub Actions workflow_dispatch to rebuild the frontend.
+# Called by cloudflared-tunnel.service ExecStartPost (20 s after start).
+# =============================================================================
+set -euo pipefail
+LOG="/home/ubuntu/tunnel-update.log"
+VERCEL_TOKEN="${VERCEL_TOKEN:-}"
+GH_TOKEN="${GH_TOKEN:-}"
+PROJECT_ID="${VERCEL_PROJECT_ID:-}"
+ENV_VAR_ID="${VERCEL_ENV_VAR_ID:-}"
+
+log() { echo "[\$(date -u +%Y-%m-%dT%H:%M:%SZ)] \$1" | tee -a "\$LOG"; }
+
+log "=== Tunnel URL update starting ==="
+
+# Wait up to 150 s for the tunnel URL to appear in the journal
+NEW_URL=""
+for i in \$(seq 1 30); do
+    sleep 5
+    NEW_URL=\$(journalctl -u cloudflared-tunnel --no-pager -n 300 2>/dev/null \
+        | grep -o 'https://[a-z0-9-]*.trycloudflare.com' | tail -1 || true)
+    if [ -n "\$NEW_URL" ]; then
+        log "Tunnel URL detected: \$NEW_URL"
+        break
+    fi
+    log "Waiting for tunnel URL... (\$i/30)"
+done
+
+if [ -z "\$NEW_URL" ]; then
+    log "ERROR: Could not detect tunnel URL after 150 s."
+    exit 1
+fi
+
+# Patch Vercel env var (requires VERCEL_TOKEN, PROJECT_ID, ENV_VAR_ID)
+if [ -n "\$VERCEL_TOKEN" ] && [ -n "\$PROJECT_ID" ] && [ -n "\$ENV_VAR_ID" ]; then
+    HTTP_STATUS=\$(curl -sf -o /dev/null -w "%{http_code}" -X PATCH \
+        "https://api.vercel.com/v9/projects/\$PROJECT_ID/env/\$ENV_VAR_ID" \
+        -H "Authorization: Bearer \$VERCEL_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"value\":\"\$NEW_URL\",\"target\":[\"production\"]}" || echo "000")
+    log "Vercel PATCH status: \$HTTP_STATUS"
+else
+    log "WARN: Vercel tokens not set — skipping Vercel env var update."
+fi
+
+# Trigger GitHub Actions workflow_dispatch to rebuild frontend with new URL
+if [ -n "\$GH_TOKEN" ]; then
+    HTTP_STATUS=\$(curl -sf -o /dev/null -w "%{http_code}" -X POST \
+        "https://api.github.com/repos/daarshnicsanjeev/sentinel-enterprise/actions/workflows/deploy.yml/dispatches" \
+        -H "Authorization: Bearer \$GH_TOKEN" \
+        -H "Accept: application/vnd.github+json" \
+        -d '{"ref":"main"}' || echo "000")
+    log "GitHub dispatch status: \$HTTP_STATUS"
+else
+    log "WARN: GH_TOKEN not set — skipping GitHub Actions redeploy."
+fi
+
+log "=== Tunnel URL update complete ==="
+HEALEOF
+
+sudo chmod +x "$APP_DIR/update-tunnel-url.sh"
+sudo chown ubuntu:ubuntu "$APP_DIR/update-tunnel-url.sh"
+echo "  update-tunnel-url.sh installed."
+
+# ── [10/12] Start / restart services ─────────────────────────────────────────
+echo "[10/12] Starting services..."
 sudo systemctl daemon-reload
 sudo systemctl enable sentinel --quiet
 sudo systemctl restart sentinel
 
-# ── [8/8] Health check ────────────────────────────────────────────────────────
-echo "[8/8] Waiting for service to start..."
+sudo systemctl enable cloudflared-tunnel --quiet
+sudo systemctl restart cloudflared-tunnel
+
+echo "  Waiting for sentinel to be healthy..."
 for i in 1 2 3 4 5; do
-    sleep 3
+    sleep 5
     if curl -sf http://localhost:8000/api/health > /dev/null 2>&1; then
-        echo ""
-        echo "✓ Sentinel backend is UP"
-        echo "  API health : http://${PUBLIC_IP}:8000/api/health"
-        echo "  Docs       : http://${PUBLIC_IP}:8000/docs"
-        echo ""
-        exit 0
+        echo "  ✓ sentinel is UP"
+        break
     fi
     echo "  Waiting... (attempt $i/5)"
 done
 
+# ── [11/12] Show tunnel URL ───────────────────────────────────────────────────
+echo "[11/12] Waiting for Cloudflare tunnel URL..."
+TUNNEL_URL=""
+for i in $(seq 1 20); do
+    sleep 5
+    TUNNEL_URL=$(sudo journalctl -u cloudflared-tunnel --no-pager -n 200 2>/dev/null \
+        | grep -o 'https://[a-z0-9-]*.trycloudflare.com' | tail -1 || true)
+    if [ -n "$TUNNEL_URL" ]; then
+        break
+    fi
+done
+
+# ── [12/12] Summary ───────────────────────────────────────────────────────────
 echo ""
-echo "⚠ Service may still be starting (Ollama model load takes time)."
-echo "  Check logs: sudo journalctl -u sentinel -f"
-sudo systemctl status sentinel --no-pager || true
+echo "╔══════════════════════════════════════════════════════╗"
+echo "║          Sentinel Deployment Complete                ║"
+echo "╠══════════════════════════════════════════════════════╣"
+if [ -n "$TUNNEL_URL" ]; then
+echo "║  Backend HTTPS : $TUNNEL_URL"
+echo "║  (self-heal script will update Vercel automatically)"
+else
+echo "║  Tunnel URL not yet visible — check:"
+echo "║    sudo journalctl -u cloudflared-tunnel -n 50"
+fi
+echo "║  API health    : http://localhost:8000/api/health"
+echo "║  Logs          : sudo journalctl -u sentinel -f"
+if [ -n "$OPENSEARCH_HOST" ]; then
+echo "╠══════════════════════════════════════════════════════╣"
+echo "║  Vector store  : OpenSearch (VECTOR_STORE=opensearch)"
+echo "║  Host          : $OPENSEARCH_HOST"
+else
+echo "╠══════════════════════════════════════════════════════╣"
+echo "║  Vector store  : FAISS (default, in-process)"
+fi
+echo "╚══════════════════════════════════════════════════════╝"
+echo ""
+echo "NOTE: Set VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_ENV_VAR_ID, GH_TOKEN"
+echo "      on this machine for the self-heal script to function:"
+echo "      echo 'VERCEL_TOKEN=xxx' | sudo tee -a /etc/environment"
+echo ""
+echo "NOTE: To activate OpenSearch vector store (requires terraform apply first):"
+echo "      OPENSEARCH_HOST=\$(cd infra && terraform output -raw opensearch_endpoint) \\"
+echo "      OPENSEARCH_PASSWORD='<opensearch_master_password>' \\"
+echo "      bash infra/deploy-backend.sh"
