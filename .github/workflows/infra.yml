@@ -146,27 +146,18 @@ jobs:
             -detailed-exitcode
         continue-on-error: true     # exit code 2 = changes pending (not an error)
 
-      # ── Post plan summary as PR comment ──────────────────────────────────────
+      # ── Post plan summary as PR comment (gh CLI — no action download) ──────────
       - name: Post plan to PR
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const outcome = '${{ steps.plan.outcome }}';
-            const body = [
-              '## Terraform Plan',
-              outcome === 'success' ? '✅ No changes — infrastructure is up to date.' : '⚠️ Changes detected — review before merging.',
-              '',
-              'Run `terraform plan` locally or check the Actions log for details.',
-              '',
-              '> This plan will be applied automatically when the PR is merged to `main`.',
-            ].join('\n');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body,
-            });
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ steps.plan.outcome }}" = "success" ]; then
+            MSG="## Terraform Plan\n✅ No changes — infrastructure is up to date."
+          else
+            MSG="## Terraform Plan\n⚠️ Changes detected — review before merging.\n\nRun \`terraform plan\` locally or check the Actions log for details.\n\n> This plan will be applied automatically when the PR is merged to \`main\`."
+          fi
+          printf "%b" "$MSG" | gh pr comment ${{ github.event.number }} --body-file -
 
       # ── Apply — only on push to main (not on PRs) or manual apply ────────────
       - name: Terraform Apply
