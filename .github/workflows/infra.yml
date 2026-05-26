@@ -275,10 +275,13 @@ jobs:
       # Reads the opensearch_endpoint output and patches the backend .env on EC2
       # so sentinel.service connects to OpenSearch on next restart.
       # Only runs when enable_opensearch=true (output is not "not provisioned").
+      # Non-fatal: OpenSearch provisioning succeeds even if EC2 SSH is briefly
+      # unreachable (e.g. instance rebooting after a volume change).
       - name: Configure OpenSearch on EC2
         if: >-
           (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
           github.event.inputs.action == 'apply'
+        continue-on-error: true
         env:
           OPENSEARCH_PASSWORD: ${{ secrets.OPENSEARCH_MASTER_PASSWORD }}
         run: |
@@ -289,13 +292,21 @@ jobs:
           fi
 
           echo "OpenSearch endpoint: $ENDPOINT"
+
+          # Prefer EC2 IP from Terraform state (always current) over the
+          # EC2_HOST secret (which can become stale if the instance restarts
+          # and its dynamic public IP changes).
+          EC2_IP=$(terraform output -raw ec2_public_ip 2>/dev/null || echo "")
+          EC2_IP="${EC2_IP:-${{ secrets.EC2_HOST }}}"
+          echo "EC2 target: $EC2_IP"
+
           echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/infra-key.pem
           chmod 600 /tmp/infra-key.pem
 
           ssh -i /tmp/infra-key.pem \
               -o StrictHostKeyChecking=no \
               -o ConnectTimeout=30 \
-              ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+              ${{ secrets.EC2_USER }}@${EC2_IP} \
               "set -euo pipefail
                ENV_FILE=/opt/sentinel/backend/.env
 
