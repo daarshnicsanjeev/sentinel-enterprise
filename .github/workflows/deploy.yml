@@ -180,6 +180,22 @@ jobs:
             sample_docs/ \
             ${{ secrets.EC2_USER }}@$EC2_IP:/opt/sentinel/sample_docs/
 
+      - name: Ensure Ollama is running on EC2
+        run: |
+          ssh -i /tmp/sentinel-key.pem \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=20 \
+              ${{ secrets.EC2_USER }}@$EC2_IP \
+              "sudo systemctl enable ollama 2>/dev/null || true
+               sudo systemctl start ollama 2>/dev/null || true
+               sleep 3
+               if curl -sf http://localhost:11434/api/tags > /dev/null 2>&1; then
+                 echo 'Ollama is running'
+                 curl -s http://localhost:11434/api/tags | python3 -c 'import sys,json; d=json.load(sys.stdin); [print(\" model:\",m[\"name\"]) for m in d.get(\"models\",[])]'
+               else
+                 echo 'WARNING: Ollama not responding on :11434 — sentinel may fail LLM calls'
+               fi"
+
       - name: Restart backend + Cloudflare tunnel
         run: |
           ssh -i /tmp/sentinel-key.pem \
