@@ -246,7 +246,8 @@ ENVEOF
 # Activated by: enable_opensearch = true in terraform.tfvars (or -var flag).
 #
 # Free-tier entitlements used:
-#   • t2.small.search — 750 instance-hours/month for 12 months
+#   • t3.small.search — 750 instance-hours/month for 12 months (t3 supports FGAC;
+#                       t2.small.search does NOT support encryption-at-rest)
 #   • 10 GB gp2 EBS   — included in free tier
 #
 # Authentication: Fine-Grained Access Control (FGAC) with an internal
@@ -268,7 +269,7 @@ resource "aws_opensearch_domain" "vectors" {
   engine_version = "OpenSearch_2.13"
 
   cluster_config {
-    instance_type            = "t2.small.search" # free tier: 750 hrs/month for 12 months
+    instance_type            = "t3.small.search" # free tier: 750 hrs/month for 12 months; t3 supports FGAC
     instance_count           = 1
     dedicated_master_enabled = false
     zone_awareness_enabled   = false # single-AZ — no HA needed for demo

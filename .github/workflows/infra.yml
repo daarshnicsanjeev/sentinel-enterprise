@@ -141,6 +141,79 @@ jobs:
             -backend-config="encrypt=true" \
             -input=false
 
+      # ── Import existing AWS resources into Terraform state ───────────────────
+      # Idempotent: if a resource is already in state the import is skipped (exit 1
+      # from "already managed" is suppressed). Resources that don't exist are also
+      # skipped. This handles the case where AWS resources were created in a
+      # previous run but the state bucket was reset.
+      - name: Import existing AWS resources
+        run: |
+          set +e   # non-fatal — import errors mean "already in state" or "doesn't exist"
+
+          TF_VARS="-var=aws_region=${{ secrets.AWS_REGION }} \
+            -var=frontend_bucket_name=${{ secrets.FRONTEND_BUCKET_NAME }} \
+            -var=key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }} \
+            -var=review_min_evidence=${{ secrets.REVIEW_MIN_EVIDENCE || '1' }} \
+            -var=ollama_base_url=${{ secrets.OLLAMA_BASE_URL || '' }} \
+            -var=enable_opensearch=true \
+            -var=opensearch_master_password=${{ secrets.OPENSEARCH_MASTER_PASSWORD || '' }}"
+
+          # ── S3 frontend bucket ──
+          if aws s3api head-bucket --bucket "${{ secrets.FRONTEND_BUCKET_NAME }}" 2>/dev/null; then
+            echo "Importing S3 frontend bucket..."
+            terraform import $TF_VARS aws_s3_bucket.frontend \
+              "${{ secrets.FRONTEND_BUCKET_NAME }}" 2>&1 | grep -v "already managed"
+            terraform import $TF_VARS aws_s3_bucket_public_access_block.frontend \
+              "${{ secrets.FRONTEND_BUCKET_NAME }}" 2>&1 | grep -v "already managed"
+            terraform import $TF_VARS aws_s3_bucket_website_configuration.frontend \
+              "${{ secrets.FRONTEND_BUCKET_NAME }}" 2>&1 | grep -v "already managed"
+            terraform import $TF_VARS "aws_s3_bucket_policy.frontend_public_read" \
+              "${{ secrets.FRONTEND_BUCKET_NAME }}" 2>&1 | grep -v "already managed"
+          fi
+
+          # ── Security group ──
+          SG_ID=$(aws ec2 describe-security-groups \
+            --filters "Name=group-name,Values=sentinel-api-sg" \
+            --query "SecurityGroups[0].GroupId" --output text 2>/dev/null || true)
+          if [ -n "$SG_ID" ] && [ "$SG_ID" != "None" ]; then
+            echo "Importing security group $SG_ID..."
+            terraform import $TF_VARS aws_security_group.sentinel_api "$SG_ID" \
+              2>&1 | grep -v "already managed"
+          fi
+
+          # ── EC2 instance (running or stopped) ──
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=sentinel-api" \
+                      "Name=instance-state-name,Values=running,stopped" \
+            --query "Reservations[0].Instances[0].InstanceId" --output text 2>/dev/null || true)
+          if [ -n "$INSTANCE_ID" ] && [ "$INSTANCE_ID" != "None" ]; then
+            echo "Importing EC2 instance $INSTANCE_ID..."
+            terraform import $TF_VARS aws_instance.sentinel_api "$INSTANCE_ID" \
+              2>&1 | grep -v "already managed"
+          fi
+
+          # ── CloudFront distribution ──
+          CF_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Comment=='Sentinel frontend CDN'].Id" \
+            --output text 2>/dev/null || true)
+          if [ -n "$CF_ID" ] && [ "$CF_ID" != "None" ]; then
+            echo "Importing CloudFront distribution $CF_ID..."
+            terraform import $TF_VARS aws_cloudfront_distribution.frontend "$CF_ID" \
+              2>&1 | grep -v "already managed"
+          fi
+
+          # ── OpenSearch domain (if already provisioned) ──
+          OS_EXISTS=$(aws opensearch describe-domain --domain-name sentinel-vectors \
+            --query "DomainStatus.DomainName" --output text 2>/dev/null || true)
+          if [ -n "$OS_EXISTS" ] && [ "$OS_EXISTS" != "None" ]; then
+            echo "Importing OpenSearch domain sentinel-vectors..."
+            terraform import $TF_VARS "aws_opensearch_domain.vectors[0]" \
+              "sentinel-vectors" 2>&1 | grep -v "already managed"
+          fi
+
+          echo "=== Import step complete ==="
+          set -e
+
       # ── Validate ─────────────────────────────────────────────────────────────
       - name: Terraform Validate
         run: terraform validate
