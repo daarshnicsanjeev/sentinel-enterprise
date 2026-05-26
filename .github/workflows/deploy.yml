@@ -235,7 +235,9 @@ jobs:
             | jq -r '"Created VITE_API_BASE_URL = " + .value'
 
       # Also keep the GitHub secret in sync for future fallbacks
+      # (non-fatal — GITHUB_TOKEN may lack secrets:write in some repo configs)
       - name: Sync VITE_API_BASE_URL GitHub secret
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
