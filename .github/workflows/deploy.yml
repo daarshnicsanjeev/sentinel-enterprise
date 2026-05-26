@@ -211,8 +211,37 @@ jobs:
           echo "TUNNEL_URL=${TUNNEL_URL}" >> $GITHUB_ENV
 
       # ── Step D: Update VITE_API_BASE_URL in Vercel project env ───────────────
-      # Vercel's env var is updated BEFORE the build step so vite bakes in
-      # the fresh tunnel URL.
+      # Uses Vercel REST API directly (no vercel link needed).
+      # The env var is updated BEFORE the build so vite bakes in the fresh URL.
+      - name: Update VITE_API_BASE_URL in Vercel project (REST API)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          # Find and delete any existing VITE_API_BASE_URL env var
+          ENV_ID=$(curl -sf "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env" \
+            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+            | jq -r '.envs[] | select(.key=="VITE_API_BASE_URL") | .id' 2>/dev/null | head -1 || true)
+          if [ -n "$ENV_ID" ] && [ "$ENV_ID" != "null" ]; then
+            curl -sf -X DELETE "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env/${ENV_ID}" \
+              -H "Authorization: Bearer ${VERCEL_TOKEN}" > /dev/null
+            echo "Deleted existing VITE_API_BASE_URL (id: $ENV_ID)"
+          fi
+          # Create the new env var pointing to the live tunnel URL
+          curl -sf -X POST "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env" \
+            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "{\"key\":\"VITE_API_BASE_URL\",\"value\":\"${TUNNEL_URL}\",\"type\":\"plain\",\"target\":[\"production\"]}" \
+            | jq -r '"Created VITE_API_BASE_URL = " + .value'
+
+      # Also keep the GitHub secret in sync for future fallbacks
+      - name: Sync VITE_API_BASE_URL GitHub secret
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$TUNNEL_URL" | gh secret set VITE_API_BASE_URL
+
+      # ── Step E: Build + deploy frontend to Vercel ─────────────────────────────
       - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
@@ -221,24 +250,6 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      - name: Update VITE_API_BASE_URL in Vercel project (production)
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          # Remove existing value (ignore error if not present)
-          vercel env rm VITE_API_BASE_URL production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-          # Add current tunnel URL
-          echo "$TUNNEL_URL" | vercel env add VITE_API_BASE_URL production --token=$VERCEL_TOKEN
-          echo "Vercel VITE_API_BASE_URL set to: $TUNNEL_URL"
-
-      # Also keep the GitHub secret in sync for future runs
-      - name: Sync VITE_API_BASE_URL GitHub secret
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "$TUNNEL_URL" | gh secret set VITE_API_BASE_URL
-
-      # ── Step E: Build + deploy frontend to Vercel ─────────────────────────────
       - name: Install npm dependencies
         working-directory: frontend/sentinel-ui
         run: npm install --no-fund --no-audit
