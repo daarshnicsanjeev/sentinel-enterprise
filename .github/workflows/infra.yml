@@ -90,17 +90,16 @@ jobs:
       group: terraform-${{ github.ref }}
       cancel-in-progress: false
 
+    # AWS credentials — injected as env vars so Terraform + AWS CLI pick them up
+    # automatically. Avoids the aws-actions/configure-aws-credentials download.
+    env:
+      AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION:    ${{ secrets.AWS_REGION }}
+
     steps:
       # ── Checkout ────────────────────────────────────────────────────────────
       - uses: actions/checkout@v4
-
-      # ── AWS credentials ─────────────────────────────────────────────────────
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ secrets.AWS_REGION }}
 
       # ── Terraform CLI ────────────────────────────────────────────────────────
       - name: Set up Terraform ${{ env.TF_VERSION }}
