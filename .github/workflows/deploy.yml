@@ -5,17 +5,24 @@
 #   1. Run backend tests (pytest) — all LLM calls mocked, no Ollama needed
 #   2. Run frontend tests (vitest)
 #   3. Build React app (vite build)
-#   4. Deploy frontend to Vercel (HTTPS CDN)
-#   5. rsync backend/ to EC2 + restart sentinel.service + cloudflared-tunnel
+#   4. rsync backend/ to EC2 + restart sentinel.service + cloudflared-tunnel
+#   5. Extract live Cloudflare tunnel URL → update Vercel env var
+#   6. Deploy frontend to Vercel (HTTPS CDN) with correct backend URL baked in
+#
+# Deploy order is intentional: backend first → extract tunnel URL → Vercel build.
+# This ensures VITE_API_BASE_URL is always the live tunnel URL, not a stale one.
 #
 # Required GitHub Secrets (Settings → Secrets → Actions):
-#   EC2_HOST                  public IP of the EC2 instance
+#   EC2_HOST                  fallback public IP (updated by infra.yml)
 #   EC2_SSH_KEY               full contents of the .pem file
 #   EC2_USER                  ubuntu
 #   VERCEL_TOKEN              from vercel.com → Settings → Tokens
 #   VERCEL_ORG_ID             from vercel.json or `vercel link`
 #   VERCEL_PROJECT_ID         from vercel.json or `vercel link`
-#   VITE_API_BASE_URL         Cloudflare tunnel URL (update if EC2 restarts)
+#   VITE_API_BASE_URL         auto-updated each deploy from live tunnel URL
+#   AWS_ACCESS_KEY_ID         for dynamic EC2 IP resolution
+#   AWS_SECRET_ACCESS_KEY     for dynamic EC2 IP resolution
+#   AWS_REGION                ap-south-1
 # =============================================================================
 
 name: CI/CD — Test, Build, Deploy
@@ -63,10 +70,11 @@ jobs:
         run: python -m pytest tests/ -v --tb=short -q
 
   # ---------------------------------------------------------------------------
-  # Job 2: Frontend tests + production build
+  # Job 2: Frontend tests (vitest only — build happens in deploy job after
+  # the live tunnel URL is known)
   # ---------------------------------------------------------------------------
-  frontend-build:
-    name: Frontend Tests + Build (vitest + vite)
+  frontend-tests:
+    name: Frontend Tests (vitest)
     runs-on: ubuntu-latest
 
     steps:
@@ -87,30 +95,26 @@ jobs:
         working-directory: frontend/sentinel-ui
         run: npx vitest run
 
-      - name: Build production bundle
-        working-directory: frontend/sentinel-ui
-        env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-        run: npx vite build
-
-      - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist
-          path: frontend/sentinel-ui/dist/
-          retention-days: 1
-
   # ---------------------------------------------------------------------------
   # Job 3: Deploy — only on push to main (not on PRs)
+  #
+  # ORDER MATTERS:
+  #   Step A: Resolve EC2 IP
+  #   Step B: Deploy backend to EC2 + restart services
+  #   Step C: Extract live Cloudflare tunnel URL from EC2 logs
+  #   Step D: Update VITE_API_BASE_URL in Vercel project env
+  #   Step E: Build + deploy frontend to Vercel with correct URL baked in
+  #
+  # This guarantees the Vercel build always uses the URL the tunnel is
+  # actually serving on right now, not a URL from a previous run.
   # ---------------------------------------------------------------------------
   deploy:
     name: Deploy to AWS + Vercel
     runs-on: ubuntu-latest
-    needs: [backend-tests, frontend-build]
+    needs: [backend-tests, frontend-tests]
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
 
     # AWS credentials — used to resolve the current EC2 public IP dynamically
-    # (EC2_HOST secret can become stale when the instance restarts and gets a new IP)
     env:
       AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -119,7 +123,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ── Resolve current EC2 public IP ─────────────────────────────────────
+      # ── Step A: Resolve current EC2 public IP ────────────────────────────────
       # Query AWS for the running sentinel-api instance rather than relying on
       # the EC2_HOST secret, which becomes stale when the instance restarts
       # and is assigned a new dynamic public IP.
@@ -135,27 +139,7 @@ jobs:
           echo "EC2_IP=${IP}" >> $GITHUB_ENV
           echo "Resolved EC2 IP: ${IP}"
 
-      # ── Frontend → Vercel ──────────────────────────────────────────────────
-      - name: Set up Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
-
-      - name: Deploy frontend to Vercel (production)
-        working-directory: frontend/sentinel-ui
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-          vercel build --prod --token=$VERCEL_TOKEN
-          vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
-
-      # ── Backend → EC2 via rsync + SSH ─────────────────────────────────────
+      # ── Step B: Deploy backend to EC2 ────────────────────────────────────────
       - name: Write SSH key
         run: |
           echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/sentinel-key.pem
@@ -208,13 +192,68 @@ jobs:
                sudo systemctl is-active cloudflared-tunnel || sudo systemctl restart cloudflared-tunnel && \
                echo 'Cloudflare tunnel active'"
 
-      - name: Show Cloudflare tunnel URL
+      # ── Step C: Extract live tunnel URL ──────────────────────────────────────
+      # Must run AFTER the tunnel is up (Step B). The URL is ephemeral and
+      # changes on each EC2 restart — we capture it here and inject it into
+      # the Vercel build so the frontend always calls the live backend.
+      - name: Extract Cloudflare tunnel URL
         run: |
-          ssh -i /tmp/sentinel-key.pem \
+          TUNNEL_URL=$(ssh -i /tmp/sentinel-key.pem \
               -o StrictHostKeyChecking=no \
               -o ConnectTimeout=20 \
               ${{ secrets.EC2_USER }}@$EC2_IP \
-              "sudo journalctl -u cloudflared-tunnel --no-pager -n 100 | grep -o 'https://[a-z0-9-]*.trycloudflare.com' | tail -1 | xargs -I{} echo 'Backend HTTPS URL: {}'"
+              "sudo journalctl -u cloudflared-tunnel --no-pager -n 200 | grep -o 'https://[a-z0-9-]*.trycloudflare.com' | tail -1")
+          echo "Backend tunnel URL: ${TUNNEL_URL}"
+          if [ -z "$TUNNEL_URL" ]; then
+            echo "WARNING: Could not extract tunnel URL — falling back to VITE_API_BASE_URL secret"
+            TUNNEL_URL="${{ secrets.VITE_API_BASE_URL }}"
+          fi
+          echo "TUNNEL_URL=${TUNNEL_URL}" >> $GITHUB_ENV
+
+      # ── Step D: Update VITE_API_BASE_URL in Vercel project env ───────────────
+      # Vercel's env var is updated BEFORE the build step so vite bakes in
+      # the fresh tunnel URL.
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Update VITE_API_BASE_URL in Vercel project (production)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          # Remove existing value (ignore error if not present)
+          vercel env rm VITE_API_BASE_URL production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+          # Add current tunnel URL
+          echo "$TUNNEL_URL" | vercel env add VITE_API_BASE_URL production --token=$VERCEL_TOKEN
+          echo "Vercel VITE_API_BASE_URL set to: $TUNNEL_URL"
+
+      # Also keep the GitHub secret in sync for future runs
+      - name: Sync VITE_API_BASE_URL GitHub secret
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$TUNNEL_URL" | gh secret set VITE_API_BASE_URL
+
+      # ── Step E: Build + deploy frontend to Vercel ─────────────────────────────
+      - name: Install npm dependencies
+        working-directory: frontend/sentinel-ui
+        run: npm install --no-fund --no-audit
+
+      - name: Deploy frontend to Vercel (production)
+        working-directory: frontend/sentinel-ui
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VITE_API_BASE_URL: ${{ env.TUNNEL_URL }}
+        run: |
+          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          vercel build --prod --token=$VERCEL_TOKEN
+          vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
 
       - name: Remove SSH key
         if: always()
