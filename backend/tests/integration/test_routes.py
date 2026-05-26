@@ -122,6 +122,17 @@ class TestHealthEndpoint:
         expected = "ok" if all_pass else "degraded"
         assert body["status"] == expected
 
+    def test_checks_include_llm(self, client):
+        body = client.get("/api/health").json()
+        assert "llm" in body["checks"]
+
+    def test_llm_info_returned(self, client):
+        body = client.get("/api/health").json()
+        assert "llm" in body
+        assert "provider" in body["llm"]
+        assert "model" in body["llm"]
+        assert "base_url" in body["llm"]
+
 
 # ---------------------------------------------------------------------------
 # Analyze endpoint — input validation

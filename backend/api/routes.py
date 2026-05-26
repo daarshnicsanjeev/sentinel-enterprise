@@ -1769,5 +1769,29 @@ async def health():
     except Exception:
         checks["embeddings"] = False
 
+    # LLM connectivity check — quick ping with a tiny prompt (5 s timeout)
+    import os as _os
+    llm_info: dict = {
+        "provider": _os.getenv("LLM_PROVIDER", "ollama"),
+        "model": _os.getenv("OLLAMA_MODEL", "gemma4:31b-cloud"),
+        "base_url": _os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434"),
+    }
+    try:
+        from agents.llm_factory import create_llm
+        import asyncio as _asyncio
+        _llm = create_llm(temperature=0.0)
+        from langchain_core.messages import HumanMessage
+        await _asyncio.wait_for(
+            _asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: _llm.invoke([HumanMessage(content="Reply with one word: OK")])
+            ),
+            timeout=10.0,
+        )
+        checks["llm"] = True
+    except Exception as _exc:
+        checks["llm"] = False
+        llm_info["error"] = str(_exc)[:200]
+
     status = "ok" if all(checks.values()) else "degraded"
-    return {"status": status, "service": "Project Sentinel", "checks": checks}
+    return {"status": status, "service": "Project Sentinel", "checks": checks, "llm": llm_info}
