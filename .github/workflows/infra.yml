@@ -101,11 +101,14 @@ jobs:
       # ── Checkout ────────────────────────────────────────────────────────────
       - uses: actions/checkout@v4
 
-      # ── Terraform CLI ────────────────────────────────────────────────────────
-      - name: Set up Terraform ${{ env.TF_VERSION }}
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
+      # ── Terraform CLI — install directly from HashiCorp releases ──────────────
+      # Avoids hashicorp/setup-terraform@v3 action which can fail on CDN issues.
+      - name: Install Terraform ${{ env.TF_VERSION }}
+        run: |
+          wget -q "https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_linux_amd64.zip"
+          unzip -q "terraform_${{ env.TF_VERSION }}_linux_amd64.zip"
+          sudo mv terraform /usr/local/bin/terraform
+          terraform version
 
       # ── Init (S3 remote state) ───────────────────────────────────────────────
       - name: Terraform Init
