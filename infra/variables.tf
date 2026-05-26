@@ -41,10 +41,13 @@ variable "review_min_evidence" {
 
 variable "enable_opensearch" {
   description = <<-EOT
-    Set to true to provision an AWS OpenSearch Service domain (t2.small.search).
+    Set to true to provision an AWS OpenSearch Service domain (t3.small.search).
     Free tier includes 750 instance-hours/month and 10 GB EBS for 12 months.
+    t3.small.search is used (not t2) because t3 supports encryption-at-rest,
+    which is required for Fine-Grained Access Control (FGAC) and HTTP basic auth.
     When enabled, the domain endpoint is printed as the 'opensearch_endpoint'
-    output — inject it into the EC2 .env as OPENSEARCH_HOST (see deploy-backend.sh).
+    output — inject it into the EC2 .env as OPENSEARCH_HOST (see deploy-backend.sh
+    or the infra.yml post-apply SSH step which does this automatically).
   EOT
   type    = bool
   default = false

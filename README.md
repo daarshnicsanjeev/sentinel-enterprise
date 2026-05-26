@@ -84,8 +84,10 @@ AI Feedback Loop (on-demand, no scheduling):
 | **JWT auth + RBAC** | `analyst` (read + analyse) / `admin` (+ override + export + insights) |
 | **Structured logging** | `structlog` JSON with `trace_id` in every log line |
 | **Prometheus metrics** | `/api/metrics` endpoint + 7-day trend in Metrics tab |
-| **Terraform IaC** | One-command AWS provisioning: EC2 + S3 + CloudFront |
-| **GitHub Actions CI/CD** | Push to `main` → tests → build → deploy |
+| **Vercel + Cloudflare Tunnel** | React frontend on Vercel HTTPS CDN; FastAPI backend tunnelled via Cloudflare Quick Tunnel — no domain required, no port exposure |
+| **Self-healing tunnel URL** | EC2 systemd service auto-detects new tunnel URL on restart, patches Vercel env var, and triggers GitHub Actions redeploy automatically |
+| **Terraform IaC** | One-command EC2 provisioning; S3 + CloudFront defined for reference/fallback |
+| **GitHub Actions CI/CD** | Push to `main` → tests → Vercel frontend deploy → EC2 backend rsync → restart |
 
 ---
 
@@ -135,51 +137,65 @@ Set `OLLAMA_MODEL=gemma3:4b` in `backend/.env`.
 
 ## AWS Deployment
 
-Infrastructure is defined in `infra/` (Terraform). Everything stays within the AWS Free Tier:
+The live deployment uses **Vercel** for the HTTPS frontend and a **Cloudflare Quick Tunnel** for the HTTPS backend — both free, no domain required.
 
-| Resource | Purpose | Free Tier Limit |
-|----------|---------|----------------|
-| EC2 t3.micro | FastAPI + uvicorn | 750 hrs/month (first 12 months) |
-| EBS 25 GB gp3 | App + model storage | 30 GB total |
-| S3 bucket | React frontend (static site) | 5 GB + 20K GET/month |
-| CloudFront | HTTPS CDN for frontend | 1 TB transfer/month |
+| Resource | Purpose | Cost |
+|----------|---------|------|
+| EC2 t3.micro | FastAPI + uvicorn | Free Tier — 750 hrs/month |
+| EBS 25 GB gp3 | App + SQLite storage | Free Tier — 30 GB total |
+| Cloudflare Quick Tunnel | HTTPS endpoint for FastAPI (no port 8000 exposure) | Free — no account needed |
+| Vercel | React SPA hosting (HTTPS CDN, global edge) | Free — Hobby tier |
 
-### Provision Infrastructure
+> S3 + CloudFront are defined in `infra/main.tf` for reference / fallback but are **not** used in the live deployment — S3 is HTTP-only and triggers Mixed Content errors in an HTTPS browser.
+
+### Provision EC2 Infrastructure
 
 ```bash
 cd infra
 terraform init
 terraform plan                      # preview
-terraform apply                     # ~3 minutes
+terraform apply                     # ~3 minutes — provisions EC2 only
 ```
 
-### Deploy Backend
+### Deploy Backend (EC2 + Cloudflare Tunnel)
 
 ```bash
-# One-shot: provision + deploy app code
+# One-shot: deploy app code + set up Cloudflare tunnel
 bash infra/deploy-backend.sh
 ```
 
 The script:
-1. Clones the repo (or `git pull` if already present)
-2. Creates a Python virtualenv at `/opt/sentinel-venv`
-3. Installs `requirements.txt`
-4. Writes `/opt/sentinel/backend/.env` (first run only)
-5. Installs and starts `sentinel.service` (systemd)
-6. Health-checks `GET /api/health`
+1. Installs system packages (Python, git, Tesseract, cloudflared)
+2. Clones/updates the repo at `/opt/sentinel`
+3. Creates a Python virtualenv at `/opt/sentinel-venv`
+4. Installs `requirements.txt`
+5. Writes `/opt/sentinel/backend/.env` (first run only)
+6. Installs and starts `sentinel.service` (systemd)
+7. Installs `cloudflared` from Cloudflare's apt repo
+8. Writes and enables `cloudflared-tunnel.service` (systemd)
+9. Creates `/opt/sentinel/update-tunnel-url.sh` (self-heal script)
+10. Health-checks `GET /api/health`
+11. Prints the live Cloudflare HTTPS tunnel URL
 
-### Deploy Frontend
+### Deploy Frontend (Vercel)
 
-```powershell
-cd frontend\sentinel-ui
-node_modules\.bin\vite build
-aws s3 sync dist s3://<your-bucket> --delete
+```bash
+cd frontend/sentinel-ui
+npm install -g vercel
+vercel link                         # one-time: link to your Vercel account
+vercel --prod                       # deploy to production
 ```
+
+After every EC2 restart, the self-heal script automatically:
+1. Reads the new `trycloudflare.com` URL from the systemd journal
+2. PATCHes the Vercel `VITE_API_BASE_URL` env var via the Vercel API
+3. Triggers a GitHub Actions `workflow_dispatch` to rebuild the frontend
 
 ### Tear Down
 
 ```bash
-terraform destroy                   # removes all AWS resources
+terraform destroy                   # removes EC2 + EBS
+# To remove Vercel project: vercel remove sentinel-enterprise
 ```
 
 ---
@@ -307,7 +323,7 @@ See `backend/.env.example` for the complete list.
 │   └── DEVELOPER_GUIDE.md        # Architecture, API reference, extending Sentinel
 ├── sample_docs/                  # 55+ labelled test documents (all formats)
 ├── .github/workflows/
-│   └── deploy.yml                # CI/CD: test → build → S3 sync → EC2 deploy
+│   └── deploy.yml                # CI/CD: test → Vercel frontend deploy → EC2 rsync → restart tunnel
 └── .gitignore
 ```
 

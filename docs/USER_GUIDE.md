@@ -45,7 +45,7 @@ All processing is streamed live — you can watch each AI agent work in real tim
 
 ## 2. Getting Started — The Six Tabs
 
-Open the application in your browser. You will see six tabs in the navigation bar:
+Open the application at **https://sentinel-enterprise-tau.vercel.app** (or at `http://localhost:5173` when running locally). You will see six tabs in the navigation bar:
 
 | Tab | Label | Purpose |
 |-----|-------|---------|

@@ -9,7 +9,7 @@
 
 ### Development Methodology: TDD — Red → Green → Refactor
 
-### Overall Progress: Phase 8 — Fully Deployed ✅
+### Overall Progress: Phase 10 — CI/CD Hardened + OpenSearch Live ✅
 
 | Phase | Status | Description |
 |-------|--------|-------------|
@@ -18,10 +18,11 @@
 | Phase 3: TDD test suite | ✅ Complete | Full test suite — all green |
 | Phase 4: Live integration | ✅ Complete | Full pipeline verified with Ollama |
 | Phase 5: PDF + Docker | ✅ Complete | PDF ingestion, FAISS neural embeddings, Docker Compose |
-| Phase 9: OpenSearch | ✅ Complete | Dual vector-store backend (FAISS default / OpenSearch optional) |
 | Phase 6: Enterprise features | ✅ Complete | JWT auth, RBAC, batch upload, PDF reports, CSV export |
 | Phase 7: AI feedback loop | ✅ Complete | Review agent, approve/reject/undo, insights dashboard |
 | Phase 8: AWS deployment | ✅ Complete | EC2 + Cloudflare Tunnel + Vercel — all free tier |
+| Phase 9: OpenSearch | ✅ Complete | Dual vector-store backend (FAISS default / OpenSearch live on EC2) |
+| Phase 10: CI/CD hardening | ✅ Complete | Self-healing EC2 IP, S3 bootstrap, resource import, workflow_dispatch deploy |
 
 ---
 
@@ -30,8 +31,9 @@
 | Component | URL / Location | Status |
 |-----------|----------------|--------|
 | Frontend | https://sentinel-enterprise-tau.vercel.app | ✅ Live (Vercel) |
-| Backend API | https://responded-applicants-findlaw-clearance.trycloudflare.com | ✅ Live (Cloudflare Quick Tunnel) |
-| EC2 instance | ap-south-1 (Mumbai), t3.micro | ✅ Running |
+| Backend API | https://nebraska-jackets-annotation-figure.trycloudflare.com | ✅ Live (Cloudflare Quick Tunnel) |
+| EC2 instance | ap-south-1 (Mumbai), t3.micro — IP 13.126.38.0 | ✅ Running |
+| OpenSearch | sentinel-vectors domain (t3.small.search, ap-south-1) | ✅ Provisioned + active |
 | CI/CD | github.com/daarshnicsanjeev/sentinel-enterprise/actions | ✅ Green |
 
 > **Note:** The Cloudflare Quick Tunnel URL is ephemeral. If EC2 restarts, the self-heal script (`/opt/sentinel/update-tunnel-url.sh`) automatically detects the new URL, patches the Vercel env var, and triggers a GitHub Actions redeploy. The table above shows the URL at last session; check Vercel or the EC2 journal for the current URL.
@@ -92,12 +94,12 @@ EC2 t3.micro ap-south-1                     ← FastAPI + uvicorn :8000
 | Vercel deployment | `frontend/sentinel-ui/vercel.json` | ✅ Done — SPA rewrite rule |
 | Cloudflare tunnel | EC2 systemd `cloudflared-tunnel.service` | ✅ Running |
 | Self-heal script | EC2 `/opt/sentinel/update-tunnel-url.sh` | ✅ Installed |
-| GitHub Actions | `.github/workflows/deploy.yml` | ✅ Green — Vercel + EC2 rsync |
-| Terraform | `infra/main.tf` | ✅ Done — EC2 + OpenSearch t2.small.search (free tier) |
+| GitHub Actions deploy.yml | `.github/workflows/deploy.yml` | ✅ Green — resolves EC2 IP dynamically via AWS CLI; workflow_dispatch triggers full deploy |
+| GitHub Actions infra.yml | `.github/workflows/infra.yml` | ✅ Green — bootstraps S3 state bucket; imports existing AWS resources; t3.small.search |
+| Terraform | `infra/main.tf` | ✅ Done — EC2 + OpenSearch t3.small.search (free tier, FGAC-capable); CloudFront removed |
 | Terraform variables | `infra/variables.tf` | ✅ Done — enable_opensearch + opensearch_master_password |
 | Terraform outputs | `infra/outputs.tf` | ✅ Done — opensearch_endpoint + opensearch_dashboard_url |
 | Deploy script | `infra/deploy-backend.sh` | ✅ Done — 12-step incl. OpenSearch env injection |
-| GitHub Actions infra.yml | `.github/workflows/infra.yml` | ✅ Done — passes OPENSEARCH_MASTER_PASSWORD + patches EC2 .env post-apply |
 
 ---
 
@@ -143,14 +145,45 @@ All LLM calls are mocked — no Ollama required to run tests.
 For any new work: **write a failing test before touching implementation code.**
 
 Optional next tasks (priority order):
-1. Set `VERCEL_TOKEN`, `VERCEL_ENV_VAR_ID`, `GH_TOKEN` on EC2 to enable the self-heal script
-2. Provision AWS OpenSearch Service domain (t2.small.search — free 12 months) and point EC2 at it via `VECTOR_STORE=opensearch`
-3. Named Tunnel (stable URL) — only when a domain is available
-4. PostgreSQL migration for high-concurrency production use
+1. Set `VERCEL_TOKEN`, `VERCEL_ENV_VAR_ID`, `GH_TOKEN` on EC2 to fully enable the self-heal script (tunnel URL auto-update)
+2. Named Tunnel (stable URL) — only when a domain is available in Cloudflare
+3. PostgreSQL migration for high-concurrency production use
+4. Assign an Elastic IP to the EC2 instance to make the IP permanent (prevents stale `EC2_HOST` issues on restart)
 
 ---
 
 ## Session Log
+
+### Session 10 — 2026-05-26 (Claude Sonnet 4.6) — OpenSearch Provisioned + CI/CD Hardened
+**What was done:**
+
+**AWS OpenSearch provisioning:**
+- Fixed `t2.small.search` → `t3.small.search` (t2 doesn't support encryption-at-rest required for FGAC/HTTP basic auth)
+- Removed `aws_cloudfront_distribution` resource — new AWS accounts require support verification for CloudFront; Vercel is the live CDN
+- `terraform apply` succeeded: OpenSearch domain `sentinel-vectors` provisioned in ap-south-1
+- EC2 `.env` auto-patched by post-apply SSH step: `VECTOR_STORE=opensearch`, all 6 OpenSearch vars set
+
+**infra.yml hardening (4 successive fixes):**
+- Fixed `actions/github-script@v7` → `gh` CLI for PR comments (GitHub CDN was failing to download third-party action archives)
+- Added `Bootstrap Terraform State Bucket` step — idempotent S3 create+version+encrypt; eliminates manual one-time bootstrap
+- Added `Import existing AWS resources` step — queries AWS CLI for existing S3 bucket, security group, EC2 instance, and OpenSearch domain; imports each into Terraform state before plan/apply; handles state-reset scenarios without blocking apply
+- Added `continue-on-error: true` to Configure OpenSearch on EC2 SSH step; SSH now reads EC2 IP from `terraform output -raw ec2_public_ip` (always current) with `EC2_HOST` secret as fallback
+
+**deploy.yml hardening:**
+- Added `Resolve current EC2 public IP` step using `aws ec2 describe-instances` by tag; resolves stale `EC2_HOST` secret caused by dynamic IP change on instance restart
+- Added AWS credential env vars to deploy job
+- Fixed deploy job `if:` condition to also run on `workflow_dispatch` (previously only ran on `push`)
+- Updated `VERCEL_TOKEN` secret with fresh token after expiry
+
+**Final verified state:**
+- `infra.yml` ✅ green — Terraform apply clean, OpenSearch live
+- `deploy.yml` ✅ green — 601 backend tests pass, Vercel deployed, EC2 synced, tunnel active
+- EC2 IP: `13.126.38.0`
+- Backend tunnel: `https://nebraska-jackets-annotation-figure.trycloudflare.com`
+- Frontend: `https://sentinel-enterprise-tau.vercel.app`
+- OpenSearch endpoint: `search-sentinel-vectors-j3dgpsxevjm34k5a4kmf5cpqrq.*.es.amazonaws.com`
+
+---
 
 ### Session 9 — 2026-05-26 (Claude Sonnet 4.6) — OpenSearch Dual Vector-Store Backend
 **What was done:**
