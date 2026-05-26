@@ -94,7 +94,13 @@ def _get_opensearch_client():
 
 
 def _build_opensearch_index(text: str, doc_hash: str | None = None) -> Any:
-    """Chunk text and index it into OpenSearch. Returns an OpenSearchVectorSearch."""
+    """Chunk text and index it into OpenSearch. Returns an OpenSearchVectorSearch.
+
+    Uses engine='lucene' (supported in OpenSearch 2.x; nmslib is deprecated).
+    Sets verify_certs=False for AWS-signed certificates and a 30s timeout so
+    the pipeline fails fast rather than hanging if the domain is unreachable.
+    Falls back to FAISS in-process if OpenSearch is unavailable.
+    """
     from langchain_community.vectorstores import OpenSearchVectorSearch
     chunks = _splitter.create_documents([text])
     index_name = _opensearch_index_name(doc_hash) if doc_hash else "sentinel-temp"
@@ -106,8 +112,11 @@ def _build_opensearch_index(text: str, doc_hash: str | None = None) -> Any:
         opensearch_url=_opensearch_url(),
         http_auth=(user, password),
         index_name=index_name,
-        engine="nmslib",
+        engine="lucene",          # lucene is the default k-NN engine in OpenSearch 2.x
         space_type="cosinesimil",
+        verify_certs=False,       # AWS endpoint uses a cert not in the default trust store
+        ssl_assert_hostname=False,
+        timeout=30,               # seconds — fail fast rather than hanging indefinitely
     )
 
 
@@ -121,6 +130,9 @@ def _load_opensearch_index(doc_hash: str) -> Any:
         http_auth=(user, password),
         index_name=_opensearch_index_name(doc_hash),
         embedding_function=_get_embeddings(),
+        verify_certs=False,
+        ssl_assert_hostname=False,
+        timeout=30,
     )
 
 
@@ -176,10 +188,20 @@ def build_index(text: str, doc_hash: str | None = None) -> Any:
     FAISS   → builds an in-process FAISS index (doc_hash unused here)
     OpenSearch → creates / overwrites an index on the server using doc_hash as
                  part of the index name.
+
+    If OpenSearch is configured but unreachable, automatically falls back to
+    FAISS so the pipeline never stalls on a network error.
     """
     if _get_vector_store() == "opensearch":
-        return _build_opensearch_index(text, doc_hash)
-    # FAISS (default)
+        try:
+            return _build_opensearch_index(text, doc_hash)
+        except Exception as exc:
+            import logging
+            logging.getLogger("sentinel.embeddings").warning(
+                "OpenSearch index build failed — falling back to FAISS: %s", exc
+            )
+            # Fall through to FAISS below
+    # FAISS (default / fallback)
     chunks = _splitter.create_documents([text])
     return FAISS.from_documents(chunks, _get_embeddings())
 

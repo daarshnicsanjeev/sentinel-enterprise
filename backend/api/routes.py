@@ -1769,6 +1769,20 @@ async def health():
     except Exception:
         checks["embeddings"] = False
 
+    # OpenSearch check (only when VECTOR_STORE=opensearch)
+    import os as _os2
+    if _os2.getenv("VECTOR_STORE", "faiss").lower() == "opensearch":
+        try:
+            from data.embeddings import _get_opensearch_client
+            _osc = _get_opensearch_client()
+            _osc.info()
+            checks["opensearch"] = True
+        except Exception as _exc:
+            checks["opensearch"] = False
+            llm_info_placeholder = str(_exc)[:200]  # stored below in llm dict
+    else:
+        checks["vector_store"] = True  # FAISS — always available
+
     # LLM connectivity check — quick ping with a tiny prompt (5 s timeout)
     import os as _os
     llm_info: dict = {
