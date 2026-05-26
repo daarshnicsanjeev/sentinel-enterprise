@@ -110,6 +110,27 @@ jobs:
           sudo mv terraform /usr/local/bin/terraform
           terraform version
 
+      # ── Bootstrap S3 state bucket (idempotent — no-op if bucket exists) ────────
+      - name: Bootstrap Terraform State Bucket
+        run: |
+          aws --region "${{ secrets.AWS_REGION }}" s3api head-bucket \
+            --bucket "${{ secrets.TF_STATE_BUCKET }}" 2>/dev/null \
+          || {
+            echo "Creating S3 state bucket ${{ secrets.TF_STATE_BUCKET }}..."
+            aws s3api create-bucket \
+              --bucket "${{ secrets.TF_STATE_BUCKET }}" \
+              --region "${{ secrets.AWS_REGION }}" \
+              --create-bucket-configuration LocationConstraint="${{ secrets.AWS_REGION }}"
+            aws s3api put-bucket-versioning \
+              --bucket "${{ secrets.TF_STATE_BUCKET }}" \
+              --versioning-configuration Status=Enabled
+            aws s3api put-bucket-encryption \
+              --bucket "${{ secrets.TF_STATE_BUCKET }}" \
+              --server-side-encryption-configuration \
+                '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+            echo "State bucket created and configured."
+          }
+
       # ── Init (S3 remote state) ───────────────────────────────────────────────
       - name: Terraform Init
         run: |
