@@ -23,11 +23,6 @@ output "deploy_frontend_command" {
   value       = "aws s3 sync frontend/sentinel-ui/dist/ s3://${var.frontend_bucket_name} --delete"
 }
 
-output "cloudfront_url" {
-  description = "HTTPS URL of the React frontend via CloudFront"
-  value       = "https://${aws_cloudfront_distribution.frontend.domain_name}"
-}
-
 output "opensearch_endpoint" {
   description = <<-EOT
     OpenSearch domain endpoint (HTTPS, no protocol prefix).

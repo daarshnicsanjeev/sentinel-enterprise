@@ -327,84 +327,10 @@ resource "aws_opensearch_domain" "vectors" {
 }
 
 # =============================================================================
-# 5. CLOUDFRONT — RETAINED FOR REFERENCE / FALLBACK
-#    The live CDN is Vercel. CloudFront is defined here in case the team
-#    wants to switch back to S3 hosting (e.g. if Vercel free tier limits are hit).
-#    CloudFront free tier: 1 TB transfer/month, 10M requests/month.
+# 5. CLOUDFRONT — REMOVED
+#    The live CDN is Vercel (free Hobby tier, HTTPS, global CDN).
+#    CloudFront requires account verification via AWS Support for new accounts
+#    and is not needed since Vercel is already live at:
+#      https://sentinel-enterprise-tau.vercel.app
+#    CloudFront can be re-added here once the AWS account is verified if needed.
 # =============================================================================
-
-locals {
-  s3_origin_id = "sentinel-s3-frontend"
-}
-
-resource "aws_cloudfront_distribution" "frontend" {
-  enabled             = true
-  is_ipv6_enabled     = true
-  default_root_object = "index.html"
-  price_class         = "PriceClass_All"
-
-  comment = "Sentinel frontend CDN"
-
-  origin {
-    domain_name = aws_s3_bucket_website_configuration.frontend.website_endpoint
-    origin_id   = local.s3_origin_id
-
-    # S3 website endpoint is HTTP-only; CloudFront terminates HTTPS and talks
-    # HTTP to the origin — this is the standard pattern for S3 static sites.
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
-    }
-  }
-
-  default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.s3_origin_id
-
-    forwarded_values {
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
-  }
-
-  # React Router — all 404s from S3 get rewritten to index.html
-  custom_error_response {
-    error_code            = 403
-    response_code         = 200
-    response_page_path    = "/index.html"
-    error_caching_min_ttl = 0
-  }
-
-  custom_error_response {
-    error_code            = 404
-    response_code         = 200
-    response_page_path    = "/index.html"
-    error_caching_min_ttl = 0
-  }
-
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
-
-  # Use the default CloudFront certificate (*.cloudfront.net) — no custom domain needed
-  viewer_certificate {
-    cloudfront_default_certificate = true
-  }
-
-  tags = {
-    Name    = "sentinel-frontend-cdn"
-    Project = "sentinel"
-  }
-}
