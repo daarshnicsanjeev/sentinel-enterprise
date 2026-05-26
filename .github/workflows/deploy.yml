@@ -109,8 +109,31 @@ jobs:
     needs: [backend-tests, frontend-build]
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
 
+    # AWS credentials — used to resolve the current EC2 public IP dynamically
+    # (EC2_HOST secret can become stale when the instance restarts and gets a new IP)
+    env:
+      AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION:    ${{ secrets.AWS_REGION }}
+
     steps:
       - uses: actions/checkout@v4
+
+      # ── Resolve current EC2 public IP ─────────────────────────────────────
+      # Query AWS for the running sentinel-api instance rather than relying on
+      # the EC2_HOST secret, which becomes stale when the instance restarts
+      # and is assigned a new dynamic public IP.
+      - name: Resolve current EC2 public IP
+        run: |
+          IP=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=sentinel-api" \
+                      "Name=instance-state-name,Values=running" \
+            --query "Reservations[0].Instances[0].PublicIpAddress" \
+            --output text 2>/dev/null || true)
+          # Fall back to the EC2_HOST secret if the AWS query fails
+          IP="${IP:-${{ secrets.EC2_HOST }}}"
+          echo "EC2_IP=${IP}" >> $GITHUB_ENV
+          echo "Resolved EC2 IP: ${IP}"
 
       # ── Frontend → Vercel ──────────────────────────────────────────────────
       - name: Set up Node.js ${{ env.NODE_VERSION }}
@@ -150,35 +173,35 @@ jobs:
             --exclude=".pytest_cache/" \
             --exclude="data/regulatory_db.json" \
             backend/ \
-            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/sentinel/backend/
+            ${{ secrets.EC2_USER }}@$EC2_IP:/opt/sentinel/backend/
 
       - name: Seed regulatory_db.json on EC2 (only if absent)
         run: |
           ssh -i /tmp/sentinel-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=20 \
-            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            ${{ secrets.EC2_USER }}@$EC2_IP \
             "[ -f /opt/sentinel/backend/data/regulatory_db.json ] && echo 'regulatory_db.json already exists — skipping seed' || echo 'File missing — will copy'"
           rsync -az \
             -e "ssh -i /tmp/sentinel-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=20" \
             --ignore-existing \
             backend/data/regulatory_db.json \
-            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/sentinel/backend/data/regulatory_db.json
+            ${{ secrets.EC2_USER }}@$EC2_IP:/opt/sentinel/backend/data/regulatory_db.json
 
       - name: rsync sample_docs to EC2
         run: |
           ssh -i /tmp/sentinel-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=20 \
-            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            ${{ secrets.EC2_USER }}@$EC2_IP \
             "sudo mkdir -p /opt/sentinel/sample_docs && sudo chown ubuntu:ubuntu /opt/sentinel/sample_docs"
           rsync -az --delete \
             -e "ssh -i /tmp/sentinel-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=20" \
             sample_docs/ \
-            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/sentinel/sample_docs/
+            ${{ secrets.EC2_USER }}@$EC2_IP:/opt/sentinel/sample_docs/
 
       - name: Restart backend + Cloudflare tunnel
         run: |
           ssh -i /tmp/sentinel-key.pem \
               -o StrictHostKeyChecking=no \
               -o ConnectTimeout=20 \
-              ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+              ${{ secrets.EC2_USER }}@$EC2_IP \
               "sudo systemctl restart sentinel && \
                echo 'Waiting for sentinel (sentence-transformers takes ~30s)...' && \
                for i in \$(seq 1 12); do sleep 5; curl -sf http://localhost:8000/api/history?limit=1 && echo 'API OK' && break || echo \"Attempt \$i/12...\"; done && \
@@ -190,7 +213,7 @@ jobs:
           ssh -i /tmp/sentinel-key.pem \
               -o StrictHostKeyChecking=no \
               -o ConnectTimeout=20 \
-              ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+              ${{ secrets.EC2_USER }}@$EC2_IP \
               "sudo journalctl -u cloudflared-tunnel --no-pager -n 100 | grep -o 'https://[a-z0-9-]*.trycloudflare.com' | tail -1 | xargs -I{} echo 'Backend HTTPS URL: {}'"
 
       - name: Remove SSH key
