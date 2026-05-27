@@ -1772,9 +1772,12 @@ async def health():
     # OpenSearch check (only when VECTOR_STORE=opensearch)
     import os as _os2
     if _os2.getenv("VECTOR_STORE", "faiss").lower() == "opensearch":
+        import os as _os3
+        llm_info["opensearch_host"] = _os3.getenv("OPENSEARCH_HOST", "localhost")
+        llm_info["opensearch_port"] = _os3.getenv("OPENSEARCH_PORT", "9200")
+        llm_info["opensearch_ssl"] = _os3.getenv("OPENSEARCH_USE_SSL", "false")
         try:
             from opensearchpy import OpenSearch as _OS
-            import os as _os3
             _osc = _OS(
                 hosts=[{"host": _os3.getenv("OPENSEARCH_HOST", "localhost"),
                         "port": int(_os3.getenv("OPENSEARCH_PORT", "9200"))}],
@@ -1789,6 +1792,7 @@ async def health():
             checks["opensearch"] = True
         except Exception as _exc:
             checks["opensearch"] = False
+            llm_info["opensearch_error"] = str(_exc)[:300]
     else:
         checks["vector_store"] = True  # FAISS — always available
 
