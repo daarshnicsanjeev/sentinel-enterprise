@@ -180,6 +180,28 @@ jobs:
             sample_docs/ \
             ${{ secrets.EC2_USER }}@$EC2_IP:/opt/sentinel/sample_docs/
 
+      - name: Install Python dependencies on EC2
+        run: |
+          ssh -i /tmp/sentinel-key.pem \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=20 \
+              ${{ secrets.EC2_USER }}@$EC2_IP \
+              "set -e
+               # Locate the pip that the sentinel service uses
+               # Try common venv locations, fall back to system pip3
+               PIP=\"\"
+               for candidate in \
+                   /opt/sentinel/venv/bin/pip \
+                   /opt/sentinel/backend/venv/bin/pip \
+                   /home/${{ secrets.EC2_USER }}/.venv/bin/pip \
+                   /home/${{ secrets.EC2_USER }}/venv/bin/pip; do
+                 if [ -f \"\$candidate\" ]; then PIP=\"\$candidate\"; break; fi
+               done
+               PIP=\"\${PIP:-\$(which pip3 2>/dev/null || which pip))}\"
+               echo \"Using pip: \$PIP\"
+               \$PIP install -q --upgrade -r /opt/sentinel/backend/requirements.txt
+               echo 'pip install complete'"
+
       - name: Ensure Ollama is running on EC2
         run: |
           ssh -i /tmp/sentinel-key.pem \

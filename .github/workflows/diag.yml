@@ -58,6 +58,10 @@ jobs:
                  2>/dev/null || echo 'Ollama not responding'
 
                echo ''
+               echo '=== sentinel.service ExecStart (Python path) ==='
+               sudo systemctl cat sentinel 2>/dev/null | grep -E 'ExecStart|WorkingDirectory|User' || true
+
+               echo ''
                echo '=== .env keys present (no values) ==='
                sudo grep -o '^[^=]*' /opt/sentinel/backend/.env | sort || true
 
