@@ -51,10 +51,10 @@ jobs:
             --query "Volumes[0].Size" --output text)
           echo "Current volume size: ${CURRENT} GB"
           if [ "$CURRENT" -ge 29 ]; then
-            echo "Volume is already ${CURRENT} GB — skipping resize."
+            echo "Volume is already ${CURRENT} GB — skipping AWS resize (filesystem may still need extending)."
           else
             echo "Resizing from ${CURRENT} GB → 29 GB..."
-            aws ec2 modify-volume --volume-id $VOLUME_ID --size 29
+            aws ec2 modify-volume --volume-id $VOLUME_ID --size 29 || true  # idempotent — ignore if already modified
             echo "Waiting for modification to complete (polling every 5 s)..."
             for i in $(seq 1 24); do
               STATE=$(aws ec2 describe-volumes-modifications \
@@ -85,10 +85,17 @@ jobs:
                echo '=== Disk before resize ==='
                df -h /
 
-               # Detect root device name (nvme on t3, xvd on t2/t3a)
-               ROOT_DEV=\$(findmnt -n -o SOURCE / | sed 's/p[0-9]*$//' | sed 's/[0-9]*$//')
+               # Detect root device + partition number
+               #   NVMe (t3):  /dev/nvme0n1p1  → device /dev/nvme0n1, part 1
+               #   xvd  (t2):  /dev/xvda1      → device /dev/xvda,   part 1
                ROOT_PART=\$(findmnt -n -o SOURCE /)
-               PART_NUM=\$(echo \$ROOT_PART | grep -o '[0-9]*$')
+               if echo \"\$ROOT_PART\" | grep -q 'nvme'; then
+                 ROOT_DEV=\$(echo \"\$ROOT_PART\" | sed 's/p[0-9]*\$//')
+                 PART_NUM=\$(echo \"\$ROOT_PART\" | grep -o '[0-9]*\$')
+               else
+                 ROOT_DEV=\$(echo \"\$ROOT_PART\" | sed 's/[0-9]*\$//')
+                 PART_NUM=\$(echo \"\$ROOT_PART\" | grep -o '[0-9]*\$')
+               fi
                echo \"Root device: \$ROOT_DEV  partition: \$ROOT_PART  number: \$PART_NUM\"
 
                # Grow the partition to fill the new volume size
