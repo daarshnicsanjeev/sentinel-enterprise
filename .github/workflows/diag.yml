@@ -80,8 +80,10 @@ jobs:
                  2>/dev/null || echo '    API call failed'
 
                echo ''
-               echo '=== Health endpoint ==='
-               curl -sf http://localhost:8000/api/health | python3 -m json.tool || echo 'API not responding'"
+               echo '=== Health endpoint (full response) ==='
+               curl -s --max-time 30 http://localhost:8000/api/health \
+                 | python3 -m json.tool \
+                 || echo 'API not responding or returned non-JSON'"
 
       - name: Remove SSH key
         if: always()
