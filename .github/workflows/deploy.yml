@@ -188,12 +188,13 @@ jobs:
               ${{ secrets.EC2_USER }}@$EC2_IP \
               "set -e
                # Locate pip — try known venv paths first, then fall back to system pip3
+               # Ubuntu 22.04+ blocks system pip3 without --break-system-packages
                if   [ -f /opt/sentinel/venv/bin/pip ];         then PIP=/opt/sentinel/venv/bin/pip
                elif [ -f /opt/sentinel/backend/venv/bin/pip ]; then PIP=/opt/sentinel/backend/venv/bin/pip
-               else PIP=pip3
+               else PIP=pip3; EXTRA_FLAGS='--break-system-packages'
                fi
                echo \"Using pip: \$PIP\"
-               \$PIP install -q --upgrade -r /opt/sentinel/backend/requirements.txt
+               \$PIP install -q --upgrade \${EXTRA_FLAGS:-} -r /opt/sentinel/backend/requirements.txt
                echo 'pip install complete'"
 
       - name: Ensure Ollama is running on EC2
