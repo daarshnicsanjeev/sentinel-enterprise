@@ -116,7 +116,7 @@ def _build_opensearch_index(text: str, doc_hash: str | None = None) -> Any:
         space_type="cosinesimil",
         verify_certs=False,       # AWS endpoint uses a cert not in the default trust store
         ssl_assert_hostname=False,
-        timeout=30,               # seconds — fail fast rather than hanging indefinitely
+        timeout=5,                # seconds — fail fast rather than hanging indefinitely
     )
 
 

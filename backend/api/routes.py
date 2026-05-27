@@ -1773,13 +1773,22 @@ async def health():
     import os as _os2
     if _os2.getenv("VECTOR_STORE", "faiss").lower() == "opensearch":
         try:
-            from data.embeddings import _get_opensearch_client
-            _osc = _get_opensearch_client()
+            from opensearchpy import OpenSearch as _OS
+            import os as _os3
+            _osc = _OS(
+                hosts=[{"host": _os3.getenv("OPENSEARCH_HOST", "localhost"),
+                        "port": int(_os3.getenv("OPENSEARCH_PORT", "9200"))}],
+                http_auth=(_os3.getenv("OPENSEARCH_USER", "admin"),
+                           _os3.getenv("OPENSEARCH_PASSWORD", "admin")),
+                use_ssl=_os3.getenv("OPENSEARCH_USE_SSL", "false").lower() == "true",
+                verify_certs=False,
+                ssl_assert_hostname=False,
+                timeout=5,
+            )
             _osc.info()
             checks["opensearch"] = True
         except Exception as _exc:
             checks["opensearch"] = False
-            llm_info_placeholder = str(_exc)[:200]  # stored below in llm dict
     else:
         checks["vector_store"] = True  # FAISS — always available
 
