@@ -187,6 +187,16 @@ jobs:
               -o ConnectTimeout=20 \
               ${{ secrets.EC2_USER }}@$EC2_IP \
               "set -e
+               echo '=== disk space before cleanup ==='
+               df -h / | tail -1
+
+               # Free space from pip cache and apt cache before installing
+               pip3 cache purge 2>/dev/null || true
+               sudo apt-get clean -y 2>/dev/null || true
+               sudo journalctl --vacuum-size=100M 2>/dev/null || true
+               echo '=== disk space after cleanup ==='
+               df -h / | tail -1
+
                # Locate pip — try known venv paths first, then fall back to system pip3
                # Ubuntu 22.04+ blocks system pip3 without --break-system-packages
                if   [ -f /opt/sentinel/venv/bin/pip ];         then PIP=/opt/sentinel/venv/bin/pip
@@ -194,7 +204,11 @@ jobs:
                else PIP=pip3; EXTRA_FLAGS='--break-system-packages'
                fi
                echo \"Using pip: \$PIP\"
-               \$PIP install -q --upgrade \${EXTRA_FLAGS:-} -r /opt/sentinel/backend/requirements.txt
+
+               # Do NOT use --upgrade: sentence-transformers pulls in multi-GB torch/CUDA
+               # packages on upgrade that exhaust the EC2 EBS volume.
+               # Installing without --upgrade only adds genuinely missing packages.
+               \$PIP install -q \${EXTRA_FLAGS:-} -r /opt/sentinel/backend/requirements.txt
                echo 'pip install complete'"
 
       - name: Ensure Ollama is running on EC2
