@@ -197,9 +197,11 @@ jobs:
                echo '=== disk space after cleanup ==='
                df -h / | tail -1
 
-               # Locate pip — try known venv paths first, then fall back to system pip3
-               # Ubuntu 22.04+ blocks system pip3 without --break-system-packages
-               if   [ -f /opt/sentinel/venv/bin/pip ];         then PIP=/opt/sentinel/venv/bin/pip
+               # Locate pip — ExecStart revealed venv at /opt/sentinel-venv/
+               # Try all known paths; fall back to system pip3 only as last resort.
+               # Ubuntu 22.04+ blocks system pip3 without --break-system-packages.
+               if   [ -f /opt/sentinel-venv/bin/pip ];         then PIP=/opt/sentinel-venv/bin/pip
+               elif [ -f /opt/sentinel/venv/bin/pip ];         then PIP=/opt/sentinel/venv/bin/pip
                elif [ -f /opt/sentinel/backend/venv/bin/pip ]; then PIP=/opt/sentinel/backend/venv/bin/pip
                else PIP=pip3; EXTRA_FLAGS='--break-system-packages'
                fi
