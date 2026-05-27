@@ -191,9 +191,10 @@ resource "aws_instance" "sentinel_api" {
   vpc_security_group_ids = [aws_security_group.sentinel_api.id]
   key_name               = var.key_pair_name  # set to your existing EC2 key pair name
 
-  # 20 GB gp3 root volume (Free Tier gives 30 GB EBS total — needs 20GB for torch+sentence-transformers)
+  # gp3 root volume — 29 GB (torch + sentence-transformers + HF models + app + headroom)
+  # Free Tier gives 30 GB EBS total; 29 GB leaves 1 GB margin under the limit.
   root_block_device {
-    volume_size           = 25
+    volume_size           = var.ebs_volume_size
     volume_type           = "gp3"
     delete_on_termination = true
   }

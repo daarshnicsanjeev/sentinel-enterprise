@@ -59,6 +59,18 @@ echo "    Public IP  : $PUBLIC_IP"
 echo "    Vector store: ${OPENSEARCH_HOST:+opensearch (host=$OPENSEARCH_HOST)}${OPENSEARCH_HOST:-faiss (default)}"
 echo ""
 
+# ── [0/12] Pre-deploy disk cleanup ───────────────────────────────────────────
+echo "[0/12] Freeing disk space before deploy..."
+df -h / | tail -1
+/opt/sentinel-venv/bin/pip cache purge 2>/dev/null || pip3 cache purge 2>/dev/null || true
+sudo apt-get clean -y 2>/dev/null || true
+sudo journalctl --vacuum-size=100M 2>/dev/null || true
+find /opt/sentinel/backend -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true
+find /opt/sentinel/backend -name '*.pyc' -delete 2>/dev/null || true
+rm -rf /tmp/pip-* 2>/dev/null || true
+echo "  Disk after cleanup:"
+df -h / | tail -1
+
 # ── [1/12] System packages ────────────────────────────────────────────────────
 echo "[1/12] Checking system packages..."
 sudo apt-get update -qq

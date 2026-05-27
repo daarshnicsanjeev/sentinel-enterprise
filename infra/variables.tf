@@ -10,6 +10,17 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
+variable "ebs_volume_size" {
+  description = <<-EOT
+    Root EBS volume size in GB.
+    29 GB is the recommended size: enough for torch + sentence-transformers +
+    HuggingFace model cache + the app, with comfortable headroom.
+    Free Tier provides 30 GB total EBS — stay at or below 30 GB to avoid charges.
+  EOT
+  type    = number
+  default = 29
+}
+
 variable "frontend_bucket_name" {
   description = "S3 bucket name for the React frontend — must be globally unique across all of AWS"
   type        = string

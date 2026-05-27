@@ -1,0 +1,160 @@
+# =============================================================================
+# Project Sentinel — One-shot EBS resize + EC2 disk cleanup
+#
+# Run manually:  gh workflow run resize-disk.yml
+# What it does:
+#   1. Resizes the EBS root volume to 29 GB via AWS API
+#   2. Waits for the modification to finish (usually < 30 s for gp3)
+#   3. SSHes into EC2 and extends the partition + filesystem (growpart + resize2fs)
+#   4. Runs a deep cleanup: HuggingFace cache, pip cache, apt, journals, __pycache__
+#   5. Prints before/after disk usage
+# =============================================================================
+name: Resize EC2 Disk to 29 GB + Cleanup
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION:    ${{ secrets.AWS_REGION }}
+
+jobs:
+  resize:
+    name: Resize EBS + Cleanup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Resolve EC2 IP and Volume ID
+        run: |
+          IP=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=sentinel-api" \
+                      "Name=instance-state-name,Values=running" \
+            --query "Reservations[0].Instances[0].PublicIpAddress" \
+            --output text 2>/dev/null || true)
+          IP="${IP:-${{ secrets.EC2_HOST }}}"
+          echo "EC2_IP=${IP}" >> $GITHUB_ENV
+          echo "EC2 IP: ${IP}"
+
+          VOL_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=sentinel-api" \
+                      "Name=instance-state-name,Values=running" \
+            --query "Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId" \
+            --output text 2>/dev/null || true)
+          echo "VOLUME_ID=${VOL_ID}" >> $GITHUB_ENV
+          echo "Volume ID: ${VOL_ID}"
+
+      - name: Resize EBS volume to 29 GB
+        run: |
+          CURRENT=$(aws ec2 describe-volumes \
+            --volume-ids $VOLUME_ID \
+            --query "Volumes[0].Size" --output text)
+          echo "Current volume size: ${CURRENT} GB"
+          if [ "$CURRENT" -ge 29 ]; then
+            echo "Volume is already ${CURRENT} GB — skipping resize."
+          else
+            echo "Resizing from ${CURRENT} GB → 29 GB..."
+            aws ec2 modify-volume --volume-id $VOLUME_ID --size 29
+            echo "Waiting for modification to complete (polling every 5 s)..."
+            for i in $(seq 1 24); do
+              STATE=$(aws ec2 describe-volumes-modifications \
+                --volume-ids $VOLUME_ID \
+                --query "VolumesModifications[0].ModificationState" \
+                --output text 2>/dev/null || echo "optimizing")
+              echo "  Modification state: $STATE (attempt $i/24)"
+              if [ "$STATE" = "completed" ] || [ "$STATE" = "optimizing" ]; then
+                echo "EBS resize done."
+                break
+              fi
+              sleep 5
+            done
+          fi
+
+      - name: Write SSH key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/resize-key.pem
+          chmod 600 /tmp/resize-key.pem
+
+      - name: Extend partition + filesystem on EC2
+        run: |
+          ssh -i /tmp/resize-key.pem \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=20 \
+              ${{ secrets.EC2_USER }}@$EC2_IP \
+              "set -euo pipefail
+               echo '=== Disk before resize ==='
+               df -h /
+
+               # Detect root device name (nvme on t3, xvd on t2/t3a)
+               ROOT_DEV=\$(findmnt -n -o SOURCE / | sed 's/p[0-9]*$//' | sed 's/[0-9]*$//')
+               ROOT_PART=\$(findmnt -n -o SOURCE /)
+               PART_NUM=\$(echo \$ROOT_PART | grep -o '[0-9]*$')
+               echo \"Root device: \$ROOT_DEV  partition: \$ROOT_PART  number: \$PART_NUM\"
+
+               # Grow the partition to fill the new volume size
+               sudo growpart \$ROOT_DEV \$PART_NUM
+               echo 'growpart done'
+
+               # Resize the filesystem (ext4 on Ubuntu)
+               sudo resize2fs \$ROOT_PART
+               echo 'resize2fs done'
+
+               echo '=== Disk after resize ==='
+               df -h /"
+
+      - name: Clean up disk space on EC2
+        run: |
+          ssh -i /tmp/resize-key.pem \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=20 \
+              ${{ secrets.EC2_USER }}@$EC2_IP \
+              "set -uo pipefail
+               echo '=== Disk before cleanup ==='
+               df -h /
+
+               echo ''
+               echo '--- HuggingFace model cache ---'
+               du -sh ~/.cache/huggingface 2>/dev/null || echo 'no HF cache'
+               rm -rf ~/.cache/huggingface/hub/models--*/blobs \
+                      ~/.cache/huggingface/hub/models--*/refs 2>/dev/null || true
+               # Keep the .cache dir but remove the heavy downloaded blobs
+               echo 'HF blob cache cleared'
+
+               echo ''
+               echo '--- pip cache ---'
+               /opt/sentinel-venv/bin/pip cache purge 2>/dev/null || true
+               pip3 cache purge 2>/dev/null || true
+               echo 'pip cache cleared'
+
+               echo ''
+               echo '--- apt cache ---'
+               sudo apt-get clean -y
+               sudo apt-get autoremove -y
+               echo 'apt cache cleared'
+
+               echo ''
+               echo '--- systemd journal (keep last 100 MB) ---'
+               sudo journalctl --vacuum-size=100M
+               echo 'journal trimmed'
+
+               echo ''
+               echo '--- Python __pycache__ in /opt/sentinel ---'
+               find /opt/sentinel/backend -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true
+               find /opt/sentinel/backend -name '*.pyc' -delete 2>/dev/null || true
+               echo '__pycache__ cleared'
+
+               echo ''
+               echo '--- pip download tmp files ---'
+               rm -rf /tmp/pip-* /tmp/tmp* 2>/dev/null || true
+               echo 'tmp files cleared'
+
+               echo ''
+               echo '=== Disk after cleanup ==='
+               df -h /
+               echo ''
+               echo '=== Top 10 largest directories under /opt ==='
+               sudo du -sh /opt/*/ 2>/dev/null | sort -rh | head -10"
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f /tmp/resize-key.pem
