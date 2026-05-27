@@ -1,0 +1,88 @@
+# =============================================================================
+# Project Sentinel — On-demand EC2 diagnostics
+# Run manually: gh workflow run diag.yml
+# Prints: tunnel URL, .env keys (no values), Ollama status, OpenSearch test
+# =============================================================================
+name: EC2 Diagnostics
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION:    ${{ secrets.AWS_REGION }}
+
+jobs:
+  diag:
+    name: EC2 Diagnostics
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve EC2 IP
+        run: |
+          IP=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=sentinel-api" \
+                      "Name=instance-state-name,Values=running" \
+            --query "Reservations[0].Instances[0].PublicIpAddress" \
+            --output text 2>/dev/null || true)
+          IP="${IP:-${{ secrets.EC2_HOST }}}"
+          echo "EC2_IP=${IP}" >> $GITHUB_ENV
+          echo "EC2 IP: ${IP}"
+
+      - name: Write SSH key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/diag-key.pem
+          chmod 600 /tmp/diag-key.pem
+
+      - name: Run diagnostics on EC2
+        run: |
+          ssh -i /tmp/diag-key.pem \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=20 \
+              ${{ secrets.EC2_USER }}@$EC2_IP \
+              "set -euo pipefail
+               echo '=== Cloudflare Tunnel URL ==='
+               sudo journalctl -u cloudflared-tunnel --no-pager -n 200 \
+                 | grep -o 'https://[a-z0-9-]*.trycloudflare.com' | tail -1 \
+                 || echo 'No tunnel URL found'
+
+               echo ''
+               echo '=== sentinel.service status ==='
+               sudo systemctl is-active sentinel || true
+
+               echo ''
+               echo '=== ollama.service status ==='
+               sudo systemctl is-active ollama || true
+               curl -sf http://localhost:11434/api/tags \
+                 | python3 -c 'import sys,json; d=json.load(sys.stdin); [print(\" model:\",m[\"name\"]) for m in d.get(\"models\",[]))' \
+                 2>/dev/null || echo 'Ollama not responding'
+
+               echo ''
+               echo '=== .env keys present (no values) ==='
+               sudo grep -o '^[^=]*' /opt/sentinel/backend/.env | sort || true
+
+               echo ''
+               echo '=== OpenSearch connectivity test ==='
+               OPENSEARCH_HOST=\$(sudo grep '^OPENSEARCH_HOST=' /opt/sentinel/backend/.env | cut -d= -f2)
+               OPENSEARCH_PORT=\$(sudo grep '^OPENSEARCH_PORT=' /opt/sentinel/backend/.env | cut -d= -f2 || echo 443)
+               OPENSEARCH_USER=\$(sudo grep '^OPENSEARCH_USER=' /opt/sentinel/backend/.env | cut -d= -f2 || echo admin)
+               OPENSEARCH_PASS=\$(sudo grep '^OPENSEARCH_PASSWORD=' /opt/sentinel/backend/.env | cut -d= -f2 || echo '')
+               echo \"  Host: \${OPENSEARCH_HOST}\"
+               echo \"  Port: \${OPENSEARCH_PORT}\"
+               echo \"  TCP reachability:\"
+               timeout 10 bash -c \"echo >/dev/tcp/\${OPENSEARCH_HOST}/\${OPENSEARCH_PORT}\" \
+                 && echo '    Port open ✓' || echo '    Port CLOSED / unreachable ✗'
+               echo \"  HTTPS API test:\"
+               curl -sk --max-time 10 \
+                 -u \"\${OPENSEARCH_USER}:\${OPENSEARCH_PASS}\" \
+                 \"https://\${OPENSEARCH_HOST}:\${OPENSEARCH_PORT}\" \
+                 | python3 -c 'import sys,json; d=json.load(sys.stdin); print(\"   version:\",d.get(\"version\",{}).get(\"number\",\"?\"))' \
+                 2>/dev/null || echo '    API call failed'
+
+               echo ''
+               echo '=== Health endpoint ==='
+               curl -sf http://localhost:8000/api/health | python3 -m json.tool || echo 'API not responding'"
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f /tmp/diag-key.pem
