@@ -1115,6 +1115,24 @@ async def download_report(trace_id: str):
     )
 
 
+@router.get("/history/{trace_id}/source")
+@limiter.limit(_READ_RATE_LIMIT)
+async def get_document_source(request: Request, trace_id: str):
+    """Return the extracted source text of an analyzed document so reviewers
+    can verify clause citations against the original — the agent's claims are
+    checkable, not taken on faith."""
+    if not _UUID_RE.match(trace_id):
+        raise HTTPException(status_code=422, detail="Invalid trace_id format.")
+    record = await history_store.get_by_trace_id(trace_id)
+    if record is None or not record.get("raw_text"):
+        raise HTTPException(status_code=404, detail="Source text not available for this analysis.")
+    return {
+        "trace_id": record["trace_id"],
+        "filename": record.get("filename", ""),
+        "raw_text": record["raw_text"],
+    }
+
+
 _DECISION_COLORS = {
     "APPROVED": "#15803d", "REJECTED": "#b91c1c",
     "ESCALATE": "#d97706", "BLOCKED": "#7c3aed",

@@ -265,6 +265,87 @@ class TestComplianceNode:
         tool_log = result["logs"][0]
         assert "LEGAL_CONTRACT" in tool_log
 
+    async def test_citation_verified_when_evidence_found_in_document(self, monkeypatch):
+        """Evidence that genuinely appears in the source doc gets a verified citation
+        with the character offset where it occurs — provable grounding, not LLM say-so."""
+        snippet = "In the event of force majeure neither party shall be liable"
+        raw = f"PREAMBLE TEXT. {snippet}. The parties further agree to arbitration."
+        self._mock_faiss(monkeypatch, chunks=[snippet])
+        from agents import compliance_agent
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = MagicMock(
+            content=(
+                "- force majeure clause: PRESENT\n"
+                "- limitation of liability: PRESENT\n"
+                "- dispute resolution clause: PRESENT\n"
+                "VERDICT: COMPLIANT\nREASON: ok"
+            )
+        )
+        monkeypatch.setattr(compliance_agent, "_llm", mock_llm)
+
+        from agents.compliance_agent import compliance_node
+        result = await compliance_node(make_state(doc_type="LEGAL_CONTRACT", raw_text=raw))
+        present = [c for c in result["clause_results"] if c["status"] == "PRESENT"]
+        assert present
+        for c in present:
+            assert c["citation_verified"] is True
+            assert c["citation_offset"] == raw.find(snippet)
+
+    async def test_citation_unverified_when_evidence_not_in_document(self, monkeypatch):
+        """If the retrieved evidence cannot be located in the source document,
+        the citation must be flagged unverified — never silently trusted."""
+        self._mock_faiss(monkeypatch, chunks=["completely fabricated text not in the doc"])
+        from agents import compliance_agent
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = MagicMock(
+            content="- force majeure clause: PRESENT\nVERDICT: COMPLIANT\nREASON: ok"
+        )
+        monkeypatch.setattr(compliance_agent, "_llm", mock_llm)
+
+        from agents.compliance_agent import compliance_node
+        result = await compliance_node(
+            make_state(doc_type="LEGAL_CONTRACT", raw_text="An actual contract document body.")
+        )
+        present = [c for c in result["clause_results"] if c["status"] == "PRESENT"]
+        assert present
+        for c in present:
+            assert c["citation_verified"] is False
+            assert c["citation_offset"] == -1
+
+    async def test_citation_matching_ignores_whitespace_differences(self, monkeypatch):
+        """PDF extraction introduces line breaks — citation matching must tolerate them."""
+        snippet = "neither party shall be liable for delays"
+        raw = "CONTRACT. neither party\nshall   be liable\nfor delays. END."
+        self._mock_faiss(monkeypatch, chunks=[snippet])
+        from agents import compliance_agent
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = MagicMock(
+            content="- force majeure clause: PRESENT\nVERDICT: COMPLIANT\nREASON: ok"
+        )
+        monkeypatch.setattr(compliance_agent, "_llm", mock_llm)
+
+        from agents.compliance_agent import compliance_node
+        result = await compliance_node(make_state(doc_type="LEGAL_CONTRACT", raw_text=raw))
+        present = [c for c in result["clause_results"] if c["status"] == "PRESENT"]
+        assert present and present[0]["citation_verified"] is True
+
+    async def test_missing_clause_has_no_citation(self, monkeypatch):
+        self._mock_faiss(monkeypatch)
+        from agents import compliance_agent
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = MagicMock(
+            content="- force majeure clause: MISSING\nVERDICT: NON_COMPLIANT\nREASON: gone"
+        )
+        monkeypatch.setattr(compliance_agent, "_llm", mock_llm)
+
+        from agents.compliance_agent import compliance_node
+        result = await compliance_node(make_state(doc_type="LEGAL_CONTRACT"))
+        missing = [c for c in result["clause_results"] if c["status"] == "MISSING"]
+        assert missing
+        for c in missing:
+            assert c["citation_verified"] is False
+            assert c["citation_offset"] == -1
+
     async def test_retry_label_appears_on_second_attempt(self, monkeypatch):
         self._mock_faiss(monkeypatch)
         from agents import compliance_agent

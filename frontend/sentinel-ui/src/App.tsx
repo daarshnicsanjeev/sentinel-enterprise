@@ -8,6 +8,7 @@ import { ConfidenceGauge } from "./components/ConfidenceGauge";
 import { ClauseDiffViewer } from "./components/ClauseDiffViewer";
 import { HelpPanel } from "./components/HelpPanel";
 import { FeedbackWidget } from "./components/FeedbackWidget";
+import { SourceViewer } from "./components/SourceViewer";
 import { MetricsPanel } from "./components/MetricsPanel";
 import { BatchUpload } from "./components/BatchUpload";
 import "./App.css";
@@ -34,6 +35,8 @@ interface ClauseResult {
   clause: string;
   status: string;
   evidence?: string;
+  citation_verified?: boolean;
+  citation_offset?: number;
 }
 
 interface DonePayload {
@@ -468,6 +471,7 @@ export default function App() {
                         <tr>
                           <th style={{ textAlign: "left", color: "#64748b", padding: "4px 8px" }}>Clause</th>
                           <th style={{ textAlign: "left", color: "#64748b", padding: "4px 8px" }}>Status</th>
+                          <th style={{ textAlign: "left", color: "#64748b", padding: "4px 8px" }}>Cited Evidence</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -493,11 +497,52 @@ export default function App() {
                                   {label}
                                 </span>
                               </td>
+                              <td style={{ padding: "6px 8px", color: "#94a3b8", maxWidth: "320px" }}>
+                                {c.evidence ? (
+                                  <>
+                                    <span
+                                      aria-label={
+                                        c.citation_verified
+                                          ? `Citation for ${c.clause} verified in source document`
+                                          : `Citation for ${c.clause} could not be verified in source document`
+                                      }
+                                      title={
+                                        c.citation_verified
+                                          ? "This exact passage was found in the uploaded document"
+                                          : "This passage could not be located in the uploaded document"
+                                      }
+                                      style={{
+                                        color: c.citation_verified ? "#4ade80" : "#fbbf24",
+                                        fontWeight: 700,
+                                        fontSize: "0.72rem",
+                                        marginRight: "6px",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {c.citation_verified ? "✓ Verified in source" : "⚠ Not found in source"}
+                                    </span>
+                                    <span style={{ fontStyle: "italic", fontSize: "0.78rem" }}>
+                                      “{c.evidence.length > 140 ? c.evidence.slice(0, 140) + "…" : c.evidence}”
+                                    </span>
+                                  </>
+                                ) : (
+                                  <span style={{ color: "#475569", fontSize: "0.78rem" }}>—</span>
+                                )}
+                              </td>
                             </tr>
                           );
                         })}
                       </tbody>
                     </table>
+                    {result.trace_id && (
+                      <SourceViewer
+                        traceId={result.trace_id}
+                        apiBase={API_BASE}
+                        highlights={result.clause_results
+                          .filter((c) => c.evidence && c.citation_verified)
+                          .map((c) => c.evidence!) }
+                      />
+                    )}
                   </div>
                 )}
                 {result.clause_results_history && result.clause_results_history.length >= 2 && (

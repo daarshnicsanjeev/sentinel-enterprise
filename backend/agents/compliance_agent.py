@@ -198,7 +198,9 @@ async def compliance_node(state: AgentState) -> dict:
     response = _llm.invoke([SystemMessage(content=system_msg), HumanMessage(content=user_msg)])
     compliance_output = response.content[:_MAX_LLM_RESPONSE_CHARS].strip()
 
-    clause_results = _parse_clause_results(compliance_output, required_clauses, index)
+    clause_results = _parse_clause_results(
+        compliance_output, required_clauses, index, raw_text=state["raw_text"]
+    )
 
     # Derive verdict from structured clause results
     all_present = clause_results and all(r["status"] == "PRESENT" for r in clause_results)
@@ -234,8 +236,26 @@ async def compliance_node(state: AgentState) -> dict:
     }
 
 
-def _parse_clause_results(output: str, required_clauses: list[dict], index=None) -> list[dict]:
-    """Extract per-clause PRESENT/MISSING status, evidence, and risk_level."""
+def _find_citation(evidence: str, raw_text: str) -> int:
+    """Locate evidence inside the source document, tolerating whitespace
+    differences introduced by PDF/OCR extraction. Returns the character
+    offset in raw_text, or -1 if the evidence cannot be found verbatim."""
+    if not evidence or not raw_text:
+        return -1
+    tokens = evidence.split()
+    if not tokens:
+        return -1
+    pattern = re.compile(r"\s+".join(re.escape(tok) for tok in tokens), re.IGNORECASE)
+    match = pattern.search(raw_text)
+    return match.start() if match else -1
+
+
+def _parse_clause_results(
+    output: str, required_clauses: list[dict], index=None, raw_text: str = ""
+) -> list[dict]:
+    """Extract per-clause PRESENT/MISSING status, evidence, and risk_level.
+    Each evidence chunk is verified against the source document so the UI can
+    prove the citation is real rather than trusting the LLM's word."""
     results = []
     for clause in required_clauses:
         name = clause["name"]
@@ -250,5 +270,13 @@ def _parse_clause_results(output: str, required_clauses: list[dict], index=None)
         if status == "PRESENT" and index is not None:
             chunks = semantic_search(index, name, k=1)
             evidence = chunks[0][:300] if chunks else ""
-        results.append({"clause": name, "status": status, "evidence": evidence, "risk_level": risk_level})
+        citation_offset = _find_citation(evidence, raw_text)
+        results.append({
+            "clause": name,
+            "status": status,
+            "evidence": evidence,
+            "risk_level": risk_level,
+            "citation_verified": citation_offset >= 0,
+            "citation_offset": citation_offset,
+        })
     return results
