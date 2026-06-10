@@ -135,19 +135,32 @@ class TestComplianceNode:
             lambda index, query, k=2: chunks or ["Relevant document chunk."]
         )
 
-    async def test_auto_approves_unknown_doc_type(self, monkeypatch):
+    async def test_escalates_unknown_doc_type(self, monkeypatch):
+        """An unrecognized document type must never be auto-approved —
+        it goes to a human (regression: Rajasthan traffic challan got APPROVED)."""
         self._mock_faiss(monkeypatch)
         from agents.compliance_agent import compliance_node
         state = make_state(doc_type="UNKNOWN", required_clauses=[])
         result = await compliance_node(state)
-        assert result["final_decision"] == "APPROVED"
+        assert result["final_decision"] == "ESCALATE"
         assert result["required_clauses"] == []
 
-    async def test_auto_approve_log_mentions_no_clauses(self, monkeypatch):
+    async def test_escalate_log_mentions_unrecognized_type(self, monkeypatch):
         self._mock_faiss(monkeypatch)
         from agents.compliance_agent import compliance_node
         state = make_state(doc_type="UNKNOWN")
         result = await compliance_node(state)
+        assert any("ESCALATED for human review" in log for log in result["logs"])
+
+    async def test_auto_approves_valid_doc_type_with_no_clauses(self, monkeypatch):
+        """A recognized doc type with no clauses configured still auto-approves."""
+        self._mock_faiss(monkeypatch)
+        from agents import compliance_agent
+        from agents.compliance_agent import compliance_node
+        monkeypatch.setattr(compliance_agent, "query_regulatory_db", lambda *a, **kw: [])
+        state = make_state(doc_type="LEGAL_CONTRACT", required_clauses=[])
+        result = await compliance_node(state)
+        assert result["final_decision"] == "APPROVED"
         assert any("auto-APPROVED" in log for log in result["logs"])
 
     async def test_approves_when_all_clauses_present(self, monkeypatch):

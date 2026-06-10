@@ -155,6 +155,18 @@ async def compliance_node(state: AgentState) -> dict:
     clause_names = [c["name"] for c in required_clauses]
     tool_log = f"[Compliance Tool] Queried regulatory DB for {doc_type} → Required: {clause_names}"
 
+    if doc_type == "UNKNOWN":
+        return {
+            "required_clauses": [],
+            "compliance_output": (
+                "Unrecognized document type — this document does not match any "
+                "supported category, so no automated compliance verdict can be issued."
+            ),
+            "final_decision": "ESCALATE",
+            "retry_count": retry,
+            "logs": [tool_log, "[Compliance] Unrecognized document type — ESCALATED for human review."],
+        }
+
     if not required_clauses:
         return {
             "required_clauses": [],
