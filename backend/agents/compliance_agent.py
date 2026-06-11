@@ -1,4 +1,5 @@
 import json
+import os
 import re
 from datetime import date
 from pathlib import Path
@@ -17,6 +18,49 @@ _PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "compliance_v1.0.0.jso
 _prompt_cfg: dict = json.loads(_PROMPT_PATH.read_text())
 
 _FEW_SHOT_PATH = Path(__file__).parent.parent / "data" / "few_shot_examples.jsonl"
+
+# Verdicts built on a shaky classification go to a human: below this routing
+# confidence the compliance verdict is overridden to ESCALATE.
+_ROUTING_CONFIDENCE_THRESHOLD = float(os.environ.get("ROUTING_CONFIDENCE_THRESHOLD", "0.5"))
+
+# Total character budget for the retrieved-context section of the prompt.
+_CONTEXT_BUDGET = 6000
+_CONTEXT_SEPARATOR = "\n---\n"
+
+
+def _build_context(clause_names: list[str], index, budget: int = _CONTEXT_BUDGET) -> str:
+    """Assemble retrieval context with a per-clause guarantee: every clause's
+    top-ranked chunk gets a slot (truncated to a fair share if needed) before
+    lower-ranked chunks fill the rest. A blind global cut could silently drop
+    a clause's only evidence and produce a false MISSING."""
+    per_clause = [semantic_search(index, name, k=3) for name in clause_names]
+    sep_len = len(_CONTEXT_SEPARATOR)
+    seen: set[str] = set()
+    parts: list[str] = []
+    used = 0
+
+    def add(key: str, piece: str) -> None:
+        nonlocal used
+        if not piece or key in seen or used + len(piece) + sep_len > budget:
+            return
+        seen.add(key)
+        parts.append(piece)
+        used += len(piece) + sep_len
+
+    # Pass 1: each clause's best chunk is guaranteed representation. When the
+    # full top chunks collectively exceed the budget, cap each at a fair share.
+    tops = list(dict.fromkeys(chunks[0] for chunks in per_clause if chunks))
+    cap = None
+    if tops and sum(len(t) + sep_len for t in tops) > budget:
+        cap = max(200, budget // len(tops) - sep_len)
+    for top in tops:
+        add(top, top if cap is None else top[:cap])
+    # Pass 2: fill remaining budget with lower-ranked chunks, breadth-first.
+    for rank in (1, 2):
+        for chunks in per_clause:
+            if rank < len(chunks):
+                add(chunks[rank], chunks[rank])
+    return _CONTEXT_SEPARATOR.join(parts)
 
 
 def _load_few_shot_examples(doc_type: str) -> list[dict]:
@@ -177,11 +221,7 @@ async def compliance_node(state: AgentState) -> dict:
         }
 
     index = await build_index_async(state["raw_text"])
-    relevant_chunks = []
-    for name in clause_names:
-        chunks = semantic_search(index, name, k=3)
-        relevant_chunks.extend(chunks)
-    context = "\n---\n".join(dict.fromkeys(relevant_chunks))
+    context = _build_context(clause_names, index, budget=_CONTEXT_BUDGET)
 
     few_shot_examples = _load_few_shot_examples(doc_type)
     few_shot_section = _build_few_shot_section(few_shot_examples)
@@ -191,7 +231,7 @@ async def compliance_node(state: AgentState) -> dict:
     system_msg = _prompt_cfg["system"].format(doc_type=doc_type) + few_shot_section
     user_msg = _prompt_cfg["check_instruction"].format(
         required_clauses="\n".join(f"- {n}" for n in clause_names),
-        document=context[:6000],
+        document=context,
     )
 
     _MAX_LLM_RESPONSE_CHARS = 20_000
@@ -223,6 +263,21 @@ async def compliance_node(state: AgentState) -> dict:
 
     retry_label = f" [retry #{retry}]" if retry > 0 else ""
     check_log = f"[Compliance v{_VERSION}{retry_label}] Verdict: {verdict}"
+    logs = [tool_log, check_log]
+
+    # Low-confidence classification override: the verdict may be built on the
+    # wrong clause set entirely, so a human confirms borderline routings.
+    confidence = state.get("routing_confidence", 1.0)
+    try:
+        confidence = float(confidence)
+    except (TypeError, ValueError):
+        confidence = 1.0
+    if confidence < _ROUTING_CONFIDENCE_THRESHOLD:
+        verdict = "ESCALATE"
+        logs.append(
+            f"[Compliance] Routing confidence {confidence:.0%} below threshold "
+            f"{_ROUTING_CONFIDENCE_THRESHOLD:.0%} — ESCALATED for human review."
+        )
 
     return {
         "required_clauses": required_clauses,
@@ -232,7 +287,7 @@ async def compliance_node(state: AgentState) -> dict:
         "clause_results_history": history,
         "final_decision": verdict,
         "retry_count": retry,
-        "logs": [tool_log, check_log],
+        "logs": logs,
     }
 
 

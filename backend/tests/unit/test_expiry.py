@@ -47,14 +47,26 @@ class TestExpiryNode:
         assert len(result["logs"]) > 0
         assert "expiry" in result["logs"][0].lower() or "date" in result["logs"][0].lower()
 
-    def test_sets_final_decision_approved(self, monkeypatch):
+    def test_sets_final_decision_scanned(self, monkeypatch):
+        """Expiry scan only extracts a date — it must never claim compliance
+        approval (same false-approval class as the UNKNOWN doc-type bug)."""
         from agents import expiry_agent
         mock_llm = MagicMock()
         mock_llm.invoke.return_value = MagicMock(content="2029-01-01")
         monkeypatch.setattr(expiry_agent, "_llm", mock_llm)
         from agents.expiry_agent import expiry_node
         result = expiry_node(make_state(doc_type="EXPIRY_CLAUSE_SCAN"))
-        assert result["final_decision"] == "APPROVED"
+        assert result["final_decision"] == "SCANNED"
+
+    def test_not_found_also_returns_scanned(self, monkeypatch):
+        from agents import expiry_agent
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = MagicMock(content="NOT_FOUND")
+        monkeypatch.setattr(expiry_agent, "_llm", mock_llm)
+        from agents.expiry_agent import expiry_node
+        result = expiry_node(make_state(doc_type="EXPIRY_CLAUSE_SCAN"))
+        assert result["final_decision"] == "SCANNED"
+        assert result["expiry_date"] == "NOT_FOUND"
 
 
 class TestGraphRoutingExpiry:

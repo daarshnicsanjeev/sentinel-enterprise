@@ -19,6 +19,15 @@ _DB_PATH = os.environ.get(
 # under batch load.  30 s gives writers plenty of room to queue.
 _SQLITE_TIMEOUT = 30
 
+# Bump whenever decision logic or prompts change: cached verdicts produced by
+# an older pipeline must never be served after the logic that made them is
+# fixed (a stale APPROVED survived the UNKNOWN->ESCALATE fix until purged).
+PIPELINE_VERSION = "2"
+
+
+def _versioned_key(doc_hash: str) -> str:
+    return f"{doc_hash}:{PIPELINE_VERSION}"
+
 
 @asynccontextmanager
 async def _connect():
@@ -132,11 +141,18 @@ async def init_db() -> None:
             await db.execute("ALTER TABLE analyses ADD COLUMN raw_text TEXT")
         except Exception:
             pass
+        # Self-clean cache rows from older pipeline versions (and legacy
+        # unversioned rows) so stale verdicts can never be served.
+        await db.execute(
+            "DELETE FROM doc_cache WHERE doc_hash NOT LIKE ?",
+            (f"%:{PIPELINE_VERSION}",),
+        )
         await db.commit()
 
 
-_VALID_DECISIONS = {"APPROVED", "REJECTED", "PENDING", "ESCALATE", "UNKNOWN", "RE-ROUTE", "BLOCKED"}
+_VALID_DECISIONS = {"APPROVED", "REJECTED", "PENDING", "ESCALATE", "UNKNOWN", "RE-ROUTE", "BLOCKED", "SCANNED"}
 _VALID_RISKS = {"low", "medium", "high", "unknown"}
+_VALID_RISK_LEVELS = {"LOW", "MEDIUM", "HIGH"}
 
 
 def _sanitize_cache_payload(payload: dict) -> dict:
@@ -152,10 +168,18 @@ def _sanitize_cache_payload(payload: dict) -> dict:
     clause_results = []
     for c in payload.get("clause_results", []):
         if isinstance(c, dict):
+            risk_level = str(c.get("risk_level", "MEDIUM")).upper()
+            try:
+                citation_offset = int(c.get("citation_offset", -1))
+            except (TypeError, ValueError):
+                citation_offset = -1
             clause_results.append({
                 "clause": str(c.get("clause", ""))[:200],
                 "status": "PRESENT" if str(c.get("status", "")).upper() == "PRESENT" else "MISSING",
                 "evidence": str(c.get("evidence", ""))[:300],
+                "risk_level": risk_level if risk_level in _VALID_RISK_LEVELS else "MEDIUM",
+                "citation_verified": bool(c.get("citation_verified", False)),
+                "citation_offset": citation_offset,
             })
 
     return {
@@ -182,7 +206,7 @@ async def insert_doc_cache(doc_hash: str, payload: dict) -> None:
         await db.execute(_CREATE_DOC_CACHE_TABLE)
         await db.execute(
             "INSERT OR REPLACE INTO doc_cache (doc_hash, payload, cached_at) VALUES (?, ?, ?)",
-            (doc_hash, json.dumps(sanitized), datetime.now(timezone.utc).isoformat()),
+            (_versioned_key(doc_hash), json.dumps(sanitized), datetime.now(timezone.utc).isoformat()),
         )
         await db.commit()
 
@@ -191,7 +215,7 @@ async def get_doc_cache(doc_hash: str) -> dict | None:
     try:
         async with _connect() as db:
             cursor = await db.execute(
-                "SELECT payload FROM doc_cache WHERE doc_hash = ?", (doc_hash,)
+                "SELECT payload FROM doc_cache WHERE doc_hash = ?", (_versioned_key(doc_hash),)
             )
             row = await cursor.fetchone()
             return json.loads(row[0]) if row else None
@@ -202,7 +226,7 @@ async def get_doc_cache(doc_hash: str) -> dict | None:
 async def delete_doc_cache(doc_hash: str) -> None:
     async with _connect() as db:
         await db.execute(_CREATE_DOC_CACHE_TABLE)
-        await db.execute("DELETE FROM doc_cache WHERE doc_hash = ?", (doc_hash,))
+        await db.execute("DELETE FROM doc_cache WHERE doc_hash = ?", (_versioned_key(doc_hash),))
         await db.commit()
 
 

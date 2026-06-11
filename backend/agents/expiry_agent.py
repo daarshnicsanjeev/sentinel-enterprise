@@ -46,9 +46,11 @@ def expiry_node(state: AgentState) -> dict:
     else:
         expiry_date = raw[:20] if raw else "NOT_FOUND"
 
-    log = f"[Expiry v{_VERSION}] Expiry date extracted: {expiry_date}"
+    log = f"[Expiry v{_VERSION}] Expiry date extracted: {expiry_date} — date scan only, no compliance verdict issued."
     return {
         "expiry_date": expiry_date,
-        "final_decision": "APPROVED",
+        # SCANNED, never APPROVED: this path extracts a date without running
+        # compliance, so it must not claim the document is compliant.
+        "final_decision": "SCANNED",
         "logs": [log],
     }

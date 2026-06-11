@@ -237,3 +237,62 @@ class TestFinalStateShape:
         result = await graph.ainvoke(make_state())
         assert "evaluation_score" in result
         assert isinstance(result["evaluation_score"], float)
+
+
+class TestIncidentRegressions:
+    """End-to-end shapes of the real production incident (4 June): an
+    out-of-scope upload must never come out APPROVED through any path."""
+
+    async def test_unknown_document_escalates_end_to_end(self, monkeypatch):
+        """The challan regression: router can't classify → full graph → ESCALATE."""
+        _patch_all_llms(
+            monkeypatch,
+            router_content="UNKNOWN",
+            compliance_content="should never matter",
+            eval_content=COMPLIANT_EVAL,
+        )
+        from agents.graph import graph
+        result = await graph.ainvoke(make_state(raw_text="A traffic violation notice for vehicle 25BH6324M."))
+        assert result["doc_type"] == "UNKNOWN"
+        assert result["final_decision"] == "ESCALATE"
+
+    async def test_expiry_scan_returns_scanned_not_approved(self, monkeypatch):
+        _patch_all_llms(
+            monkeypatch,
+            router_content="EXPIRY_CLAUSE_SCAN: 95",
+            compliance_content="unused",
+            eval_content=COMPLIANT_EVAL,
+        )
+        from agents import expiry_agent
+        expiry_mock = MagicMock()
+        expiry_mock.invoke.return_value = MagicMock(content="2027-03-15")
+        monkeypatch.setattr(expiry_agent, "_llm", expiry_mock)
+
+        from agents.graph import graph
+        result = await graph.ainvoke(make_state())
+        assert result["final_decision"] == "SCANNED"
+        assert result["expiry_date"] == "2027-03-15"
+
+    async def test_low_confidence_classification_escalates_end_to_end(self, monkeypatch):
+        """Compliant-looking doc, but the router was only 30% sure → ESCALATE."""
+        _patch_all_llms(
+            monkeypatch,
+            router_content="CREDIT_AGREEMENT: 30",
+            compliance_content=CREDIT_AGREEMENT_COMPLIANT,
+            eval_content=COMPLIANT_EVAL,
+        )
+        from agents.graph import graph
+        result = await graph.ainvoke(make_state())
+        assert result["doc_type"] == "CREDIT_AGREEMENT"
+        assert result["final_decision"] == "ESCALATE"
+
+    async def test_confident_classification_still_approves(self, monkeypatch):
+        _patch_all_llms(
+            monkeypatch,
+            router_content="CREDIT_AGREEMENT: 92",
+            compliance_content=CREDIT_AGREEMENT_COMPLIANT,
+            eval_content=COMPLIANT_EVAL,
+        )
+        from agents.graph import graph
+        result = await graph.ainvoke(make_state())
+        assert result["final_decision"] == "APPROVED"

@@ -32,7 +32,9 @@ def make_state(**overrides) -> dict:
         "retry_count": 0,
         "trace_id": "test-trace-id",
         "tenant_id": "default",
-        "routing_confidence": 0.0,
+        # Confident classification by default — mirrors the router's behavior for
+        # recognized categories; tests exercising low-confidence paths override this.
+        "routing_confidence": 0.9,
         "clause_results": [],
         "clause_results_history": [],
         "expiry_date": "",

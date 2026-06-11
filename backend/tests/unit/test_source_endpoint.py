@@ -55,3 +55,19 @@ class TestGetSource:
         monkeypatch.setattr(history_store, "get_by_trace_id", fake_get)
         resp = client.get(f"/api/history/{TRACE}/source")
         assert "internal_secret" not in resp.json()
+
+    def test_normal_document_is_not_flagged_truncated(self, client, monkeypatch):
+        async def fake_get(trace_id):
+            return _record()
+        monkeypatch.setattr(history_store, "get_by_trace_id", fake_get)
+        resp = client.get(f"/api/history/{TRACE}/source")
+        assert resp.json()["truncated"] is False
+
+    def test_document_at_storage_cap_is_flagged_truncated(self, client, monkeypatch):
+        from api import routes as routes_module
+
+        async def fake_get(trace_id):
+            return _record(raw_text="x" * routes_module._RAW_TEXT_CAP)
+        monkeypatch.setattr(history_store, "get_by_trace_id", fake_get)
+        resp = client.get(f"/api/history/{TRACE}/source")
+        assert resp.json()["truncated"] is True

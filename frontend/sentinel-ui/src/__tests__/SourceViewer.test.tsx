@@ -76,6 +76,33 @@ describe('SourceViewer', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
 
+  it('shows a truncation notice when the stored text was cut', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          trace_id: TRACE,
+          filename: 'huge.pdf',
+          raw_text: RAW,
+          truncated: true,
+        }),
+      }),
+    )
+    render(<SourceViewer traceId={TRACE} apiBase="" />)
+    fireEvent.click(screen.getByRole('button', { name: /view source/i }))
+    await waitFor(() => expect(screen.getByText(/truncated/i)).toBeInTheDocument())
+  })
+
+  it('shows no truncation notice for a complete document', async () => {
+    vi.stubGlobal('fetch', mockFetchOk())
+    render(<SourceViewer traceId={TRACE} apiBase="" />)
+    fireEvent.click(screen.getByRole('button', { name: /view source/i }))
+    await waitFor(() => expect(screen.getByText(/PREAMBLE/)).toBeInTheDocument())
+    expect(screen.queryByText(/truncated/i)).not.toBeInTheDocument()
+  })
+
   it('shows a friendly error when the source is unavailable', async () => {
     vi.stubGlobal(
       'fetch',

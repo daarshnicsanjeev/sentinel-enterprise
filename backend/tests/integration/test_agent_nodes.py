@@ -346,6 +346,50 @@ class TestComplianceNode:
             assert c["citation_verified"] is False
             assert c["citation_offset"] == -1
 
+    async def test_low_routing_confidence_forces_escalate(self, monkeypatch):
+        """A verdict built on a shaky classification (confidence below threshold)
+        must go to a human, even when all clauses look PRESENT."""
+        self._mock_faiss(monkeypatch)
+        from agents import compliance_agent
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = MagicMock(
+            content=(
+                "- force majeure clause: PRESENT\n"
+                "- limitation of liability: PRESENT\n"
+                "- dispute resolution clause: PRESENT\n"
+                "VERDICT: COMPLIANT\nREASON: ok"
+            )
+        )
+        monkeypatch.setattr(compliance_agent, "_llm", mock_llm)
+
+        from agents.compliance_agent import compliance_node
+        result = await compliance_node(
+            make_state(doc_type="LEGAL_CONTRACT", routing_confidence=0.3)
+        )
+        assert result["final_decision"] == "ESCALATE"
+        assert any("confidence" in log.lower() and "escalat" in log.lower()
+                   for log in result["logs"])
+
+    async def test_high_routing_confidence_keeps_verdict(self, monkeypatch):
+        self._mock_faiss(monkeypatch)
+        from agents import compliance_agent
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = MagicMock(
+            content=(
+                "- force majeure clause: PRESENT\n"
+                "- limitation of liability: PRESENT\n"
+                "- dispute resolution clause: PRESENT\n"
+                "VERDICT: COMPLIANT\nREASON: ok"
+            )
+        )
+        monkeypatch.setattr(compliance_agent, "_llm", mock_llm)
+
+        from agents.compliance_agent import compliance_node
+        result = await compliance_node(
+            make_state(doc_type="LEGAL_CONTRACT", routing_confidence=0.9)
+        )
+        assert result["final_decision"] == "APPROVED"
+
     async def test_retry_label_appears_on_second_attempt(self, monkeypatch):
         self._mock_faiss(monkeypatch)
         from agents import compliance_agent

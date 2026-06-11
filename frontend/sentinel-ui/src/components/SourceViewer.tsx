@@ -11,6 +11,7 @@ interface SourcePayload {
   trace_id: string
   filename: string
   raw_text: string
+  truncated?: boolean
 }
 
 /** Build a whitespace-tolerant regex for an evidence quote, since PDF/OCR
@@ -176,6 +177,24 @@ export function SourceViewer({ traceId, apiBase, highlights = [] }: Props) {
               <p style={{ color: '#94a3b8', fontSize: '0.78rem', margin: '0 0 8px' }}>
                 Highlighted passages are the exact evidence cited by the compliance agent,
                 verified to appear in this document.
+              </p>
+            )}
+
+            {source?.truncated && (
+              <p
+                role="note"
+                style={{
+                  color: '#fbbf24',
+                  fontSize: '0.78rem',
+                  margin: '0 0 8px',
+                  border: '1px solid #92400e',
+                  borderRadius: '6px',
+                  padding: '6px 10px',
+                  background: 'rgba(146, 64, 14, 0.15)',
+                }}
+              >
+                This document was truncated for storage — text and citation highlights
+                beyond the stored portion are not shown.
               </p>
             )}
 

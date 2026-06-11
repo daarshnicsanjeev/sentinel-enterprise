@@ -6,6 +6,8 @@ const COLORS: Record<string, string> = {
   "RE-ROUTE":"#b45309",  // amber-700  — white contrast ~4.5:1
   PENDING:   "#1d4ed8",  // blue-700   — white contrast ~5.8:1
   BLOCKED:   "#6d28d9",  // violet-700 — white contrast ~5.1:1
+  ESCALATE:  "#b45309",  // amber-700  — matches report color intent, ~4.5:1
+  SCANNED:   "#0f766e",  // teal-700   — white contrast ~4.8:1
 };
 
 interface Props {

@@ -167,7 +167,18 @@ async def _fire_webhook(url: str, payload: dict) -> None:
         _log.error("webhook_unexpected_error", url=url, error=str(exc))
 
 
+# Stored source-text cap. Citation offsets are computed against the full text,
+# so this must comfortably exceed typical documents or View Source highlighting
+# silently loses citations past the cut.
+_RAW_TEXT_CAP = 200_000
+
+
 async def _save_to_history(trace_id: str, filename: str, final_state: dict, raw_text: str = "") -> None:
+    # Privacy: never persist the body of a document the guardrail refused to
+    # process — blocked content (PII, injection payloads) must not be
+    # retrievable later via /history/{trace_id}/source.
+    if final_state.get("final_decision") == "BLOCKED" or final_state.get("sanitized") is False:
+        raw_text = ""
     try:
         await history_store.insert({
             "trace_id": trace_id,
@@ -177,7 +188,7 @@ async def _save_to_history(trace_id: str, filename: str, final_state: dict, raw_
             "faithfulness": final_state.get("evaluation_score", 0.0),
             "risk": final_state.get("hallucination_risk", ""),
             "created_at": datetime.now(timezone.utc).isoformat(),
-            "raw_text": raw_text[:50_000] if raw_text else None,
+            "raw_text": raw_text[:_RAW_TEXT_CAP] if raw_text else None,
         })
     except Exception as exc:
         _log.error("history_save_error", trace_id=trace_id, error=str(exc))
@@ -1130,6 +1141,9 @@ async def get_document_source(request: Request, trace_id: str):
         "trace_id": record["trace_id"],
         "filename": record.get("filename", ""),
         "raw_text": record["raw_text"],
+        # At-cap length means the stored text was almost certainly cut, so
+        # citation highlights past this point would be missing.
+        "truncated": len(record["raw_text"]) >= _RAW_TEXT_CAP,
     }
 
 
@@ -1137,6 +1151,7 @@ _DECISION_COLORS = {
     "APPROVED": "#15803d", "REJECTED": "#b91c1c",
     "ESCALATE": "#d97706", "BLOCKED": "#7c3aed",
     "PENDING": "#2563eb", "UNKNOWN": "#475569",
+    "SCANNED": "#0f766e",
 }
 
 

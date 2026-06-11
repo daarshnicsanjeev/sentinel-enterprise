@@ -88,6 +88,18 @@ describe('StatusBadge', () => {
       const badge = screen.getByText('SOMETHING_ELSE')
       expect(badge.style.background).toBe('rgb(107, 114, 128)')
     })
+
+    it('ESCALATE badge has amber-700 background (#b45309, ~4.5:1) — not fallback grey', () => {
+      render(<StatusBadge decision="ESCALATE" />)
+      const badge = screen.getByText('ESCALATE')
+      expect(badge.style.background).toBe('rgb(180, 83, 9)')
+    })
+
+    it('SCANNED badge has teal-700 background (#0f766e, ~4.8:1)', () => {
+      render(<StatusBadge decision="SCANNED" />)
+      const badge = screen.getByText('SCANNED')
+      expect(badge.style.background).toBe('rgb(15, 118, 110)')
+    })
   })
 
   describe('structure', () => {
