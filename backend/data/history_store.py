@@ -117,6 +117,17 @@ CREATE TABLE IF NOT EXISTS recommendation_blacklist (
 )
 """
 
+_CREATE_VISITOR_FEEDBACK_TABLE = """
+CREATE TABLE IF NOT EXISTS visitor_feedback (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    name        TEXT,
+    email       TEXT,
+    message     TEXT NOT NULL,
+    rating      INTEGER,
+    created_at  TEXT NOT NULL
+)
+"""
+
 _CREATE_INDEXES = [
     "CREATE INDEX IF NOT EXISTS idx_analyses_trace_id  ON analyses  (trace_id)",
     "CREATE INDEX IF NOT EXISTS idx_analyses_created_at ON analyses (created_at DESC)",
@@ -134,6 +145,7 @@ async def init_db() -> None:
         await db.execute(_CREATE_FEEDBACK_TABLE)
         await db.execute(_CREATE_RECOMMENDATIONS_TABLE)
         await db.execute(_CREATE_BLACKLIST_TABLE)
+        await db.execute(_CREATE_VISITOR_FEEDBACK_TABLE)
         for idx_sql in _CREATE_INDEXES:
             await db.execute(idx_sql)
         # Additive migrations (no-op if column already exists)
@@ -228,6 +240,45 @@ async def delete_doc_cache(doc_hash: str) -> None:
         await db.execute(_CREATE_DOC_CACHE_TABLE)
         await db.execute("DELETE FROM doc_cache WHERE doc_hash = ?", (_versioned_key(doc_hash),))
         await db.commit()
+
+
+async def insert_visitor_feedback(record: dict) -> None:
+    """Persist demo-visitor feedback (name/email optional, message required)."""
+    async with _connect() as db:
+        await db.execute(_CREATE_VISITOR_FEEDBACK_TABLE)
+        await db.execute(
+            "INSERT INTO visitor_feedback (name, email, message, rating, created_at) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (
+                (record.get("name") or "")[:200],
+                (record.get("email") or "")[:320],
+                record["message"][:5000],
+                record.get("rating"),
+                datetime.now(timezone.utc).isoformat(),
+            ),
+        )
+        await db.commit()
+
+
+async def get_visitor_feedback(limit: int = 200) -> list[dict]:
+    """Return visitor feedback, newest first."""
+    try:
+        async with _connect() as db:
+            cursor = await db.execute(
+                "SELECT id, name, email, message, rating, created_at "
+                "FROM visitor_feedback ORDER BY created_at DESC LIMIT ?",
+                (limit,),
+            )
+            rows = await cursor.fetchall()
+            return [
+                {
+                    "id": r[0], "name": r[1], "email": r[2],
+                    "message": r[3], "rating": r[4], "created_at": r[5],
+                }
+                for r in rows
+            ]
+    except Exception:
+        return []
 
 
 def _safe_store_filename(filename: str) -> str:

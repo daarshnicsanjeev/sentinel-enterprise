@@ -19,7 +19,7 @@ import structlog
 import httpx
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, UploadFile, File, Form, HTTPException, Header
 from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
@@ -868,6 +868,81 @@ async def get_job_status(request: Request, job_id: str):
     if not job:
         raise HTTPException(status_code=404, detail="Job not found.")
     return job
+
+
+class DemoFeedbackRequest(BaseModel):
+    """Visitor feedback on the public demo (distinct from per-analysis feedback)."""
+    name: str = Field(default="", max_length=200)
+    email: str = Field(default="", max_length=320)
+    message: str = Field(min_length=10, max_length=5000)
+    rating: int | None = Field(default=None, ge=1, le=5)
+
+
+_FEEDBACK_EMAIL = os.environ.get("FEEDBACK_EMAIL", "daarshnicsanjeev@gmail.com")
+
+
+def _send_feedback_email(feedback: dict) -> None:
+    """Relay a feedback entry to the owner's inbox. Requires SMTP_HOST,
+    SMTP_USER, SMTP_PASSWORD env vars; silently skipped when unset."""
+    host = os.environ.get("SMTP_HOST", "")
+    if not host:
+        return
+    import smtplib
+    from email.message import EmailMessage
+
+    msg = EmailMessage()
+    sender = os.environ.get("SMTP_USER", "sentinel-demo@localhost")
+    visitor = feedback.get("name") or "Anonymous visitor"
+    msg["Subject"] = f"Sentinel demo feedback from {visitor}"
+    msg["From"] = sender
+    msg["To"] = _FEEDBACK_EMAIL
+    rating = feedback.get("rating")
+    msg.set_content(
+        f"Name:   {feedback.get('name') or '-'}\n"
+        f"Email:  {feedback.get('email') or '-'}\n"
+        f"Rating: {f'{rating}/5' if rating else '-'}\n\n"
+        f"{feedback.get('message', '')}\n"
+    )
+    port = int(os.environ.get("SMTP_PORT", "587"))
+    with smtplib.SMTP(host, port, timeout=15) as smtp:
+        smtp.starttls()
+        user = os.environ.get("SMTP_USER", "")
+        password = os.environ.get("SMTP_PASSWORD", "")
+        if user and password:
+            smtp.login(user, password)
+        smtp.send_message(msg)
+
+
+def _relay_feedback_email(feedback: dict) -> None:
+    """Best-effort wrapper: email failures are logged, never surfaced."""
+    try:
+        _send_feedback_email(feedback)
+    except Exception as exc:
+        _log.warning("feedback_email_failed", error=str(exc))
+
+
+@router.post("/demo-feedback")
+@limiter.limit("5/minute")
+async def submit_demo_feedback(
+    request: Request,
+    payload: DemoFeedbackRequest,
+    background_tasks: BackgroundTasks,
+):
+    record = payload.model_dump()
+    await history_store.insert_visitor_feedback(record)
+    background_tasks.add_task(_relay_feedback_email, record)
+    _log.info("demo_feedback_received", rating=record.get("rating"),
+              has_email=bool(record.get("email")))
+    return {"status": "received"}
+
+
+@router.get("/demo-feedback")
+@limiter.limit(_READ_RATE_LIMIT)
+async def list_demo_feedback(
+    request: Request,
+    current_user: dict = Depends(require_admin),
+):
+    return await history_store.get_visitor_feedback()
 
 
 @router.post("/feedback/{trace_id}", status_code=201)

@@ -9,6 +9,8 @@ import { ClauseDiffViewer } from "./components/ClauseDiffViewer";
 import { HelpPanel } from "./components/HelpPanel";
 import { FeedbackWidget } from "./components/FeedbackWidget";
 import { SourceViewer } from "./components/SourceViewer";
+import { DemoNotice } from "./components/DemoNotice";
+import { DemoFeedback } from "./components/DemoFeedback";
 import { MetricsPanel } from "./components/MetricsPanel";
 import { BatchUpload } from "./components/BatchUpload";
 import "./App.css";
@@ -296,6 +298,8 @@ export default function App() {
         </nav>
       </header>
 
+      <DemoNotice />
+
       <main className="app-main">
         {activeTab === "history" ? (
           <HistoryPanel onReanalyze={handleReanalyze} />
@@ -556,6 +560,7 @@ export default function App() {
             )}
           </>
         )}
+        <DemoFeedback apiBase={API_BASE} />
       </main>
     </div>
   );
