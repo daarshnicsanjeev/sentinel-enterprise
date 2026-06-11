@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import re
@@ -35,6 +36,14 @@ def _build_context(clause_names: list[str], index, budget: int = _CONTEXT_BUDGET
     a clause's only evidence and produce a false MISSING."""
     per_clause = [semantic_search(index, name, k=3) for name in clause_names]
     sep_len = len(_CONTEXT_SEPARATOR)
+
+    # Fast path: when everything fits, keep the exact legacy clause-major
+    # ordering — the compliance LLM's output is sensitive to chunk order, so
+    # we only reshuffle when the budget actually forces a choice.
+    all_chunks = list(dict.fromkeys(c for chunks in per_clause for c in chunks))
+    if sum(len(c) + sep_len for c in all_chunks) <= budget:
+        return _CONTEXT_SEPARATOR.join(all_chunks)
+
     seen: set[str] = set()
     parts: list[str] = []
     used = 0
@@ -220,7 +229,11 @@ async def compliance_node(state: AgentState) -> dict:
             "logs": [tool_log, "[Compliance] No clauses required — auto-APPROVED."],
         }
 
-    index = await build_index_async(state["raw_text"])
+    # Per-document index: without the hash, the OpenSearch backend reuses one
+    # shared 'sentinel-temp' index and every upload's chunks pollute retrieval
+    # for all later documents (observed as false MISSING verdicts in prod).
+    doc_hash = hashlib.sha256(state["raw_text"].encode("utf-8")).hexdigest()
+    index = await build_index_async(state["raw_text"], doc_hash=doc_hash)
     context = _build_context(clause_names, index, budget=_CONTEXT_BUDGET)
 
     few_shot_examples = _load_few_shot_examples(doc_type)

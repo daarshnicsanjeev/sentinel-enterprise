@@ -346,6 +346,34 @@ class TestComplianceNode:
             assert c["citation_verified"] is False
             assert c["citation_offset"] == -1
 
+    async def test_index_built_with_document_hash(self, monkeypatch):
+        """compliance_node must pass the document's hash to build_index_async.
+        Without it the OpenSearch backend dumps every upload into one shared
+        'sentinel-temp' index — cross-document chunks then pollute retrieval
+        (production incident: clause bodies crowded out by duplicate headings
+        from earlier uploads, causing false MISSING verdicts)."""
+        import hashlib
+        from unittest.mock import AsyncMock
+        from agents import compliance_agent
+
+        captured = {}
+
+        async def capture_build(text, doc_hash=None):
+            captured["doc_hash"] = doc_hash
+            return MagicMock()
+
+        monkeypatch.setattr(compliance_agent, "build_index_async", capture_build)
+        monkeypatch.setattr(compliance_agent, "semantic_search", lambda *a, **kw: ["chunk"])
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = MagicMock(content="VERDICT: COMPLIANT\nREASON: ok")
+        monkeypatch.setattr(compliance_agent, "_llm", mock_llm)
+
+        from agents.compliance_agent import compliance_node
+        state = make_state(doc_type="LEGAL_CONTRACT")
+        await compliance_node(state)
+        expected = hashlib.sha256(state["raw_text"].encode("utf-8")).hexdigest()
+        assert captured["doc_hash"] == expected
+
     async def test_low_routing_confidence_forces_escalate(self, monkeypatch):
         """A verdict built on a shaky classification (confidence below threshold)
         must go to a human, even when all clauses look PRESENT."""
